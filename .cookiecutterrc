@@ -1,0 +1,61 @@
+# This file exists so you can easily regenerate your project.
+#
+# `cookiepatcher` is a convenient shim around `cookiecutter`
+# for regenerating projects (it will generate a .cookiecutterrc
+# automatically for any template). To use it:
+#
+#    pip install cookiepatcher
+#    cookiepatcher gh:ionelmc/cookiecutter-pylibrary lib-samsara
+#
+# See:
+#    https://pypi.org/project/cookiepatcher
+#
+# Alternatively, you can run:
+#
+#    cookiecutter --overwrite-if-exists --config-file=lib-samsara/.cookiecutterrc gh:ionelmc/cookiecutter-pylibrary
+
+default_context:
+    allow_tests_inside_package: "no"
+    c_extension_function: "longest"
+    c_extension_module: "_samsara"
+    c_extension_optional: "no"
+    c_extension_support: "no"
+    codacy: "no"
+    codacy_projectid: "[Get ID from https://app.codacy.com/gh/Data-Observatory/lib-samsara/settings]"
+    codeclimate: "no"
+    codecov: "yes"
+    command_line_interface: "argparse"
+    command_line_interface_bin_name: "samsara"
+    coveralls: "no"
+    distribution_name: "samsara"
+    email: "devops-team@dataobservatory.net"
+    formatter_quote_style: "single"
+    full_name: "Data Observatory"
+    github_actions: "yes"
+    github_actions_osx: "yes"
+    github_actions_windows: "yes"
+    license: "GNU Lesser General Public License v3 (LGPLv3)"
+    package_name: "samsara"
+    pre_commit: "yes"
+    project_name: "SAMSARA"
+    project_short_description: "Package for the Satellite Alert and Monitoring System for Areas of Environmental Relevance (SAMSARA)."
+    pypi_badge: "yes"
+    pypi_disable_upload: "yes"
+    release_date: "2023-11-05"
+    repo_hosting: "github.com"
+    repo_hosting_domain: "github.com"
+    repo_main_branch: "main"
+    repo_name: "lib-samsara"
+    repo_username: "Data-Observatory"
+    scrutinizer: "no"
+    setup_py_uses_setuptools_scm: "yes"
+    sphinx_docs: "yes"
+    sphinx_docs_hosting: "https://lib-samsara.readthedocs.io/"
+    sphinx_doctest: "no"
+    sphinx_theme: "pydata-sphinx-theme"
+    test_matrix_separate_coverage: "yes"
+    version: "0.0.0"
+    version_manager: "bump2version"
+    website: "https://dataobservatory.net/"
+    year_from: "2023"
+    year_to: "2024"
