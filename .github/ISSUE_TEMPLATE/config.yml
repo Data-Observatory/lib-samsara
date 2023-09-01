@@ -1,0 +1,25 @@
+blank_issues_enabled: false
+
+default: bug_report.md
+
+# Define the available templates and their labels.
+templates:
+  - name: Bug Report
+    about: Create a report to help us improve
+    filename: bug_report.md
+    labels: [bug]
+    
+  - name: Feature Request
+    about: Suggest an idea for this project
+    filename: feature_request.md
+    labels: [enhancement]
+    
+  - name: Documentation Update
+    about: Help us improve project documentation
+    filename: documentation_update.md
+    labels: [documentation]
+
+  - name: Security Vulnerability Report
+    about: Report a security vulnerability
+    filename: security_vulnerability_report.md
+    labels: [security]
