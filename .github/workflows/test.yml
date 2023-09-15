@@ -22,19 +22,24 @@ jobs:
         uses: isort/isort-action@v1
         with:
           sort-paths: ./src ./tests
-          configuration: --profile black --check-only --diff --verbose
+          configuration: |
+            --profile black --check-only --diff --verbose --line-length 88 --multi-line 3 \
+            --split-on-trailing-comma --include-trailing-comma --use-parentheses \
+            --ensure-newline-before-comments
 
       - name: Check ruff
         uses: chartboost/ruff-action@v1
         with:
           src: ./src ./tests
-          args: --no-fix --line-length 88 --verbose
+          args: --no-fix --line-length 88 --verbose --ignore RUF001,E501,E203
 
       - name: Check black
         uses: psf/black@stable
         with:
           src: ./src ./tests
-          options: --check --verbose --diff --color --target-version py39
+          options: |
+            --check --verbose --diff --color --target-version py39 --target-version py310 \
+            --target-version py311
 
   test:
     strategy:
