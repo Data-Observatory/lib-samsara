@@ -2,9 +2,6 @@ name: build
 on: [push, pull_request]
 jobs:
   test:
-    name: {{ '${{ matrix.name }}' }}
-    runs-on: {{ '${{ matrix.os }}' }}
-    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -43,22 +40,27 @@ jobs:
             os: '{{ os }}-latest'
 {% endfor %}
 {% endfor %}
+    name: {{ '${{ matrix.name }}' }}
+    runs-on: {{ '${{ matrix.os }}' }}
+    timeout-minutes: 30
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - uses: actions/setup-python@v4
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
         python-version: {{ '${{ matrix.python }}' }}
         architecture: {{ '${{ matrix.python_arch }}' }}
-    - name: install dependencies
+    - name: Install dependencies
       run: |
         python -mpip install --progress-bar=off -r ci/requirements.txt
         virtualenv --version
         pip --version
         tox --version
         pip list --format=freeze
-    - name: test
+    - name: Test
       env:
         TOXPYTHON: '{{ '${{ matrix.toxpython }}' }}'
       run: >
