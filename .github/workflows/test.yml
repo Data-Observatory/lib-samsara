@@ -1,10 +1,42 @@
-name: build
+name: Tests
+
 on: [push, pull_request]
+
 jobs:
-  test:
-    name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
+  check:
+    name: check
+    runs-on: ubuntu-latest
     timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Check isort
+        uses: isort/isort-action@v1
+        with:
+          sort-paths: ./src ./tests
+          configuration: --profile black --check-only --diff
+
+      - name: Check ruff
+        uses: chartboost/ruff-action@v1
+        with:
+          src: ./src ./tests
+          args: --no-fix --line-length 88
+
+      - name: Check black
+        uses: psf/black@stable
+        with:
+          src: ./src ./tests
+          options: --check --verbose --diff --line-length 88
+
+  test:
     strategy:
       fail-fast: false
       matrix:
@@ -163,22 +195,27 @@ jobs:
             python_arch: "x64"
             tox_env: "pypy39-nocov"
             os: "macos-latest"
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
           architecture: ${{ matrix.python_arch }}
-      - name: install dependencies
+      - name: Install dependencies
         run: |
           python -mpip install --progress-bar=off -r ci/requirements.txt
           virtualenv --version
           pip --version
           tox --version
           pip list --format=freeze
-      - name: test
+      - name: Test
         env:
           TOXPYTHON: "${{ matrix.toxpython }}"
         run: >
