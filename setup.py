@@ -7,7 +7,9 @@ from setuptools import setup
 
 
 def read(*names, **kwargs):
-    with Path(__file__).parent.joinpath(*names).open(encoding=kwargs.get('encoding', 'utf8')) as fh:
+    with Path(__file__).parent.joinpath(*names).open(
+        encoding=kwargs.get('encoding', 'utf8')
+    ) as fh:
         return fh.read()
 
 
@@ -21,7 +23,9 @@ setup(
     license='LGPL-3.0-only',
     description='Package for the Satellite Alert and Monitoring System for Areas of Environmental Relevance (SAMSARA).',
     long_description='{}\n{}'.format(
-        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub('', read('README.rst')),
+        re.compile('^.. start-badges.*^.. end-badges', re.M | re.S).sub(
+            '', read('README.rst')
+        ),
         re.sub(':[a-z]+:`~?(.*?)`', r'``\1``', read('CHANGELOG.rst')),
     ),
     author='Data Observatory',
@@ -36,7 +40,8 @@ setup(
         # complete classifier list: http://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)' 'Operating System :: Unix',
+        'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)'
+        'Operating System :: Unix',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
         'Programming Language :: Python',
@@ -64,12 +69,19 @@ setup(
     ],
     python_requires='>=3.9',
     install_requires=[
-        # eg: "aspectlib==1.1.1", "six>=1.7",
+        'dask==2023.9.1',
+        'rioxarray==0.15.0',
+        'scikit-image==0.21.0',
+        'xarray==2023.8.0',
     ],
     extras_require={
-        # eg:
-        #   "rst": ["docutils>=0.11"],
-        #   ":python_version=="2.6"": ["argparse"],
+        'dev': [
+            'black>=23.9.1',
+            'pytest>=7.4',
+            'pytest-cov>=4.1.0',
+            'pre-commit>=3.4.0',
+            'ruff>=0.0.289',
+        ]
     },
     setup_requires=[
         'setuptools_scm>=3.3.1',
