@@ -12,7 +12,7 @@ ignore = [
   "S308",   # flake8-bandit suspicious-mark-safe-usage
   "E501",   # pycodestyle line-too-long
 ]
-line-length = 140
+line-length = 88
 select = [
   "B",   # flake8-bugbear
   "C4",  # flake8-comprehensions
@@ -46,7 +46,7 @@ forced-separate = ["conftest"]
 force-single-line = true
 
 [tool.black]
-line-length = 140
+line-length = 88
 target-version = ["py39"]
 skip-string-normalization = true
 
