@@ -1,7 +1,5 @@
 import traceback
 
-import pydata_sphinx_theme
-
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
@@ -34,7 +32,6 @@ extlinks = {
     'pr': ('https://github.com/Data-Observatory/lib-samsara/pull/%s', 'PR #'),
 }
 html_theme = 'pydata_sphinx_theme'
-html_theme_path = [pydata_sphinx_theme.get_html_theme_path()]
 html_theme_options = {
     'githuburl': 'https://github.com/Data-Observatory/lib-samsara/',
 }
