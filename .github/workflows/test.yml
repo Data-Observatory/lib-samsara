@@ -16,25 +16,25 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.9"
 
       - name: Check isort
         uses: isort/isort-action@v1
         with:
           sort-paths: ./src ./tests
-          configuration: --profile black --check-only --diff
+          configuration: --profile black --check-only --diff --verbose
 
       - name: Check ruff
         uses: chartboost/ruff-action@v1
         with:
           src: ./src ./tests
-          args: --no-fix --line-length 88
+          args: --no-fix --line-length 88 --verbose
 
       - name: Check black
         uses: psf/black@stable
         with:
           src: ./src ./tests
-          options: --check --verbose --diff --line-length 88
+          options: --check --verbose --diff --color --target-version py39
 
   test:
     strategy:
