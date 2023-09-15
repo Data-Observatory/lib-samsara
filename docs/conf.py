@@ -33,7 +33,7 @@ extlinks = {
 }
 html_theme = 'pydata_sphinx_theme'
 html_theme_options = {
-    'githuburl': 'https://github.com/Data-Observatory/lib-samsara/',
+    'github_url': 'https://github.com/Data-Observatory/lib-samsara/',
 }
 
 html_use_smartypants = True
