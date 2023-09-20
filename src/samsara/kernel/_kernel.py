@@ -19,6 +19,8 @@ class Kernel:
     data: np.ndarray = field(default_factory=_default_data)
     name: str = field(default="square")
     normalized: bool = field(default=False)
+    # Override numpy array behavior to avoid entering ufunc
+    __array_ufunc__ = None
 
     def __post_init__(self) -> None:
         if self.normalized:
