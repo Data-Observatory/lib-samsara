@@ -24,7 +24,7 @@ jobs:
           sort-paths: ./src ./tests
           configuration: |
             --profile black --check-only --diff --verbose --line-length 88 --multi-line 3 \
-            --split-on-trailing-comma --include-trailing-comma --use-parentheses \
+            --split-on-trailing-comma --tc --use-parentheses \
             --ensure-newline-before-comments
 
       - name: Check ruff
