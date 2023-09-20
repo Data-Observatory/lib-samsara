@@ -7,6 +7,7 @@ __all__ = [
     "circle",
     "cross",
     "custom",
+    "ex",
     "octagon",
     "rectangle",
     "rhombus",
