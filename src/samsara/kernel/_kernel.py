@@ -16,9 +16,30 @@ def _default_data() -> np.ndarray:
 
 @dataclass(init=True, repr=False)
 class Kernel:
+    """Kernel for neighborhood based image computation.
+
+    A Kernel is an object to specify the neighborhood of a pixel. The kernel defines the size and
+    shape of the neighborhood, and also defines the weight of each element in the neighborhood.
+
+    Parameters
+    ----------
+    data: np.ndarray, optional
+        Kernel data array.
+    name: str, optional
+        Name of the type of kernel.
+    normalized: bool, optional
+        Flag to indicate if the euclidean norm of the data array is equal to 1, by default False.
+    """
+
     data: np.ndarray = field(default_factory=_default_data)
+    """Kernel data array (np.ndarray).
+    """
     name: str = field(default="square")
+    """Name of the type of kernel (str).
+    """
     normalized: bool = field(default=False)
+    """Flag to indicate if the euclidean norm of the data array is equal to 1 (bool).
+    """
     # Override numpy array behavior to avoid entering ufunc
     __array_ufunc__ = None
 
@@ -30,9 +51,28 @@ class Kernel:
 
     @property
     def shape(self) -> tuple:
+        """Shape of the kernel data array (tuple, read-only)."""
         return self.data.shape
 
     def add(self, kernel: Kernel, normalize: bool = False) -> Kernel:
+        """Add two kernels elementwise.
+
+        Elementwise sum of data from two kernels. The shape of the data of both kernels must be
+        broadcastable.
+        Currently the sum of kernels with different shapes is not supported.
+
+        Parameters
+        ----------
+        kernel : Kernel
+            The kernel to be added.
+        normalize : bool, optional
+            Normalize the sum of both kernels, by default False
+
+        Returns
+        -------
+        Kernel
+            The sum of both kernels elementwise.
+        """
         add_kernels = self + kernel
 
         # Normalize data if normalized flag is set
@@ -44,6 +84,22 @@ class Kernel:
         return add_kernels
 
     def rotate(self, rotation: int) -> Kernel:
+        """Rotates the data array of a kernel.
+
+        Parameters
+        ----------
+        rotation : int
+            Number of degrees of the rotation to make.
+
+        Returns
+        -------
+        Kernel
+            The rotation of the kernel.
+
+        Notes
+        -----
+        Method not yet implemented.
+        """
         raise NotImplementedError
 
     def __repr__(self):
@@ -51,6 +107,7 @@ class Kernel:
         return f"{shape} {self.name} kernel."
 
     def __binary_operation(self, other: Any, operation: callable) -> np.ndarray:
+        # Operation of different data types with Kernel
         if isinstance(other, Kernel):
             new_data = operation(self.data, other.data)
         elif isinstance(other, (int, float, complex, np.ndarray)):
