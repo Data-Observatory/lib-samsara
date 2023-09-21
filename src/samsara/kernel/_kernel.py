@@ -83,24 +83,28 @@ class Kernel:
 
         return add_kernels
 
-    def rotate(self, rotation: int) -> Kernel:
+    def rotate90(self, rotation: int) -> Kernel:
         """Rotates the data array of a kernel.
+
+        Creates a new kernel with rotated data. The rotations are 90 degree rotations.
 
         Parameters
         ----------
         rotation : int
-            Number of degrees of the rotation to make.
+            Number of 90 degrees clockwise rotation to make.
 
         Returns
         -------
         Kernel
-            The rotation of the kernel.
+            A new kernel with rotated data.
 
         Notes
         -----
         Method not yet implemented.
         """
-        raise NotImplementedError
+        # copied to generate new data
+        new_data = np.rot90(self.data, -rotation).copy()
+        return self.__class__(new_data, self.name, self.normalized)
 
     def __repr__(self):
         shape = str(self.data.shape).replace(", ", "x")[1:-1]
