@@ -75,6 +75,24 @@ class TestKernel:
         assert res.normalized == expected.normalized
         assert res.name == expected.name
 
+    @pytest.mark.parametrize(
+        ("rotation", "expected"),
+        [
+            (1, Kernel(np.array([[6, 3, 0], [7, 4, 1], [8, 5, 2]]), "custom", False)),
+            (3, Kernel(np.array([[2, 5, 8], [1, 4, 7], [0, 3, 6]]), "custom", False)),
+            (2, Kernel(np.array([[8, 7, 6], [5, 4, 3], [2, 1, 0]]), "custom", False)),
+            (4, Kernel(np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]), "custom", False)),
+            (-1, Kernel(np.array([[2, 5, 8], [1, 4, 7], [0, 3, 6]]), "custom", False)),
+        ],
+    )
+    def test_rotate90(self, rotation, expected):
+        kernel_data = np.arange(9).reshape((3, 3))
+        kernel_1 = Kernel(kernel_data, "custom", False)
+        kernel_2 = kernel_1.rotate90(rotation)
+        assert kernel_2.data == pytest.approx(expected.data)
+        assert kernel_2.normalized == pytest.approx(expected.normalized)
+        assert kernel_2.name == pytest.approx(expected.name)
+
     # Test operators
     @pytest.mark.parametrize(
         ("kernel_1", "other", "expected"),
