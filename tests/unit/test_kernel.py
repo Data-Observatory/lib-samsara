@@ -294,7 +294,7 @@ class TestKernel:
             (
                 Kernel(np.full((5, 5), 1.4), "square", False),
                 Kernel(np.full((5, 5), 0.6), "square", False),
-                Kernel(np.full((5, 5), 0.2), "custom", False),
+                Kernel(np.full((5, 5), 0.2), "custom", True),
             ),
         ],
     )
@@ -590,7 +590,7 @@ class TestKernel:
             (
                 Kernel(np.full((5, 5), 0.6), "square", False),
                 Kernel(np.full((5, 5), 1.4), "square", False),
-                Kernel(np.full((5, 5), 0.2), "custom", False),
+                Kernel(np.full((5, 5), 0.2), "custom", True),
             ),
         ],
     )
@@ -880,7 +880,7 @@ class TestKernel:
             (
                 Kernel(np.full((5, 5), 1.4), "square", False),
                 Kernel(np.full((5, 5), 0.6), "square", False),
-                Kernel(np.full((5, 5), 0.2), "custom", False),
+                Kernel(np.full((5, 5), 0.2), "custom", True),
             ),
         ],
     )
