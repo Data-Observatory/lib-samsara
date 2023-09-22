@@ -140,154 +140,194 @@ class Kernel:
     # Binary operators
     def __add__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x + y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __sub__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x - y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __mul__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x * y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __floordiv__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x // y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __truediv__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x / y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __mod__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x % y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __pow__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x**y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __and__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x & y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __xor__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x ^ y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __or__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x | y)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     # Right side operators
     def __radd__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y + x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rsub__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y - x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rmul__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y * x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rfloordiv__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y // x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rtruediv__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y / x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rmod__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y % x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rpow__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y**x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rand__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y & x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __rxor__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y ^ x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     def __ror__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: y | x)
-        return self.__class__(data=new_data, name="custom", normalized=False)
+        return self.__class__(
+            data=new_data, name="custom", normalized=is_normalized(new_data)
+        )
 
     # In place operators
     def __iadd__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x + y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __isub__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x - y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __imul__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x * y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __idiv__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x / y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __ifloordiv__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x // y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __imod__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x % y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __ipow__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x**y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __iand__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x & y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __ixor__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x ^ y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     def __ior__(self, other: Any) -> Kernel:
         new_data = self.__binary_operation(other, lambda x, y: x | y)
         self.data = new_data
         self.name = "custom"
-        self.normalized = False
+        self.normalized = is_normalized(new_data)
         return self
 
     # Unary operators
@@ -305,8 +345,9 @@ class Kernel:
 
     def __invert__(self) -> Kernel:
         new_data = np.invert(self.data)
-        normalized = is_normalized(new_data)
-        return self.__class__(data=new_data, name=self.name, normalized=normalized)
+        return self.__class__(
+            data=new_data, name=self.name, normalized=is_normalized(new_data)
+        )
 
     # Comparison operators
     def __lt__(self, other: Any) -> np.ndarray:
