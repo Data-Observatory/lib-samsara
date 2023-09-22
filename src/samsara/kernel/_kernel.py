@@ -72,6 +72,17 @@ class Kernel:
         -------
         Kernel
             The sum of both kernels elementwise.
+
+        Examples
+        --------
+        >>> from samsara.kernel import Kernel
+        >>> import numpy as np
+        >>> x = Kernel(np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]), "custom", False)
+        >>> y = Kernel(np.ones((3, 3)), "square", False)
+        >>> x.add(y).data
+        array([[1., 2., 3.],
+               [4., 5., 6.],
+               [7., 8., 9.]])
         """
         add_kernels = self + kernel
 
@@ -98,9 +109,15 @@ class Kernel:
         Kernel
             A new kernel with rotated data.
 
-        Notes
-        -----
-        Method not yet implemented.
+        Examples
+        --------
+        >>> from samsara.kernel import Kernel
+        >>> import numpy as np
+        >>> x = Kernel(np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]), "custom", False)
+        >>> x.rotate90(1).data
+        array([[6, 3, 0],
+               [7, 4, 1],
+               [8, 5, 2]])
         """
         # copied to generate new data
         new_data = np.rot90(self.data, -rotation).copy()
