@@ -70,7 +70,9 @@ setup(
     install_requires=[
         "dask==2023.9.1",
         "rioxarray==0.15.0",
+        "ruptures==1.1.7",
         "scikit-image==0.21.0",
+        "scikit-learn==1.2.1",
         "xarray==2023.8.0",
     ],
     extras_require={
