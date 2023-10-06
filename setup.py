@@ -69,6 +69,7 @@ setup(
     python_requires=">=3.9",
     install_requires=[
         "dask==2023.9.1",
+        "numba==0.58.0",
         "rioxarray==0.15.0",
         "ruptures==1.1.7",
         "scikit-image==0.21.0",
