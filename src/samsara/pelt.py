@@ -44,6 +44,20 @@ def pelt(
     return magnitude_cube, dates_cube
 
 
+def datetime_to_year_fraction(dates):
+    year = dates.astype("datetime64[Y]")
+    next_year = year + np.timedelta64(1, "Y")
+    year_start = year + np.timedelta64(0, "D")
+    next_year_start = next_year + np.timedelta64(0, "D")
+    # Get year length
+    year_length = (next_year_start - year_start) / np.timedelta64(1, "D")
+    # Get number of day since the start of the year
+    days_elapsed = (dates.astype("datetime64[D]") - year_start) / np.timedelta64(1, "D")
+
+    year_fraction = year.astype(float) + 1970 + days_elapsed / year_length
+    return year_fraction
+
+
 def block_pelt(
     array: np.ndarray,
     dates: np.ndarray,
