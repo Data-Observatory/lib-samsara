@@ -148,11 +148,19 @@ def segment_mean(array, break_idx, seg_mean):
 
 
 @guvectorize(
-    [(float32[:], float32[:], float32[:]), (float64[:], float64[:], float64[:])],
-    "(),()->()",
+    [
+        (float32[:], float32[:], float32[:]),
+        (float64[:], float64[:], float64[:]),
+    ],
+    "(times),(break)->(break)",
+    nopython=True,
 )
-def segment_dates(dates: np.ndarray, break_idx: np.ndarray):
-    return
+def segment_dates(dates, break_idx, seg_date):
+    for i in range(break_idx.shape[0]):
+        if np.isnan(break_idx[i]):
+            return
+        idx = int(break_idx[i])
+        seg_date[i] = dates[idx]
 
 
 # For 1 pixel
