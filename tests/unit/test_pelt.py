@@ -63,3 +63,105 @@ class TestPelt:
 
         assert segment_mean_mag.shape == expected.shape
         np.testing.assert_array_equal(segment_mean_mag, expected)
+
+    def test_numba_segment_dates(self):
+        array_t = np.array(
+            [
+                [
+                    [
+                        2005.32,
+                        2005.54,
+                        2006.13,
+                        2006.42,
+                        2007.87,
+                        2007.95,
+                        2008.53,
+                        2008.69,
+                    ],
+                    [
+                        2005.62,
+                        2005.75,
+                        2006.09,
+                        2006.17,
+                        2007.35,
+                        2007.62,
+                        2008.57,
+                        2008.81,
+                    ],
+                    [
+                        2005.35,
+                        2005.56,
+                        2006.38,
+                        2006.39,
+                        2007.78,
+                        2007.97,
+                        2008.37,
+                        2008.93,
+                    ],
+                ],
+                [
+                    [
+                        2005.34,
+                        2005.86,
+                        2006.58,
+                        2006.98,
+                        2007.28,
+                        2007.82,
+                        2008.11,
+                        2008.77,
+                    ],
+                    [
+                        2005.58,
+                        2005.75,
+                        2006.22,
+                        2006.77,
+                        2007.36,
+                        2007.56,
+                        2008.13,
+                        2008.84,
+                    ],
+                    [
+                        2005.58,
+                        2005.79,
+                        2006.27,
+                        2006.47,
+                        2007.32,
+                        2007.82,
+                        2008.25,
+                        2008.81,
+                    ],
+                ],
+            ],
+            dtype=np.float32,
+        )
+
+        breaks_t = np.array(
+            [
+                [[np.nan, np.nan, np.nan], [1.0, np.nan, np.nan], [1.0, 3.0, np.nan]],
+                [[1.0, 2.0, 3.0], [1.0, 2.0, 5.0], [1.0, 3.0, 7.0]],
+            ],
+            dtype=np.float32,
+        )
+
+        segment_dates = np.full_like(breaks_t, np.nan)
+
+        pelt.segment_dates(array_t, breaks_t, segment_dates)
+
+        expected = np.array(
+            [
+                [
+                    [np.nan, np.nan, np.nan],
+                    [2005.75, np.nan, np.nan],
+                    [2005.56, 2006.39, np.nan],
+                ],
+                [
+                    [2005.86, 2006.58, 2006.98],
+                    [2005.75, 2006.22, 2007.56],
+                    [2005.79, 2006.47, 2008.81],
+                ],
+            ],
+            dtype=np.float32,
+        )
+
+        assert segment_dates.shape == expected.shape
+        np.testing.assert_array_equal(segment_dates, expected)
