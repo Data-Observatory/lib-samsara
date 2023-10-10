@@ -105,11 +105,46 @@ def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
 
 
 @guvectorize(
-    [(float32[:], float32[:], float32[:]), (float64[:], float64[:], float64[:])],
-    "(),()->()",
+    [
+        (float32[:], float32[:], float32[:]),
+        (float64[:], float64[:], float64[:]),
+    ],
+    "(times),(break)->(break)",
+    nopython=True,
 )
-def segment_mean(array: np.ndarray, break_idx: np.ndarray):
-    return
+def segment_mean(array, break_idx, segment_mean_mag):
+    if np.isnan(break_idx[0]):
+        return
+
+    segment_mean_ = np.zeros(break_idx.shape[0] + 1)
+
+    # First segment value
+    idx_f = int(break_idx[0])
+    segment_mean_[0] = array[:idx_f].mean()
+
+    for i in range(break_idx.shape[0] - 1):
+        idx_s = int(break_idx[i])  # Segment starting index
+
+        if np.isnan(break_idx[i + 1]):
+            segment_mean_[i + 1] = array[idx_s:].mean()
+            segment_mean_mag[i] = segment_mean_[i + 1] - segment_mean_[i]
+            break
+
+        idx_f = int(break_idx[i + 1])  # Segment final index
+        segment_mean_[i + 1] = array[idx_s:idx_f].mean()
+
+        segment_mean_mag[i] = segment_mean_[i + 1] - segment_mean_[i]  # Segment mag
+
+    if np.isnan(break_idx[-1]):
+        return
+
+    # The function will reach this statement only if the break_idx array does not have a nan as its
+    # last value
+
+    idx_s = int(break_idx[-1])  # Last segment value
+    segment_mean_[-1] = array[idx_s:].mean()
+
+    segment_mean_mag[-1] = segment_mean_[-1] - segment_mean_[-2]  # Last segment mag
 
 
 @guvectorize(
