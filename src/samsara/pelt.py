@@ -16,9 +16,9 @@ def pelt(
     penalty: float = 30,
     start_date: Union[str, None] = None,
     **kwargs,
-) -> tuple(da.Array, da.Array):
+) -> tuple[da.Array, da.Array]:
     data = array.data
-    dates = array.time.values
+    dates = array.time.values  # 1d
     chunks = ((n_breaks, n_breaks), data.chunks[1], data.chunks[2])
     # Each chunk, that contains the whole time series, will generate 2 chunks, where the first is
     # the mean magnitude and the second is the dates. There is no problem with iterated magnitude
