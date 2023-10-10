@@ -62,7 +62,7 @@ def block_pelt(
 
     segment_mean_mag, segment_dates = block_segment_metrics(array, dates, break_idx)
 
-    return np.vstack(segment_mean_mag, segment_dates)
+    return np.vstack([segment_mean_mag, segment_dates])
 
 
 def filter_index_by_date(dates: np.ndarray, start_date: str):
