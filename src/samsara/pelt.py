@@ -115,7 +115,25 @@ def block_breakpoints_index(
 
 
 def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.ndarray):
-    return
+    # dates are year fraction
+    array_t = np.transpose(array, axes=(1, 2, 0))  # (time,y,x) -> (y,x,time)
+    break_idx_t = np.transpose(break_idx, axes=(1, 2, 0))  # (break,y,x) -> (y,x,break)
+
+    # If break_idx_t is of integer type, it will fail when trying to execute a numba function.
+    # Cast to float.
+    if break_idx_t.dtype.char in np.typecodes["AllInteger"]:
+        break_idx_t = break_idx_t.astype(array_t.dtype)
+
+    seg_mean = np.full_like(break_idx_t, np.nan)
+    seg_date = np.full_like(break_idx_t, np.nan)
+
+    segment_mean(array_t, break_idx_t, seg_mean)
+    segment_dates(dates, break_idx_t, seg_date)
+
+    seg_mean = np.transpose(seg_mean, axes=(2, 0, 1))
+    seg_date = np.transpose(seg_date, axes=(2, 0, 1))
+
+    return seg_mean, seg_date
 
 
 @guvectorize(
