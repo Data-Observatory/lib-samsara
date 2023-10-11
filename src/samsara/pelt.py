@@ -54,7 +54,7 @@ def datetime_to_year_fraction(dates):
     # Get number of day since the start of the year
     days_elapsed = (dates.astype("datetime64[D]") - year_start) / np.timedelta64(1, "D")
 
-    year_fraction = year.astype(float) + 1970 + days_elapsed / year_length
+    year_fraction = (year.astype(float) + 1970) + (days_elapsed / year_length)
     return year_fraction
 
 
