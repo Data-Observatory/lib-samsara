@@ -24,6 +24,57 @@ class TestPelt:
         assert len(dates_frac) == bp
         assert (mean_mag > 0.0).all()
 
+    @pytest.mark.parametrize(
+        ("dates", "expected"),
+        [
+            (
+                np.array(
+                    ["2007-07-13", "2006-01-13", "2010-08-13"], dtype="datetime64"
+                ),
+                np.array([2007.528767, 2006.032877, 2010.613699]),
+            ),
+            (
+                np.array(
+                    ["2020-01-01", "2020-12-31", "2021-01-01", "2021-12-31"],
+                    dtype="datetime64",
+                ),
+                np.array([2020.0, 2020.997267, 2021.0, 2021.997260]),
+            ),
+            (
+                np.array(
+                    [
+                        "2000-05-12",
+                        "2004-05-12",
+                        "2008-05-12",
+                        "2012-05-12",
+                        "2016-05-12",
+                        "2020-02-12",
+                        "2020-05-12",
+                        "2021-02-12",
+                        "2021-05-12",
+                    ],
+                    dtype="datetime64",
+                ),
+                np.array(
+                    [
+                        2000.360656,
+                        2004.360656,
+                        2008.360656,
+                        2012.360656,
+                        2016.360656,
+                        2020.114754,
+                        2020.360656,
+                        2021.115068,
+                        2021.358904,
+                    ]
+                ),
+            ),
+        ],
+    )
+    def test_datetime_to_year_fraction(self, dates, expected):
+        res = pelt.datetime_to_year_fraction(dates)
+        assert res == pytest.approx(expected)
+
     def test_numba_segment_mean(self):
         array_t = np.array(
             [
