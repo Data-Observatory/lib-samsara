@@ -216,3 +216,46 @@ class TestPelt:
 
         assert segment_dates.shape == expected.shape
         np.testing.assert_array_equal(segment_dates, expected)
+
+    def test_block_segment_metrics(self):
+        array = np.arange(48, dtype=np.float32).reshape((8, 2, 3))
+        dates = np.array(
+            [2005.58, 2005.79, 2006.27, 2006.47, 2007.32, 2007.82, 2008.25, 2008.81],
+            dtype=np.float32,
+        )
+        break_idx = np.array(
+            [
+                [[np.nan, 1.0, 1.0], [1.0, 1.0, 1.0]],
+                [[np.nan, np.nan, 3.0], [2.0, 2.0, 3.0]],
+                [[np.nan, np.nan, np.nan], [3.0, 5.0, 7.0]],
+            ]
+        )
+
+        assert array.shape == (8, 2, 3)
+        assert dates.shape == (8,)
+        assert break_idx.shape == (3, 2, 3)
+
+        seg_mean, seg_date = pelt.block_segment_metrics(array, dates, break_idx)
+
+        assert seg_mean.shape == (3, 2, 3)
+        assert seg_date.shape == (3, 2, 3)
+
+        expected_mean = np.array(
+            [
+                [[np.nan, 24.0, 9.0], [6.0, 6.0, 9.0]],
+                [[np.nan, np.nan, 21.0], [6.0, 12.0, 18.0]],
+                [[np.nan, np.nan, np.nan], [18.0, 18.0, 15.0]],
+            ]
+        )
+
+        np.testing.assert_allclose(seg_mean, expected_mean, rtol=1e-02)
+
+        expected_date = np.array(
+            [
+                [[np.nan, 2005.79, 2005.79], [2005.79, 2005.79, 2005.79]],
+                [[np.nan, np.nan, 2006.47], [2006.27, 2006.27, 2006.47]],
+                [[np.nan, np.nan, np.nan], [2006.47, 2007.82, 2008.81]],
+            ]
+        )
+
+        np.testing.assert_allclose(seg_date, expected_date, rtol=1e-02)
