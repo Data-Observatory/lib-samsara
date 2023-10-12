@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 import pytest
+from ruptures import pw_constant
 
 import samsara.pelt as pelt
 
@@ -259,3 +260,108 @@ class TestPelt:
         )
 
         np.testing.assert_allclose(seg_date, expected_date, rtol=1e-02)
+
+    @pytest.mark.parametrize(
+        ("valid_index", "n_breaks", "expected"),
+        [
+            (
+                None,
+                3,
+                np.array(
+                    [
+                        [
+                            [12, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [6, 13, np.nan],
+                            [5, 24, np.nan],
+                        ],
+                        [
+                            [13, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan],
+                            [5, 17, 23],
+                        ],
+                        [
+                            [10, np.nan, np.nan],
+                            [9, 19, np.nan],
+                            [21, np.nan, np.nan],
+                            [10, 17, np.nan],
+                        ],
+                    ]
+                ).transpose((2, 0, 1)),
+            ),
+            (
+                None,
+                4,
+                np.array(
+                    [
+                        [
+                            [12, np.nan, np.nan, np.nan],
+                            [19, np.nan, np.nan, np.nan],
+                            [6, 13, np.nan, np.nan],
+                            [5, 24, np.nan, np.nan],
+                        ],
+                        [
+                            [13, np.nan, np.nan, np.nan],
+                            [19, np.nan, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan, np.nan],
+                            [5, 17, 23, np.nan],
+                        ],
+                        [
+                            [10, np.nan, np.nan, np.nan],
+                            [9, 19, np.nan, np.nan],
+                            [21, np.nan, np.nan, np.nan],
+                            [10, 17, np.nan, np.nan],
+                        ],
+                    ]
+                ).transpose((2, 0, 1)),
+            ),
+            (
+                np.arange(10, 30),
+                3,
+                np.array(
+                    [
+                        [
+                            [12, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [13, np.nan, np.nan],
+                            [24, np.nan, np.nan],
+                        ],
+                        [
+                            [13, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan],
+                            [17, 23, np.nan],
+                        ],
+                        [
+                            [10, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [21, np.nan, np.nan],
+                            [10, 17, np.nan],
+                        ],
+                    ]
+                ).transpose((2, 0, 1)),
+            ),
+        ],
+    )
+    def test_block_breakpoint_index(self, valid_index, n_breaks, expected):
+        signal = np.zeros((30, 3, 4))
+        for i in range(4):
+            sig_, _ = pw_constant(
+                signal.shape[0], signal.shape[1], 1 + i, noise_std=2, seed=720 + i
+            )
+            signal[:, :, i] = sig_
+
+        res = pelt.block_breakpoints_index(
+            array=signal,
+            penalty=3,
+            n_breaks=n_breaks,
+            model="rbf",
+            min_size=3,
+            jump=5,
+            valid_index=valid_index,
+        )
+
+        assert res.shape == (n_breaks, 3, 4)
+        assert np.issubdtype(res.dtype, np.floating)
+        np.testing.assert_array_equal(res, expected)
