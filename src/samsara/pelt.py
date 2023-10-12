@@ -91,12 +91,17 @@ def block_breakpoints_index(
     penalty: float,
     n_breaks: int,
     model: str,
+    min_size: int,
+    jump: int,
     valid_index: Union[np.ndarray, None],
 ) -> np.ndarray:
     # Non-jagged output
-    algo = rpt.KernelCPD(kernel=model, min_size=3, jump=5)
+
+    algo = rpt.KernelCPD(kernel=model, min_size=min_size, jump=jump)
 
     def predict_unique_index(array_1d, valid_index):
+        algo.cost.gamma = None
+        algo.cost._gram = None
         breaks = np.full((n_breaks), np.nan)
         breaks_ = algo.fit(array_1d).predict(pen=penalty)
         breaks_ = np.array(breaks_[:-1]) - 1
