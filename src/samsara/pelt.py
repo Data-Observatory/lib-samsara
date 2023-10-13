@@ -97,6 +97,11 @@ def block_breakpoints_index(
 ) -> np.ndarray:
     # Non-jagged output
 
+    if model != "rbf":
+        raise ValueError(
+            f"Only rbf is accepted as kernel model for KernelCPD, {model} passed."
+        )
+
     algo = rpt.KernelCPD(kernel=model, min_size=min_size, jump=jump)
 
     def predict_unique_index(array_1d, valid_index):
