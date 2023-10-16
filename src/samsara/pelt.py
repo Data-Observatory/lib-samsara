@@ -61,22 +61,31 @@ def datetime_to_year_fraction(dates):
 def block_pelt(
     array: np.ndarray,
     dates: np.ndarray,
+    year_fraction: np.ndarray,
     n_breaks: int,
     penalty: float,
     start_date: Union[str, None],
     kernel_model: str = "rbf",
+    kernel_min_size: int = 3,
+    kernel_jump: int = 5,
 ) -> np.ndarray:
     working_idx = None
     if start_date is not None:
         working_idx = filter_index_by_date(dates, start_date)  # 1d array
 
     break_idx = block_breakpoints_index(
-        array, penalty, n_breaks, model=kernel_model, valid_index=working_idx
+        array,
+        penalty,
+        n_breaks,
+        model=kernel_model,
+        min_size=kernel_min_size,
+        jump=kernel_jump,
+        valid_index=working_idx,
     )  # 3d array (n_breaks, y, x)
 
-    segment_mean_mag, segment_dates = block_segment_metrics(array, dates, break_idx)
+    seg_mean, seg_dates = block_segment_metrics(array, year_fraction, break_idx)
 
-    return np.vstack([segment_mean_mag, segment_dates])
+    return np.vstack([seg_mean, seg_dates])
 
 
 def filter_index_by_date(dates: np.ndarray, start_date: str):
