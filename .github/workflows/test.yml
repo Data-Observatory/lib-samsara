@@ -28,9 +28,7 @@ jobs:
         uses: chartboost/ruff-action@v1
         with:
           src: ./src ./tests
-          args: |
-            --no-fix --line-length 88 --verbose --ignore RUF001,E501,E203 \
-            --per-file-ignores="src/*/__init__.py:F403"
+          args: --no-fix --verbose --config pyproject.toml
 
       - name: Check black
         uses: psf/black@stable
