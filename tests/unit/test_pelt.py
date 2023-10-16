@@ -365,3 +365,83 @@ class TestPelt:
         assert res.shape == (n_breaks, 3, 4)
         assert np.issubdtype(res.dtype, np.floating)
         np.testing.assert_array_equal(res, expected)
+
+    @pytest.mark.parametrize(
+        ("valid_index", "expected"),
+        [
+            (
+                None,
+                np.array(
+                    [
+                        [
+                            [12, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [13, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                        ],
+                        [
+                            [13, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan],
+                            [17, np.nan, np.nan],
+                        ],
+                        [
+                            [np.nan, np.nan, np.nan],
+                            [9, 19, np.nan],
+                            [15, np.nan, np.nan],
+                            [9, np.nan, np.nan],
+                        ],
+                    ]
+                ).transpose((2, 0, 1)),
+            ),
+            (
+                np.arange(10, 23),
+                np.array(
+                    [
+                        [
+                            [12, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [13, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                        ],
+                        [
+                            [13, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan],
+                            [17, np.nan, np.nan],
+                        ],
+                        [
+                            [np.nan, np.nan, np.nan],
+                            [19, np.nan, np.nan],
+                            [15, np.nan, np.nan],
+                            [np.nan, np.nan, np.nan],
+                        ],
+                    ]
+                ).transpose((2, 0, 1)),
+            ),
+        ],
+    )
+    def test_block_breakpoint_index_nan(self, valid_index, expected):
+        signal = np.full((30, 3, 4), np.nan)
+        for i in range(4):
+            sig_, _ = pw_constant(
+                signal.shape[0], signal.shape[1], 1 + i, noise_std=2, seed=720 + i
+            )
+            signal[:, :, i] = sig_
+            signal[:5, :, i] = np.nan
+            signal[10, :, i] = np.nan
+            signal[20:25, :, i] = np.nan
+
+        res = pelt.block_breakpoints_index(
+            array=signal,
+            penalty=3,
+            n_breaks=3,
+            model="rbf",
+            min_size=3,
+            jump=5,
+            valid_index=valid_index,
+        )
+
+        assert res.shape == (3, 3, 4)
+        assert np.issubdtype(res.dtype, np.floating)
+        np.testing.assert_array_equal(res, expected)
