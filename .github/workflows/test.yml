@@ -83,6 +83,7 @@ jobs:
             toxpython: "python3.11"
             python_arch: "x64"
             tox_env: "py311-nocov"
+            os: "ubuntu-latest"
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
