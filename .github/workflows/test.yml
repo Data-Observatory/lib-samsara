@@ -21,22 +21,17 @@ jobs:
       - name: Check isort
         uses: isort/isort-action@v1
         with:
-          sort-paths: ./src ./tests
           configuration: --profile black --check --df -v --split-on-trailing-comma
 
       - name: Check ruff
         uses: chartboost/ruff-action@v1
         with:
-          src: ./src ./tests
           args: --no-fix --verbose --config pyproject.toml
 
       - name: Check black
         uses: psf/black@stable
         with:
-          src: ./src ./tests
-          options: |
-            --check --verbose --diff --color --target-version py39 --target-version py310 \
-            --target-version py311
+          options: "--check --verbose --diff --config pyproject.toml"
 
   test:
     strategy:
