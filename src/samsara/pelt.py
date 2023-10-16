@@ -170,18 +170,18 @@ def segment_mean(array, break_idx, seg_mean):
 
     # First segment value
     idx_f = int(break_idx[0])
-    segment_mean_[0] = array[:idx_f].mean()
+    segment_mean_[0] = np.nanmean(array[:idx_f])
 
     for i in range(break_idx.shape[0] - 1):
         idx_s = int(break_idx[i])  # Segment starting index
 
         if np.isnan(break_idx[i + 1]):
-            segment_mean_[i + 1] = array[idx_s:].mean()
+            segment_mean_[i + 1] = np.nanmean(array[idx_s:])
             seg_mean[i] = segment_mean_[i + 1] - segment_mean_[i]
             break
 
         idx_f = int(break_idx[i + 1])  # Segment final index
-        segment_mean_[i + 1] = array[idx_s:idx_f].mean()
+        segment_mean_[i + 1] = np.nanmean(array[idx_s:idx_f])
 
         seg_mean[i] = segment_mean_[i + 1] - segment_mean_[i]  # Segment mag
 
@@ -192,7 +192,7 @@ def segment_mean(array, break_idx, seg_mean):
     # last value
 
     idx_s = int(break_idx[-1])  # Last segment value
-    segment_mean_[-1] = array[idx_s:].mean()
+    segment_mean_[-1] = np.nanmean(array[idx_s:])
 
     seg_mean[-1] = segment_mean_[-1] - segment_mean_[-2]  # Last segment mag
 
