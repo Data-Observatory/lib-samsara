@@ -108,8 +108,16 @@ def block_breakpoints_index(
         algo.cost.gamma = None
         algo.cost._gram = None
         breaks = np.full((n_breaks), np.nan)
-        breaks_ = algo.fit(array_1d).predict(pen=penalty)
-        breaks_ = np.array(breaks_[:-1]) - 1
+        # Filter original array to values that are not NaN
+        arr_nnan_idx = np.where(~np.isnan(array_1d))[0]  # Not NaN indices
+        arr_nnan = array_1d[arr_nnan_idx]  # Non Nan array
+        breaks_nnan = algo.fit(arr_nnan).predict(
+            pen=penalty
+        )  # Predict breaks in not NaN indices
+        breaks_nnan = (
+            np.array(breaks_nnan[:-1], dtype=int) - 1
+        )  # Fix breaks to indices values
+        breaks_ = arr_nnan_idx[breaks_nnan]  # Break indices in the original array
         # Get valid breakpoint indices
         if valid_index is not None:
             break_idx = np.intersect1d(breaks_, valid_index)
