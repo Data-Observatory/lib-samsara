@@ -17,17 +17,20 @@ def pelt(
     start_date: Union[str, None] = None,
     **kwargs,
 ) -> tuple[da.Array, da.Array]:
-    data = array.data
+    data = array.data  # 3d
     dates = array.time.values  # 1d
     chunks = ((n_breaks, n_breaks), data.chunks[1], data.chunks[2])
     # Each chunk, that contains the whole time series, will generate 2 chunks, where the first is
     # the mean magnitude and the second is the dates. There is no problem with iterated magnitude
     # values and dates because the time dimension is not chunked.
 
+    year_fraction = datetime_to_year_fraction(dates)
+
     break_cubes = da.map_blocks(
         block_pelt,
         data,
         dates,
+        year_fraction,
         n_breaks,
         penalty,
         start_date,
