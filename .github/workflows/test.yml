@@ -22,10 +22,7 @@ jobs:
         uses: isort/isort-action@v1
         with:
           sort-paths: ./src ./tests
-          configuration: |
-            --profile black --check-only --diff --verbose --line-length 88 --multi-line 3 \
-            --split-on-trailing-comma --tc --use-parentheses \
-            --ensure-newline-before-comments
+          configuration: --profile black --check --df -v --split-on-trailing-comma
 
       - name: Check ruff
         uses: chartboost/ruff-action@v1
