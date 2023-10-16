@@ -67,7 +67,7 @@ def block_pelt(
     kernel_model: str = "rbf",
 ) -> np.ndarray:
     working_idx = None
-    if start_date is None:
+    if start_date is not None:
         working_idx = filter_index_by_date(dates, start_date)  # 1d array
 
     break_idx = block_breakpoints_index(
