@@ -30,7 +30,7 @@ jobs:
           src: ./src ./tests
           args: |
             --no-fix --line-length 88 --verbose --ignore RUF001,E501,E203 \
-            --per-file-ignores="*__init__.py:F403"
+            --per-file-ignores="src/*/__init__.py:F403"
 
       - name: Check black
         uses: psf/black@stable
