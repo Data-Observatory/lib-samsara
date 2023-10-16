@@ -81,8 +81,7 @@ def block_pelt(
 
 def filter_index_by_date(dates: np.ndarray, start_date: str):
     start_date_np = np.datetime64(start_date)
-    indices = np.argwhere(dates > start_date_np).ravel()
-    # return np.take(array, indices, axis=0), indices
+    indices = np.where(dates > start_date_np)[0]
     return indices
 
 
