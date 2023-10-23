@@ -18,7 +18,7 @@ def pelt(
     **kwargs,
 ) -> tuple[da.Array, da.Array]:
     data = array.data  # 3d
-    dates = array.time.values  # 1d
+    dates = array.time.data  # 1d
     chunks = ((n_breaks, n_breaks), data.chunks[1], data.chunks[2])
     # Each chunk, that contains the whole time series, will generate 2 chunks, where the first is
     # the mean magnitude and the second is the dates. There is no problem with iterated magnitude
@@ -156,8 +156,7 @@ def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
     seg_mean = np.full_like(break_idx_t, np.nan)
     seg_date = np.full_like(break_idx_t, np.nan)
 
-    segment_mean(array_t, break_idx_t, seg_mean)
-    segment_dates(dates, break_idx_t, seg_date)
+    segment_metrics(array_t, dates, break_idx_t, seg_mean, seg_date)
 
     seg_mean = np.transpose(seg_mean, axes=(2, 0, 1))
     seg_date = np.transpose(seg_date, axes=(2, 0, 1))
@@ -224,6 +223,52 @@ def segment_dates(dates, break_idx, seg_date):
         seg_date[i] = dates[idx]
 
 
+@guvectorize(
+    [
+        (float32[:], float32[:], float32[:], float32[:], float32[:]),
+        (float64[:], float64[:], float64[:], float64[:], float64[:]),
+    ],
+    "(times),(times),(break)->(break),(break)",
+    nopython=True,
+)
+def segment_metrics(array, dates, break_idx, seg_mean, seg_date):
+    if np.isnan(break_idx[0]):
+        return
+
+    segment_mean_ = np.zeros(break_idx.shape[0] + 1)
+
+    # First segment value
+    idx_f = int(break_idx[0])
+    segment_mean_[0] = np.nanmean(array[:idx_f])
+
+    for i in range(break_idx.shape[0] - 1):
+        idx_s = int(break_idx[i])  # Segment starting index
+
+        seg_date[i] = dates[idx_s]  # Segment date
+
+        if np.isnan(break_idx[i + 1]):
+            segment_mean_[i + 1] = np.nanmean(array[idx_s:])
+            seg_mean[i] = segment_mean_[i + 1] - segment_mean_[i]
+            break
+
+        idx_f = int(break_idx[i + 1])  # Segment final index
+        segment_mean_[i + 1] = np.nanmean(array[idx_s:idx_f])
+
+        seg_mean[i] = segment_mean_[i + 1] - segment_mean_[i]  # Segment mag
+
+    if np.isnan(break_idx[-1]):
+        return
+
+    # The function will reach this statement only if the break_idx array does not have a nan as its
+    # last value
+
+    idx_s = int(break_idx[-1])  # Last segment value
+    segment_mean_[-1] = np.nanmean(array[idx_s:])
+
+    seg_mean[-1] = segment_mean_[-1] - segment_mean_[-2]  # Last segment mag
+    seg_date[-1] = dates[idx_s]  # Last segment date
+
+
 # For 1 pixel
 
 
@@ -252,7 +297,7 @@ def breakpoints(
     if len(break_idx) == 0:
         return np.array([]), np.array([])
 
-    segment_mean_mag, segment_dates = segment_metrics(array, dates, break_idx)
+    segment_mean_mag, segment_dates = segment_metrics_1d(array, dates, break_idx)
     return segment_mean_mag, segment_dates
 
 
@@ -265,7 +310,7 @@ def breakpoints_index(array: np.ndarray, penalty: float, model: str = "rbf") -> 
     return breaks
 
 
-def segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.ndarray):
+def segment_metrics_1d(array: np.ndarray, dates: np.ndarray, break_idx: np.ndarray):
     break_idx = break_idx.tolist()
     if break_idx[0] != 0:
         break_idx = [0, *break_idx]

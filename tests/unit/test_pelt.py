@@ -9,7 +9,7 @@ import samsara.pelt as pelt
 
 class TestPelt:
     @pytest.mark.parametrize(("n", "bp"), [(15, 1), (15, 3), (15, 6)])
-    def test_segment_metrics(self, n, bp):
+    def test_segment_metrics_1d(self, n, bp):
         # array
         array = np.arange(n)
         # dates
@@ -20,7 +20,7 @@ class TestPelt:
         break_idx = np.array(break_idx)
         assert len(break_idx) == bp
         # run
-        mean_mag, dates_frac = pelt.segment_metrics(array, dates, break_idx)
+        mean_mag, dates_frac = pelt.segment_metrics_1d(array, dates, break_idx)
         assert len(mean_mag) == bp
         assert len(dates_frac) == bp
         assert (mean_mag > 0.0).all()
