@@ -67,6 +67,13 @@ You can also install the in-development version with::
     pip install https://github.com/Data-Observatory/lib-samsara/archive/main.zip
 
 
+To install the package from the source (in an existing environment) use::
+
+    git clone git@github.com:Data-Observatory/lib-samsara.git
+    cd lib-samsara
+    git checkout develop
+    pip install .
+
 Documentation
 =============
 
@@ -76,6 +83,19 @@ https://lib-samsara.readthedocs.io/
 
 Development
 ===========
+
+For development, download the repository content and install the package in editable mode with the
+developer packages::
+
+    git clone git@github.com:Data-Observatory/lib-samsara.git
+    cd lib-samsara
+    git checkout develop
+    # Create virtual environment
+    python3 -m venv .venv
+    source .venv/bin/activate
+    pip install -e .[dev]
+    # Check pre-commit is installed
+    pre-commit install
 
 To run all the tests run::
 
