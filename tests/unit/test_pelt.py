@@ -1,33 +1,34 @@
-import random
-
 import numpy as np
 import pytest
-from ruptures import pw_constant
+from ruptures import KernelCPD, pw_constant
 
 import samsara.pelt as pelt
 
 
 class TestPelt:
-    @pytest.mark.parametrize(("n", "bp"), [(15, 1), (15, 3), (15, 6)])
-    def test_segment_metrics_1d(self, n, bp):
-        # array
-        array = np.arange(n)
-        # dates
-        dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(n)])
-        # breaks
-        break_idx = random.sample(range(1, n), bp)
-        break_idx.sort()
-        break_idx = np.array(break_idx)
-        assert len(break_idx) == bp
-        # run
-        mean_mag, dates_frac = pelt.segment_metrics_1d(array, dates, break_idx)
-        assert len(mean_mag) == bp
-        assert len(dates_frac) == bp
-        assert (mean_mag > 0.0).all()
+    @pytest.mark.parametrize(
+        ("dates", "start_date", "expected"),
+        [
+            (
+                np.array(
+                    ["2006-07-13", "2007-01-13", "2010-08-13"], dtype="datetime64"
+                ),
+                "2006-09-05",
+                np.array([1, 2]),
+            )
+        ],
+    )
+    def test_filter_index_by_date(self, dates, start_date, expected):
+        res = pelt.filter_index_by_date(dates, start_date)
+        assert res == pytest.approx(expected)
 
     @pytest.mark.parametrize(
         ("dates", "expected"),
         [
+            (
+                np.datetime64("2012-05-12"),
+                2012.360656,
+            ),
             (
                 np.array(
                     ["2007-07-13", "2006-01-13", "2010-08-13"], dtype="datetime64"
@@ -76,372 +77,57 @@ class TestPelt:
         res = pelt.datetime_to_year_fraction(dates)
         assert res == pytest.approx(expected)
 
-    def test_numba_segment_mean(self):
-        array_t = np.array(
-            [
-                [
-                    [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
-                    [1.0, 10.0, 10.0, 10.0, 10.5, 11.0, 11.0, 11.0],
-                    [1.0, 10.0, 12.0, 8.0, 8.0, 8.5, 9.0, 9.0],
-                ],
-                [
-                    [5.0, 10.0, 16.0, 20.0, 22.0, 20.0, 22.0, 21.0],
-                    [7.0, 3.0, 5.0, 6.0, 7.0, 12.0, 13.0, 14.0],
-                    [6.0, 2.0, 4.0, 10.0, 12.0, 10.0, 12.0, 7.0],
-                ],
-            ],
-            dtype=np.float32,
-        )
-
-        breaks_t = np.array(
-            [
-                [[np.nan, np.nan, np.nan], [1.0, np.nan, np.nan], [1.0, 3.0, np.nan]],
-                [[1.0, 2.0, 3.0], [1.0, 2.0, 5.0], [1.0, 3.0, 7.0]],
-            ],
-            dtype=np.float32,
-        )
-
-        segment_mean_mag = np.full_like(breaks_t, np.nan)
-
-        pelt.segment_mean(array_t, breaks_t, segment_mean_mag)
-
-        expected = np.array(
-            [
-                [[np.nan, np.nan, np.nan], [9.5, np.nan, np.nan], [10.0, -2.5, np.nan]],
-                [[5.0, 6.0, 5.0], [-4.0, 3.0, 7.0], [-3.0, 8.0, -4.0]],
-            ],
-            dtype=np.float32,
-        )
-
-        assert segment_mean_mag.shape == expected.shape
-        np.testing.assert_array_equal(segment_mean_mag, expected)
-
-    def test_numba_segment_dates(self):
-        array_t = np.array(
-            [
-                [
-                    [
-                        2005.32,
-                        2005.54,
-                        2006.13,
-                        2006.42,
-                        2007.87,
-                        2007.95,
-                        2008.53,
-                        2008.69,
-                    ],
-                    [
-                        2005.62,
-                        2005.75,
-                        2006.09,
-                        2006.17,
-                        2007.35,
-                        2007.62,
-                        2008.57,
-                        2008.81,
-                    ],
-                    [
-                        2005.35,
-                        2005.56,
-                        2006.38,
-                        2006.39,
-                        2007.78,
-                        2007.97,
-                        2008.37,
-                        2008.93,
-                    ],
-                ],
-                [
-                    [
-                        2005.34,
-                        2005.86,
-                        2006.58,
-                        2006.98,
-                        2007.28,
-                        2007.82,
-                        2008.11,
-                        2008.77,
-                    ],
-                    [
-                        2005.58,
-                        2005.75,
-                        2006.22,
-                        2006.77,
-                        2007.36,
-                        2007.56,
-                        2008.13,
-                        2008.84,
-                    ],
-                    [
-                        2005.58,
-                        2005.79,
-                        2006.27,
-                        2006.47,
-                        2007.32,
-                        2007.82,
-                        2008.25,
-                        2008.81,
-                    ],
-                ],
-            ],
-            dtype=np.float32,
-        )
-
-        breaks_t = np.array(
-            [
-                [[np.nan, np.nan, np.nan], [1.0, np.nan, np.nan], [1.0, 3.0, np.nan]],
-                [[1.0, 2.0, 3.0], [1.0, 2.0, 5.0], [1.0, 3.0, 7.0]],
-            ],
-            dtype=np.float32,
-        )
-
-        segment_dates = np.full_like(breaks_t, np.nan)
-
-        pelt.segment_dates(array_t, breaks_t, segment_dates)
-
-        expected = np.array(
-            [
-                [
-                    [np.nan, np.nan, np.nan],
-                    [2005.75, np.nan, np.nan],
-                    [2005.56, 2006.39, np.nan],
-                ],
-                [
-                    [2005.86, 2006.58, 2006.98],
-                    [2005.75, 2006.22, 2007.56],
-                    [2005.79, 2006.47, 2008.81],
-                ],
-            ],
-            dtype=np.float32,
-        )
-
-        assert segment_dates.shape == expected.shape
-        np.testing.assert_array_equal(segment_dates, expected)
-
-    def test_block_segment_metrics(self):
-        array = np.arange(48, dtype=np.float32).reshape((8, 2, 3))
-        dates = np.array(
-            [2005.58, 2005.79, 2006.27, 2006.47, 2007.32, 2007.82, 2008.25, 2008.81],
-            dtype=np.float32,
-        )
-        break_idx = np.array(
-            [
-                [[np.nan, 1.0, 1.0], [1.0, 1.0, 1.0]],
-                [[np.nan, np.nan, 3.0], [2.0, 2.0, 3.0]],
-                [[np.nan, np.nan, np.nan], [3.0, 5.0, 7.0]],
-            ]
-        )
-
-        assert array.shape == (8, 2, 3)
-        assert dates.shape == (8,)
-        assert break_idx.shape == (3, 2, 3)
-
-        seg_mean, seg_date = pelt.block_segment_metrics(array, dates, break_idx)
-
-        assert seg_mean.shape == (3, 2, 3)
-        assert seg_date.shape == (3, 2, 3)
-
-        expected_mean = np.array(
-            [
-                [[np.nan, 24.0, 9.0], [6.0, 6.0, 9.0]],
-                [[np.nan, np.nan, 21.0], [6.0, 12.0, 18.0]],
-                [[np.nan, np.nan, np.nan], [18.0, 18.0, 15.0]],
-            ]
-        )
-
-        np.testing.assert_allclose(seg_mean, expected_mean, rtol=1e-02)
-
-        expected_date = np.array(
-            [
-                [[np.nan, 2005.79, 2005.79], [2005.79, 2005.79, 2005.79]],
-                [[np.nan, np.nan, 2006.47], [2006.27, 2006.27, 2006.47]],
-                [[np.nan, np.nan, np.nan], [2006.47, 2007.82, 2008.81]],
-            ]
-        )
-
-        np.testing.assert_allclose(seg_date, expected_date, rtol=1e-02)
-
     @pytest.mark.parametrize(
-        ("valid_index", "n_breaks", "expected"),
-        [
-            (
-                None,
-                3,
-                np.array(
-                    [
-                        [
-                            [12, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [6, 13, np.nan],
-                            [5, 24, np.nan],
-                        ],
-                        [
-                            [13, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan],
-                            [5, 17, 23],
-                        ],
-                        [
-                            [10, np.nan, np.nan],
-                            [9, 19, np.nan],
-                            [21, np.nan, np.nan],
-                            [10, 17, np.nan],
-                        ],
-                    ]
-                ).transpose((2, 0, 1)),
-            ),
-            (
-                None,
-                4,
-                np.array(
-                    [
-                        [
-                            [12, np.nan, np.nan, np.nan],
-                            [19, np.nan, np.nan, np.nan],
-                            [6, 13, np.nan, np.nan],
-                            [5, 24, np.nan, np.nan],
-                        ],
-                        [
-                            [13, np.nan, np.nan, np.nan],
-                            [19, np.nan, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan, np.nan],
-                            [5, 17, 23, np.nan],
-                        ],
-                        [
-                            [10, np.nan, np.nan, np.nan],
-                            [9, 19, np.nan, np.nan],
-                            [21, np.nan, np.nan, np.nan],
-                            [10, 17, np.nan, np.nan],
-                        ],
-                    ]
-                ).transpose((2, 0, 1)),
-            ),
-            (
-                np.arange(10, 30),
-                3,
-                np.array(
-                    [
-                        [
-                            [12, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [13, np.nan, np.nan],
-                            [24, np.nan, np.nan],
-                        ],
-                        [
-                            [13, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan],
-                            [17, 23, np.nan],
-                        ],
-                        [
-                            [10, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [21, np.nan, np.nan],
-                            [10, 17, np.nan],
-                        ],
-                    ]
-                ).transpose((2, 0, 1)),
-            ),
-        ],
+        ("n_breaks", "start_date", "n_nan"), [(3, None, 0), (6, None, 4)]
     )
-    def test_block_breakpoint_index(self, valid_index, n_breaks, expected):
-        signal = np.zeros((30, 3, 4))
-        for i in range(4):
-            sig_, _ = pw_constant(
-                signal.shape[0], signal.shape[1], 1 + i, noise_std=2, seed=720 + i
-            )
-            signal[:, :, i] = sig_
-
-        res = pelt.block_breakpoints_index(
-            array=signal,
-            penalty=3,
+    def test_pixel_pelt(self, n_breaks, start_date, n_nan):
+        array = pw_constant(30, 1, n_breaks + 1, noise_std=2, seed=723)[0].reshape(30)
+        dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(30)])
+        res = pelt.pixel_pelt(
+            array=array,
+            dates=dates,
             n_breaks=n_breaks,
-            model="rbf",
-            min_size=3,
-            jump=5,
-            valid_index=valid_index,
+            penalty=1,
+            start_date=start_date,
         )
-
-        assert res.shape == (n_breaks, 3, 4)
-        assert np.issubdtype(res.dtype, np.floating)
-        np.testing.assert_array_equal(res, expected)
+        assert res.shape == (n_breaks * 2,)
+        assert np.count_nonzero(np.isnan(res)) == n_nan
 
     @pytest.mark.parametrize(
-        ("valid_index", "expected"),
-        [
-            (
-                None,
-                np.array(
-                    [
-                        [
-                            [12, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [13, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                        ],
-                        [
-                            [13, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan],
-                            [17, np.nan, np.nan],
-                        ],
-                        [
-                            [np.nan, np.nan, np.nan],
-                            [9, 19, np.nan],
-                            [15, np.nan, np.nan],
-                            [9, np.nan, np.nan],
-                        ],
-                    ]
-                ).transpose((2, 0, 1)),
-            ),
-            (
-                np.arange(10, 23),
-                np.array(
-                    [
-                        [
-                            [12, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [13, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                        ],
-                        [
-                            [13, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan],
-                            [17, np.nan, np.nan],
-                        ],
-                        [
-                            [np.nan, np.nan, np.nan],
-                            [19, np.nan, np.nan],
-                            [15, np.nan, np.nan],
-                            [np.nan, np.nan, np.nan],
-                        ],
-                    ]
-                ).transpose((2, 0, 1)),
-            ),
-        ],
+        ("n_breaks", "start_date", "n_nan"),
+        [(3, None, 4), (4, None, 14), (3, "2007-03-28", 10)],
     )
-    def test_block_breakpoint_index_nan(self, valid_index, expected):
-        signal = np.full((30, 3, 4), np.nan)
-        for i in range(4):
-            sig_, _ = pw_constant(
-                signal.shape[0], signal.shape[1], 1 + i, noise_std=2, seed=720 + i
-            )
-            signal[:, :, i] = sig_
-            signal[:5, :, i] = np.nan
-            signal[10, :, i] = np.nan
-            signal[20:25, :, i] = np.nan
-
-        res = pelt.block_breakpoints_index(
-            array=signal,
-            penalty=3,
-            n_breaks=3,
-            model="rbf",
-            min_size=3,
-            jump=5,
-            valid_index=valid_index,
+    def test_block_pelt(
+        self, pelt_signal, pelt_dates, pelt_year_fraction, n_breaks, start_date, n_nan
+    ):
+        array_shape = pelt_signal.shape
+        algo_rpt = KernelCPD(kernel="rbf", min_size=3, jump=5)
+        res = pelt.block_pelt(
+            array=pelt_signal,
+            dates=pelt_dates,
+            year_fraction=pelt_year_fraction,
+            n_breaks=n_breaks,
+            penalty=1,
+            start_date=start_date,
+            algo_rpt=algo_rpt,
         )
+        assert res.shape == (2 * n_breaks, array_shape[1], array_shape[2])
+        assert np.count_nonzero(np.isnan(res)) == n_nan
 
-        assert res.shape == (3, 3, 4)
-        assert np.issubdtype(res.dtype, np.floating)
-        np.testing.assert_array_equal(res, expected)
+    @pytest.mark.parametrize(
+        ("n_breaks", "start_date"),
+        [(3, None), (4, None), (3, "2007-03-28")],
+    )
+    def test_pelt_xarray(self, pelt_signal_xarray, n_breaks, start_date):
+        array_shape = pelt_signal_xarray.shape
+        res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="xarray")
+        assert res.shape == (array_shape[1], array_shape[2], 2 * n_breaks)
+
+    @pytest.mark.parametrize(
+        ("n_breaks", "start_date"),
+        [(3, None), (4, None), (3, "2007-03-28")],
+    )
+    def test_pelt_dask(self, pelt_signal_xarray, n_breaks, start_date):
+        array_shape = pelt_signal_xarray.shape
+        res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="dask")
+        assert res.shape == (2 * n_breaks, array_shape[1], array_shape[2])
