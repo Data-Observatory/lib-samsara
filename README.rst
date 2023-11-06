@@ -74,6 +74,12 @@ To install the package from the source (in an existing environment) use::
     git checkout develop
     pip install .
 
+You can also install from VCS::
+
+    pip install git+ssh://git@github.com/Data-Observatory/lib-samsara
+    # to install a specific branch (e.g. develop)
+    pip install git+ssh://git@github.com/Data-Observatory/lib-samsara@develop
+
 Documentation
 =============
 
@@ -85,7 +91,7 @@ Development
 ===========
 
 For development, download the repository content and install the package in editable mode with the
-developer packages::
+developer packages in a new environment::
 
     git clone git@github.com:Data-Observatory/lib-samsara.git
     cd lib-samsara
