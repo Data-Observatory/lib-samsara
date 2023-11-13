@@ -1,3 +1,6 @@
+"""
+Functions for Pelt applied over a 1-dimensional array.
+"""
 from typing import Union
 
 import numpy as np
@@ -16,8 +19,41 @@ def pixel_pelt(
     start_date: Union[str, None] = None,
     model: str = "rbf",
     min_size: int = 3,
-    jump: int = 5,
+    jump: int = 1,
 ) -> np.ndarray:
+    """Apply the linearly penalized segmentation (Pelt) over a NumPy Array.
+
+    Parameters
+    ----------
+    array : np.ndarray
+        1-dim array, with the data for 1 pixel or (x, y) in a time series.
+    dates : np.ndarray
+        Array with dates of type np.datetime64.
+    n_breaks : int, optional
+        Number of breaks expected in the data, by default 5
+    penalty : float, optional
+        Penalty value for the KernelCPD prediction, by default 30.0
+    start_date : Union[str, None], optional
+        Dates from which breaks are calculated, by default None
+    model : str, optional
+        Model used by ruptures KernelCPD, by default 'rbf'.
+    min_size : int, optional
+        Minimum segment length used by ruptures KernelCPD, by default 3.
+    jump : int, optional
+        Subsample (one every `jump` points), used by ruptures KernelCPD, by default 1.
+
+    Returns
+    -------
+    np.ndarray
+        1-dim array, with length equal to twice `n_breaks`, where the first `n_breaks` values
+        correspond to the difference of the medians between two consecutive breaks, and the
+        following `n_breaks` contain the date on which the break occurred.
+
+    Notes
+    -----
+    The value of `jump` is set to 1 due to ruptures setting not accepting values other than 1 for
+    KernelCPD.
+    """
     # array : dataarray 1dim (time, ) because of input_core_dims
     # dates : len equal to first dim of array of type datetime
     break_idx = pixel_breakpoints_index(array, penalty, model, min_size, jump)
@@ -66,8 +102,11 @@ def pixel_breakpoints_index(
     penalty: float,
     model: str = "rbf",
     min_size: int = 3,
-    jump: int = 5,
+    jump: int = 1,
 ) -> list:
+    """
+    Get the index of each breakpoint.
+    """
     # array: array 1dim
     arr_nnan_idx = np.where(~np.isnan(array))[0]  # Not NaN indices
     arr_nnan = array[arr_nnan_idx]  # Non Nan array
@@ -79,6 +118,9 @@ def pixel_breakpoints_index(
 
 
 def pixel_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.ndarray):
+    """
+    Get the difference of the mean of consecutive segments and the date of each break occurence.
+    """
     break_idx = break_idx.tolist()
     if break_idx[0] != 0:
         break_idx = [0, *break_idx]

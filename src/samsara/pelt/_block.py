@@ -1,3 +1,6 @@
+"""
+Functions for Pelt applied over blocks/cubes of data.
+"""
 from typing import Union
 
 import numpy as np
@@ -18,6 +21,38 @@ def block_pelt(
     start_date: Union[str, None],
     algo_rpt: rpt.KernelCPD,
 ) -> np.ndarray:
+    """Apply the linearly penalized segmentation (Pelt) over a NumPy Array.
+
+    Apply the Pelt algorithm over every geo-coordinate to find the optimal segmentation in a time
+    series.
+
+    Parameters
+    ----------
+    array : np.ndarray
+        3-dim array, with dimensions ('time', 'y', 'x'), to apply pelt over each (x, y) pair.
+    dates : np.ndarray
+        Array with dates of type np.datetime64.
+    year_fraction : np.ndarray
+        Array with dates of type float. Should be the `dates` array with the date as year as the
+        whole number and the day of the year as decimal.
+    n_breaks : int
+        Number of breaks expected in the data.
+    penalty : float
+        Penalty value for the KernelCPD prediction.
+    start_date : Union[str, None]
+        Dates from which breaks are calculated.
+    algo_rpt : rpt.KernelCPD
+        KernelCPD instance to use in the search of breakpoints. Must be defined with 'rbf' as model.
+
+    Returns
+    -------
+    np.ndarray
+        3-dim array, the two original positional dimensions and a new one of size equal to twice
+        `n_breaks`, where the first `n_breaks` values correspond to the difference of the medians
+        between two consecutive breaks, and the following `n_breaks` contain the date on which the
+        break occurred. This new dimension will be in the first position, which means that the
+        coordinates will be ('new', 'y', 'x').
+    """
     working_idx = None
     if start_date is not None:
         working_idx = filter_index_by_date(dates, start_date)  # 1d array
@@ -42,6 +77,10 @@ def block_breakpoints_index(
     algo_rpt: rpt.KernelCPD,
     valid_index: Union[np.ndarray, None],
 ) -> np.ndarray:
+    """
+    Get the index of each breakpoint for every pixel/geo-location.
+    """
+
     # Non-jagged output
     def predict_unique_index(array_1d, valid_index):
         algo_rpt.cost.gamma = None
@@ -72,6 +111,9 @@ def block_breakpoints_index(
 
 
 def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.ndarray):
+    """
+    Get the difference of the mean of consecutive segments and the date of each break occurence.
+    """
     # dates are year fraction
     array_t = np.transpose(array, axes=(1, 2, 0))  # (time,y,x) -> (y,x,time)
     break_idx_t = np.transpose(break_idx, axes=(1, 2, 0))  # (break,y,x) -> (y,x,break)
@@ -101,6 +143,9 @@ def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
     nopython=True,
 )
 def segment_mean(array, break_idx, seg_mean):
+    """
+    Get the difference of the mean of consecutive segments.
+    """
     if np.isnan(break_idx[0]):
         return
 
@@ -144,6 +189,9 @@ def segment_mean(array, break_idx, seg_mean):
     nopython=True,
 )
 def segment_dates(dates, break_idx, seg_date):
+    """
+    Get the dates of each break occurrence.
+    """
     for i in range(break_idx.shape[0]):
         if np.isnan(break_idx[i]):
             return
@@ -160,6 +208,9 @@ def segment_dates(dates, break_idx, seg_date):
     nopython=True,
 )
 def segment_metrics(array, dates, break_idx, seg_mean, seg_date):
+    """
+    Get the difference of the mean of consecutive segments and the date of each break occurence.
+    """
     if np.isnan(break_idx[0]):
         return
 
