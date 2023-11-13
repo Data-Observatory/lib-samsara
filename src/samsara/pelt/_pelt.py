@@ -75,11 +75,11 @@ def pelt_dask(
 
     break_xarray = xr.DataArray(
         data=break_cubes,
-        dims=["new", "y", "x"],
+        dims=["new", array.dims[1], array.dims[2]],
         coords={
             "new": np.arange(n_breaks * 2),
-            "y": array.y,
-            "x": array.x,
+            array.dims[1]: array.coords[array.dims[1]].data,
+            array.dims[2]: array.coords[array.dims[2]].data,
         },
     )
 
