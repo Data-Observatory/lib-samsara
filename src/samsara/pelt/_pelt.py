@@ -1,6 +1,7 @@
 from typing import Union
 
 import dask.array as da
+import numpy as np
 import ruptures as rpt
 import xarray as xr
 
@@ -45,8 +46,8 @@ def pelt_dask(
     start_date: Union[str, None] = None,
     model: str = "rbf",
     min_size: int = 3,
-    jump: int = 5,
-) -> da.Array:
+    jump: int = 1,
+) -> xr.DataArray:
     data = array.data  # 3d
     dates = array.time.data  # 1d
     chunks = (n_breaks * 2, data.chunks[1], data.chunks[2])
@@ -72,7 +73,17 @@ def pelt_dask(
         new_axis=0,
     )
 
-    return break_cubes
+    break_xarray = xr.DataArray(
+        data=break_cubes,
+        dims=["new", "y", "x"],
+        coords={
+            "new": np.arange(n_breaks * 2),
+            "y": array.y,
+            "x": array.x,
+        },
+    )
+
+    return break_xarray
 
 
 def pelt_xarray(
@@ -82,7 +93,7 @@ def pelt_xarray(
     start_date: Union[str, None] = None,
     model: str = "rbf",
     min_size: int = 3,
-    jump: int = 5,
+    jump: int = 1,
 ) -> xr.DataArray:
     func_kwargs = {
         "dates": array.time.data,
@@ -108,4 +119,5 @@ def pelt_xarray(
         dask="parallelized",
         kwargs=func_kwargs,
     )
+    break_xarray = break_xarray.assign_coords({"new": np.arange(n_breaks * 2)})
     return break_xarray
