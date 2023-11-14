@@ -17,7 +17,7 @@ setup(
     use_scm_version={
         "local_scheme": "dirty-tag",
         "write_to": "src/samsara/_version.py",
-        "fallback_version": "0.0.0",
+        "fallback_version": "0.0.1",
     },
     license="LGPL-3.0-only",
     description="Package for the Satellite Alert and Monitoring System for Areas of Environmental Relevance (SAMSARA).",
