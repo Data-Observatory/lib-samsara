@@ -7,23 +7,25 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.extlinks",
     "sphinx.ext.ifconfig",
-    "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "autoapi.extension",
 ]
+
 source_suffix = ".rst"
 master_doc = "index"
 project = "SAMSARA"
 year = "2023-2024"
 author = "Data Observatory"
 copyright = f"{year}, {author}"
+
 try:
     from pkg_resources import get_distribution
 
     version = release = get_distribution("samsara").version
 except Exception:
     traceback.print_exc()
-    version = release = "0.0.0"
+    version = release = "0.0.1"
 
 pygments_style = "trac"
 templates_path = ["."]
@@ -44,6 +46,13 @@ html_sidebars = {
 }
 html_short_title = f"{project}-{version}"
 
-napoleon_use_ivar = True
-napoleon_use_rtype = False
-napoleon_use_param = False
+autoapi_type = "python"
+autoapi_dirs = ["../src/samsara"]
+autoapi_file_patterns = ["*.py"]
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "show-inheritance",
+    "show-module-summary",
+    "imported-members",
+]
