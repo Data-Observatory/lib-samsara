@@ -2,6 +2,6 @@
 Installation
 ============
 
-At the command line::
+To install from VCS, at the command line::
 
-    pip install samsara
+    pip install git+ssh://git@github.com/Data-Observatory/lib-samsara

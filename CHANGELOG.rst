@@ -2,7 +2,7 @@
 Changelog
 =========
 
-0.0.0 (2023-11-05)
+0.0.1 (2023-11-15)
 ------------------
 
-* First release on PyPI.
+* Publish subpackages :code:`kernel` and :code:`pelt`.
