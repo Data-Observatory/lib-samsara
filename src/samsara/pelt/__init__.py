@@ -1,4 +1,4 @@
-"""Pelt module (:mod: `samsara.pelt`)
+"""Subpackage for Pelt algorithm (`samsara.pelt`)
 """
 from ._block import *
 from ._dates import *

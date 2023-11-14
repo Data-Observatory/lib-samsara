@@ -1,4 +1,4 @@
-"""Kernel module (:mod: `samsara.kernel`)
+"""Subpackage for Kernel structures. (`samsara.kernel`)
 """
 from ._basic import *
 from ._kernel import *
