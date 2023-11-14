@@ -62,11 +62,6 @@ Installation
 
     pip install samsara
 
-You can also install the in-development version with::
-
-    pip install https://github.com/Data-Observatory/lib-samsara/archive/main.zip
-
-
 To install the package from the source (in an existing environment) use::
 
     git clone git@github.com:Data-Observatory/lib-samsara.git
@@ -77,7 +72,7 @@ To install the package from the source (in an existing environment) use::
 You can also install from VCS::
 
     pip install git+ssh://git@github.com/Data-Observatory/lib-samsara
-    # to install a specific branch (e.g. develop)
+    # To install a specific branch (e.g. develop)
     pip install git+ssh://git@github.com/Data-Observatory/lib-samsara@develop
 
 Documentation
