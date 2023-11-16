@@ -19,7 +19,7 @@ Overview
     :target: https://lib-samsara.readthedocs.io/
     :alt: Documentation Status
 
-.. |github-actions| image:: https://github.com/Data-Observatory/lib-samsara/actions/workflows/github-actions.yml/badge.svg
+.. |github-actions| image:: https://github.com/Data-Observatory/lib-samsara/actions/workflows/test.yml/badge.svg
     :alt: GitHub Actions Build Status
     :target: https://github.com/Data-Observatory/lib-samsara/actions
 
