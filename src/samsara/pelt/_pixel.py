@@ -54,8 +54,6 @@ def pixel_pelt(
     The value of `jump` is set to 1 due to ruptures setting not accepting values other than 1 for
     KernelCPD.
     """
-    # array : dataarray 1dim (time, ) because of input_core_dims
-    # dates : len equal to first dim of array of type datetime
     break_idx = pixel_breakpoints_index(array, penalty, model, min_size, jump)
 
     # Get filtered array and valid indices
