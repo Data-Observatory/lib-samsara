@@ -59,8 +59,8 @@ setup(
         "Private :: Do Not Upload",
     ],
     project_urls={
-        "Documentation": "https://lib-samsara.readthedocs.io/",
-        "Changelog": "https://lib-samsara.readthedocs.io/en/latest/changelog.html",
+        "Documentation": "https://data-observatory.github.io/lib-samsara/",
+        "Changelog": "https://data-observatory.github.io/lib-samsara/changelog.html",
         "Issue Tracker": "https://github.com/Data-Observatory/lib-samsara/issues",
     },
     keywords=[

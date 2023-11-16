@@ -58,10 +58,6 @@ Package for the Satellite Alert and Monitoring System for Areas of Environmental
 Installation
 ============
 
-::
-
-    pip install samsara
-
 To install the package from the source (in an existing environment) use::
 
     git clone git@github.com:Data-Observatory/lib-samsara.git
@@ -79,7 +75,7 @@ Documentation
 =============
 
 
-https://lib-samsara.readthedocs.io/
+https://data-observatory.github.io/lib-samsara/
 
 
 Development
