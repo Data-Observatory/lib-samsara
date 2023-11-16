@@ -11,12 +11,14 @@ Overview
       - |docs|
     * - tests
       - | |github-actions|
-        | |codecov|
     * - package
-      - | |version| |wheel| |supported-versions| |supported-implementations|
-        | |commits-since|
-.. |docs| image:: https://readthedocs.org/projects/lib-samsara/badge/?style=flat
-    :target: https://lib-samsara.readthedocs.io/
+      - | |commits-since|
+
+..      | |codecov|
+..      | |version| |wheel| |supported-versions| |supported-implementations|
+
+.. |docs| image:: https://github.com/Data-Observatory/lib-samsara/actions/workflows/docs.yml/badge.svg
+    :target: https://data-observatory.github.io/lib-samsara/
     :alt: Documentation Status
 
 .. |github-actions| image:: https://github.com/Data-Observatory/lib-samsara/actions/workflows/test.yml/badge.svg
@@ -68,7 +70,9 @@ To install the package from the source (in an existing environment) use::
 You can also install from VCS::
 
     pip install git+ssh://git@github.com/Data-Observatory/lib-samsara
-    # To install a specific branch (e.g. develop)
+
+To install a specific branch (e.g. develop) from VCS use::
+
     pip install git+ssh://git@github.com/Data-Observatory/lib-samsara@develop
 
 Documentation
