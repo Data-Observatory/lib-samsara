@@ -70,7 +70,7 @@ def pixel_pelt(
 
     # Return mean magnitude and segment dates
     if len(break_idx) == 0:
-        return np.full((n_breaks), np.nan), np.full((n_breaks), np.nan)
+        return np.full((n_breaks * 2), np.nan)
 
     segment_mean_mag, segment_dates = pixel_segment_metrics(array, dates, break_idx)
 
