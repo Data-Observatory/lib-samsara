@@ -123,6 +123,56 @@ class TestPelt:
         assert res.shape == (2 * n_breaks, array_shape[1], array_shape[2])
         assert np.count_nonzero(np.isnan(res)) == n_nan
 
+    def test_block_pelt_int_breakidx(self):
+        array = pw_constant(30, 1, 4, noise_std=2, seed=723)[0].reshape((30, 1, 1))
+        dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(30)])
+        year_fraction = np.array(
+            [
+                2010.0,
+                2010.02739726,
+                2010.05479452,
+                2010.08219178,
+                2010.10958904,
+                2010.1369863,
+                2010.16438356,
+                2010.19178082,
+                2010.21917808,
+                2010.24657534,
+                2010.2739726,
+                2010.30136986,
+                2010.32876712,
+                2010.35616438,
+                2010.38356164,
+                2010.4109589,
+                2010.43835616,
+                2010.46575342,
+                2010.49315068,
+                2010.52054795,
+                2010.54794521,
+                2010.57534247,
+                2010.60273973,
+                2010.63013699,
+                2010.65753425,
+                2010.68493151,
+                2010.71232877,
+                2010.73972603,
+                2010.76712329,
+                2010.79452055,
+            ]
+        )
+        algo_rpt = KernelCPD(kernel="rbf", min_size=3, jump=5)
+        res = pelt.block_pelt(
+            array=array,
+            dates=dates,
+            year_fraction=year_fraction,
+            n_breaks=4,
+            penalty=1,
+            start_date=None,
+            algo_rpt=algo_rpt,
+        )
+        assert res.shape == (8, 1, 1)
+        assert np.count_nonzero(np.isnan(res)) == 0
+
     @pytest.mark.parametrize(
         ("n_breaks", "start_date"),
         [(3, None), (4, None), (3, "2007-03-28")],
