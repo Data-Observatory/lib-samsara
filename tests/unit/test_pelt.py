@@ -78,10 +78,19 @@ class TestPelt:
         assert res == pytest.approx(expected)
 
     @pytest.mark.parametrize(
-        ("n_breaks", "start_date", "n_nan"), [(3, None, 0), (6, None, 4)]
+        ("signal_breaks", "n_breaks", "start_date", "n_nan"),
+        [
+            (4, 3, None, 0),
+            (7, 6, None, 4),
+            (7, 6, "2010-05-20", 8),
+            (6, 5, "2011-06-30", 10),
+            (1, 6, None, 10),
+            (1, 6, "2010-05-20", 12),
+            (4, 4, None, 0),
+        ],
     )
-    def test_pixel_pelt(self, n_breaks, start_date, n_nan):
-        array = pw_constant(30, 1, n_breaks + 1, noise_std=2, seed=723)[0].reshape(30)
+    def test_pixel_pelt(self, signal_breaks, n_breaks, start_date, n_nan):
+        array = pw_constant(30, 1, signal_breaks, noise_std=2, seed=723)[0].reshape(30)
         dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(30)])
         res = pelt.pixel_pelt(
             array=array,
@@ -131,3 +140,16 @@ class TestPelt:
         array_shape = pelt_signal_xarray.shape
         res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="dask")
         assert res.shape == (2 * n_breaks, array_shape[1], array_shape[2])
+
+    def test_pelt_model_error(self, pelt_signal_xarray):
+        with pytest.raises(
+            ValueError, match="Only rbf is accepted as kernel model for KernelCPD"
+        ):
+            pelt.pelt(pelt_signal_xarray, 5, 1, model="l1")
+
+    def test_pelt_backend_error(self, pelt_signal_xarray):
+        with pytest.raises(
+            ValueError,
+            match="Incorrect backend value. Only 'dask' and 'xarray' are accepted",
+        ):
+            pelt.pelt(pelt_signal_xarray, 5, 1, backend="other")
