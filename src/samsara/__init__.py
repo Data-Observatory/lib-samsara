@@ -6,4 +6,8 @@ Using any of these subpackages requires an explicit import. For example,
 """
 __version__ = "0.0.1"
 
-__all__ = ["kernel", "pelt"]
+__all__ = [
+    "__version__",
+    "kernel",
+    "pelt",
+]
