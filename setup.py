@@ -15,7 +15,7 @@ def read(*names, **kwargs):
 setup(
     name="samsara",
     use_scm_version={
-        "local_scheme": "dirty-tag",
+        "local_scheme": "node-and-date",
         "write_to": "src/samsara/_version.py",
         "fallback_version": "0.0.1",
     },
