@@ -15,9 +15,9 @@ def read(*names, **kwargs):
 setup(
     name="samsara",
     use_scm_version={
-        "local_scheme": "dirty-tag",
+        "local_scheme": "node-and-date",
         "write_to": "src/samsara/_version.py",
-        "fallback_version": "0.0.1",
+        "fallback_version": "0.0.2",
     },
     license="LGPL-3.0-only",
     description="Package for the Satellite Alert and Monitoring System for Areas of Environmental Relevance (SAMSARA).",
@@ -59,8 +59,8 @@ setup(
         "Private :: Do Not Upload",
     ],
     project_urls={
-        "Documentation": "https://lib-samsara.readthedocs.io/",
-        "Changelog": "https://lib-samsara.readthedocs.io/en/latest/changelog.html",
+        "Documentation": "https://data-observatory.github.io/lib-samsara/",
+        "Changelog": "https://data-observatory.github.io/lib-samsara/changelog.html",
         "Issue Tracker": "https://github.com/Data-Observatory/lib-samsara/issues",
     },
     keywords=[
@@ -68,13 +68,13 @@ setup(
     ],
     python_requires=">=3.9",
     install_requires=[
-        "dask==2023.9.1",
-        "numba==0.58.1",
-        "rioxarray==0.15.0",
-        "ruptures==1.1.7",
-        "scikit-image==0.21.0",
-        "scikit-learn==1.2.1",
-        "xarray==2023.8.0",
+        "dask>=2023.10.0",
+        "numba>=0.58.1",
+        "rioxarray>=0.15.0",
+        "ruptures>=1.1.8",
+        "scikit-image>=0.22.0",
+        "scikit-learn>=1.3.2",
+        "xarray>=2023.10.1",
     ],
     extras_require={
         "dev": [

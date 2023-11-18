@@ -4,6 +4,10 @@ SAMSARA: Package for the Satellite Alert and Monitoring System for Areas of Envi
 Using any of these subpackages requires an explicit import. For example,
 ``import samsara.pelt`` or ``from samsara import pelt``.
 """
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 
-__all__ = ["kernel", "pelt"]
+__all__ = [
+    "__version__",
+    "kernel",
+    "pelt",
+]

@@ -54,8 +54,6 @@ def pixel_pelt(
     The value of `jump` is set to 1 due to ruptures setting not accepting values other than 1 for
     KernelCPD.
     """
-    # array : dataarray 1dim (time, ) because of input_core_dims
-    # dates : len equal to first dim of array of type datetime
     break_idx = pixel_breakpoints_index(array, penalty, model, min_size, jump)
 
     # Get filtered array and valid indices
@@ -70,7 +68,7 @@ def pixel_pelt(
 
     # Return mean magnitude and segment dates
     if len(break_idx) == 0:
-        return np.full((n_breaks), np.nan), np.full((n_breaks), np.nan)
+        return np.full((n_breaks * 2), np.nan)
 
     segment_mean_mag, segment_dates = pixel_segment_metrics(array, dates, break_idx)
 
@@ -128,10 +126,10 @@ def pixel_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
     segment_mean = np.zeros(len(break_idx), dtype=float)
     segment_dates = np.zeros(len(break_idx) - 1, dtype=float)
     for i, (j, k) in enumerate(zip(break_idx, break_idx[1:])):
-        segment_mean[i] = array[j:k].mean()
+        segment_mean[i] = np.nanmean(array[j:k])
         segment_dates[i] = datetime_to_year_fraction(dates[k])
 
-    segment_mean[-1] = array[break_idx[-1] :].mean()
+    segment_mean[-1] = np.nanmean(array[break_idx[-1] :])
 
     segment_mean_mag = (
         segment_mean[1:] - segment_mean[:-1]

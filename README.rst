@@ -11,15 +11,17 @@ Overview
       - |docs|
     * - tests
       - | |github-actions|
-        | |codecov|
     * - package
-      - | |version| |wheel| |supported-versions| |supported-implementations|
-        | |commits-since|
-.. |docs| image:: https://readthedocs.org/projects/lib-samsara/badge/?style=flat
-    :target: https://lib-samsara.readthedocs.io/
+      - | |commits-since|
+
+..      | |codecov|
+..      | |version| |wheel| |supported-versions| |supported-implementations|
+
+.. |docs| image:: https://github.com/Data-Observatory/lib-samsara/actions/workflows/docs.yml/badge.svg
+    :target: https://data-observatory.github.io/lib-samsara/
     :alt: Documentation Status
 
-.. |github-actions| image:: https://github.com/Data-Observatory/lib-samsara/actions/workflows/github-actions.yml/badge.svg
+.. |github-actions| image:: https://github.com/Data-Observatory/lib-samsara/actions/workflows/test.yml/badge.svg
     :alt: GitHub Actions Build Status
     :target: https://github.com/Data-Observatory/lib-samsara/actions
 
@@ -43,9 +45,9 @@ Overview
     :alt: Supported implementations
     :target: https://pypi.org/project/samsara
 
-.. |commits-since| image:: https://img.shields.io/github/commits-since/Data-Observatory/lib-samsara/v0.0.0.svg
+.. |commits-since| image:: https://img.shields.io/github/commits-since/Data-Observatory/lib-samsara/v0.0.2.svg
     :alt: Commits since latest release
-    :target: https://github.com/Data-Observatory/lib-samsara/compare/v0.0.0...main
+    :target: https://github.com/Data-Observatory/lib-samsara/compare/v0.0.2...main
 
 
 
@@ -58,10 +60,6 @@ Package for the Satellite Alert and Monitoring System for Areas of Environmental
 Installation
 ============
 
-::
-
-    pip install samsara
-
 To install the package from the source (in an existing environment) use::
 
     git clone git@github.com:Data-Observatory/lib-samsara.git
@@ -72,14 +70,16 @@ To install the package from the source (in an existing environment) use::
 You can also install from VCS::
 
     pip install git+ssh://git@github.com/Data-Observatory/lib-samsara
-    # To install a specific branch (e.g. develop)
+
+To install a specific branch (e.g. develop) from VCS use::
+
     pip install git+ssh://git@github.com/Data-Observatory/lib-samsara@develop
 
 Documentation
 =============
 
 
-https://lib-samsara.readthedocs.io/
+https://data-observatory.github.io/lib-samsara/
 
 
 Development
