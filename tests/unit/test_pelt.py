@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+import xarray as xr
 from ruptures import KernelCPD, pw_constant
 
 import samsara.pelt as pelt
@@ -81,11 +82,11 @@ class TestPelt:
         ("signal_breaks", "n_breaks", "start_date", "n_nan"),
         [
             (4, 3, None, 0),
-            (7, 6, None, 4),
-            (7, 6, "2010-05-20", 8),
-            (6, 5, "2011-06-30", 10),
-            (1, 6, None, 10),
-            (1, 6, "2010-05-20", 12),
+            (7, 6, None, 2),
+            (7, 6, "2010-05-20", 4),
+            (6, 5, "2011-06-30", 5),
+            (1, 6, None, 5),
+            (1, 6, "2010-05-20", 6),
             (4, 4, None, 0),
         ],
     )
@@ -99,8 +100,12 @@ class TestPelt:
             penalty=1,
             start_date=start_date,
         )
-        assert res.shape == (n_breaks * 2,)
-        assert np.count_nonzero(np.isnan(res)) == n_nan
+        assert isinstance(res, tuple)
+        assert len(res) == 2
+        assert res[0].shape == (n_breaks,)
+        assert res[1].shape == (n_breaks,)
+        assert np.count_nonzero(np.isnan(res[0])) == n_nan
+        assert np.count_nonzero(np.isnan(res[0])) == n_nan
 
     @pytest.mark.parametrize(
         ("n_breaks", "start_date", "n_nan"),
@@ -120,7 +125,7 @@ class TestPelt:
             start_date=start_date,
             algo_rpt=algo_rpt,
         )
-        assert res.shape == (2 * n_breaks, array_shape[1], array_shape[2])
+        assert res.shape == (array_shape[1], array_shape[2], 2 * n_breaks)
         assert np.count_nonzero(np.isnan(res)) == n_nan
 
     def test_block_pelt_int_breakidx(self):
@@ -170,7 +175,7 @@ class TestPelt:
             start_date=None,
             algo_rpt=algo_rpt,
         )
-        assert res.shape == (8, 1, 1)
+        assert res.shape == (1, 1, 8)
         assert np.count_nonzero(np.isnan(res)) == 0
 
     @pytest.mark.parametrize(
@@ -180,7 +185,15 @@ class TestPelt:
     def test_pelt_xarray(self, pelt_signal_xarray, n_breaks, start_date):
         array_shape = pelt_signal_xarray.shape
         res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="xarray")
-        assert res.shape == (array_shape[1], array_shape[2], 2 * n_breaks)
+        assert isinstance(res, xr.Dataset)
+        assert not {"y", "x", "break"} ^ set(
+            res.coords
+        )  # only those 3 values as coords
+        assert not {"magnitude", "date"} - set(
+            res.variables
+        )  # magnitude and date are in vars
+        assert res.magnitude.shape == (array_shape[1], array_shape[2], n_breaks)
+        assert res.date.shape == (array_shape[1], array_shape[2], n_breaks)
 
     @pytest.mark.parametrize(
         ("n_breaks", "start_date"),
@@ -189,7 +202,15 @@ class TestPelt:
     def test_pelt_dask(self, pelt_signal_xarray, n_breaks, start_date):
         array_shape = pelt_signal_xarray.shape
         res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="dask")
-        assert res.shape == (2 * n_breaks, array_shape[1], array_shape[2])
+        assert isinstance(res, xr.Dataset)
+        assert not {"y", "x", "break"} ^ set(
+            res.coords
+        )  # only those 3 values as coords
+        assert not {"magnitude", "date"} - set(
+            res.variables
+        )  # magnitude and date are in vars
+        assert res.magnitude.shape == (array_shape[1], array_shape[2], n_breaks)
+        assert res.date.shape == (array_shape[1], array_shape[2], n_breaks)
 
     def test_pelt_model_error(self, pelt_signal_xarray):
         with pytest.raises(
