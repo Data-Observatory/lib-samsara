@@ -50,8 +50,8 @@ def block_pelt(
         3-dim array, the two original positional dimensions and a new one of size equal to twice
         `n_breaks`, where the first `n_breaks` values correspond to the difference of the medians
         between two consecutive breaks, and the following `n_breaks` contain the date on which the
-        break occurred. This new dimension will be in the first position, which means that the
-        coordinates will be ('new', 'y', 'x').
+        break occurred. This new dimension will be in the last position, which means that the
+        coordinates will be ('y', 'x', 'new').
     """
     working_idx = None
     if start_date is not None:
@@ -67,7 +67,7 @@ def block_pelt(
 
     seg_mean, seg_dates = block_segment_metrics(array, year_fraction, break_idx)
 
-    return np.vstack([seg_mean, seg_dates])
+    return np.dstack([seg_mean, seg_dates])
 
 
 def block_breakpoints_index(
@@ -128,8 +128,8 @@ def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
 
     segment_metrics(array_t, dates, break_idx_t, seg_mean, seg_date)
 
-    seg_mean = np.transpose(seg_mean, axes=(2, 0, 1))
-    seg_date = np.transpose(seg_date, axes=(2, 0, 1))
+    # seg_mean = np.transpose(seg_mean, axes=(2, 0, 1))
+    # seg_date = np.transpose(seg_date, axes=(2, 0, 1))
 
     return seg_mean, seg_date
 

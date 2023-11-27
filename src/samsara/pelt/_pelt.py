@@ -24,7 +24,7 @@ def pelt(
     min_size: int = 3,
     jump: int = 1,
     backend: str = "dask",
-) -> xr.DataArray:
+) -> xr.Dataset:
     """Apply the linearly penalized segmentation (Pelt) over a DataArray.
 
     Apply the Pelt algorithm over every geo-coordinate to find the optimal segmentation in a time
@@ -53,14 +53,12 @@ def pelt(
 
     Returns
     -------
-    xr.DataArray
-        3-dim array, the two original positional dimensions and a new one of size equal to twice
-        `n_breaks`, where the first `n_breaks` values correspond to the difference of the medians
-        between two consecutive breaks, and the following `n_breaks` contain the date on which the
-        break occurred.
-        If the backend is dask, the new dimension will be in the first position, this means that the
-        coordinates will be ('new', 'y', 'x'). If the backend is xarray, the new dimension will be
-        in the third position, this means that the coordinates will be ('y', 'x', 'new').
+    xr.Dataset
+        3-dim array dataset. Contains two arrays, magnitude and date. The magnitude array correspond
+        to the difference of the medians between two consecutive breaks. The date array contains the
+        date on which the break occurred. Both arrays have the same dimensions, which will be
+        ('y', 'x', 'break') if the original array has dimensions ('time', 'y', 'x'). The length of
+        the break dimension is equal to `n_breaks`.
 
     Raises
     ------
@@ -97,12 +95,15 @@ def pelt(
 
     >>> import samsara.pelt as pelt
     >>> pelt.pelt(a, 3, 1)
-    <xarray.DataArray (new: 6, y: 4, x: 5)>
-    dask.array<block_pelt, shape=(6, 4, 5), dtype=float64, chunksize=(6, 4, 5)>
+    <xarray.Dataset>
+    Dimensions:    (y: 4, x: 5, break: 3)
     Coordinates:
-    * new      (new) int64 0 1 2 3 4 5
-    * y        (y) int64 0 1 2 3
-    * x        (x) int64 0 1 2 3 4
+    * y          (y) int64 0 1 2 3
+    * x          (x) int64 0 1 2 3 4
+    * break      (break) int64 0 1 2
+    Data variables:
+        magnitude  (y, x, break) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
+        date       (y, x, break) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
 
     """
     if model != "rbf":
@@ -128,13 +129,19 @@ def pelt_dask(
     model: str = "rbf",
     min_size: int = 3,
     jump: int = 1,
-) -> xr.DataArray:
+) -> xr.Dataset:
     """
     Apply Pelt using dask and map_blocks.
     """
     data = array.data  # 3d
     dates = array.time.data  # 1d
-    chunks = (n_breaks * 2, data.chunks[1], data.chunks[2])
+    # Recognize coordinates
+    notime_dims = [i for i in array.dims if i != "time"]
+    coord_0 = notime_dims[0]
+    coord_1 = notime_dims[1]
+    idx_c0 = array.dims.index(coord_0)
+    idx_c1 = array.dims.index(coord_1)
+    chunks = (data.chunks[idx_c0], data.chunks[idx_c1], n_breaks * 2)
     # Each chunk, that contains the whole time series, will generate 2 chunks, where the first is
     # the mean magnitude and the second is the dates. There is no problem with iterated magnitude
     # values and dates because the time dimension is not chunked.
@@ -154,18 +161,22 @@ def pelt_dask(
         dtype=float,
         chunks=chunks,
         drop_axis=0,
-        new_axis=0,
+        new_axis=2,
     )
-    break_xarray = xr.DataArray(
-        data=break_cubes,
-        dims=["new", array.dims[1], array.dims[2]],
+    magnitude = da.take(break_cubes, np.arange(0, n_breaks), axis=-1)
+    date = da.take(break_cubes, np.arange(n_breaks, n_breaks * 2), axis=-1)
+    pelt_ds = xr.Dataset(
+        data_vars={
+            "magnitude": ([coord_0, coord_1, "break"], magnitude),
+            "date": ([coord_0, coord_1, "break"], date),
+        },
         coords={
-            "new": np.arange(n_breaks * 2),
-            array.dims[1]: array.coords[array.dims[1]].data,
-            array.dims[2]: array.coords[array.dims[2]].data,
+            coord_0: array.coords[coord_0].data,
+            coord_1: array.coords[coord_1].data,
+            "break": np.arange(n_breaks),
         },
     )
-    return break_xarray
+    return pelt_ds
 
 
 def pelt_xarray(
@@ -176,7 +187,7 @@ def pelt_xarray(
     model: str = "rbf",
     min_size: int = 3,
     jump: int = 1,
-) -> xr.DataArray:
+) -> xr.Dataset:
     """
     Apply Pelt using xarray and apply_ufunc.
     """
@@ -189,20 +200,29 @@ def pelt_xarray(
         "min_size": min_size,
         "jump": jump,
     }
-    break_xarray = xr.apply_ufunc(
+    break_xarrays = xr.apply_ufunc(
         pixel_pelt,
         array,
         input_core_dims=[["time"]],
-        output_core_dims=[["new"]],
+        output_core_dims=[["break"], ["break"]],
         exclude_dims={"time"},
         vectorize=True,
-        output_dtypes=[array.dtype],
+        output_dtypes=[float, float],
         dask_gufunc_kwargs={
-            "output_sizes": {"new": n_breaks * 2},
+            "output_sizes": {"break": n_breaks},
             "allow_rechunk": True,
         },
         dask="parallelized",
         kwargs=func_kwargs,
     )
-    break_xarray = break_xarray.assign_coords({"new": np.arange(n_breaks * 2)})
-    return break_xarray
+    pelt_ds = xr.Dataset(
+        data_vars={
+            "magnitude": break_xarrays[0],
+            "date": break_xarrays[1],
+        },
+        coords={
+            "break": np.arange(n_breaks),
+        },
+    )
+
+    return pelt_ds
