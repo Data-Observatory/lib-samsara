@@ -10,6 +10,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
     "autoapi.extension",
+    "nbsphinx",
 ]
 
 source_suffix = ".rst"
