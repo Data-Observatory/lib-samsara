@@ -135,7 +135,7 @@ def last_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
 
 def _get_func(filter_type: str) -> callable:
     """
-    Get the function that filters the
+    Get the function for the requested filter type
     """
     if filter_type == "negative_of_first":
         return negative_of_first
