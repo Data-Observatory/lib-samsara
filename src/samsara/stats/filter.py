@@ -149,27 +149,21 @@ def _get_func(filter_type: str) -> callable:
         raise ValueError("Invalid filter type.")
 
 
-def _pixel_negative_of_last(
-    magnitude: np.ndarray, date: np.ndarray, variable: str = "magnitude"
-) -> tuple:
-    data = {"magnitude": magnitude, "date": date}
-    last_not_nan = np.argwhere(~np.isnan(magnitude))
+def _pixel_negative_of_last(data: np.ndarray, date: np.ndarray) -> tuple:
+    last_not_nan = np.nonzero(~np.isnan(data))[0]
     idx = last_not_nan[-1] if len(last_not_nan) > 0 else 0  # index of last not nan
 
-    if data[variable][idx] > -1 and data[variable][idx] < 0:
-        return magnitude[idx], date[idx]
+    if data[idx] > -1 and data[idx] < 0:
+        return data[idx], date[idx]
     else:
         return np.nan, np.nan
 
 
-def _pixel_n_negative(
-    magnitude: np.ndarray, date: np.ndarray, n: int = 0, variable: str = "magnitude"
-) -> tuple:
-    data = {"magnitude": magnitude, "date": date}
-    negatives = np.argwhere((data[variable] < 0) * (data[variable] > -1))
+def _pixel_n_negative(data: np.ndarray, date: np.ndarray, n: int = 0) -> tuple:
+    negatives = np.nonzero((data < 0) * (data > -1))[0]
 
     if len(negatives) == 0:
         return np.nan, np.nan
 
     idx = negatives[n]
-    return magnitude[idx], date[idx]
+    return data[idx], date[idx]
