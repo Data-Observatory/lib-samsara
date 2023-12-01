@@ -9,7 +9,6 @@ import ruptures as rpt
 import xarray as xr
 
 from ._block import block_pelt
-from ._dates import datetime_to_year_fraction
 from ._pixel import pixel_pelt
 
 __all__ = ["pelt"]
@@ -145,7 +144,7 @@ def pelt_dask(
     # Each chunk, that contains the whole time series, will generate 2 chunks, where the first is
     # the mean magnitude and the second is the dates. There is no problem with iterated magnitude
     # values and dates because the time dimension is not chunked.
-    year_fraction = datetime_to_year_fraction(dates)
+    dates_timestamp = dates.astype("datetime64[s]").astype(float)
 
     algo_rpt = rpt.KernelCPD(kernel=model, min_size=min_size, jump=jump)
 
@@ -153,7 +152,7 @@ def pelt_dask(
         block_pelt,
         data,
         dates,
-        year_fraction,
+        dates_timestamp,
         n_breaks,
         penalty,
         start_date,

@@ -15,7 +15,7 @@ __all__ = ["block_pelt"]
 def block_pelt(
     array: np.ndarray,
     dates: np.ndarray,
-    year_fraction: np.ndarray,
+    dates_timestamp: np.ndarray,
     n_breaks: int,
     penalty: float,
     start_date: Union[str, None],
@@ -32,9 +32,8 @@ def block_pelt(
         3-dim array, with dimensions ('time', 'y', 'x'), to apply pelt over each (x, y) pair.
     dates : np.ndarray
         Array with dates of type np.datetime64.
-    year_fraction : np.ndarray
-        Array with dates of type float. Should be the `dates` array with the date as year as the
-        whole number and the day of the year as decimal.
+    dates_timestamp : np.ndarray
+        Array with dates of type float. Should be the `dates` array as UNIX time/timestamp.
     n_breaks : int
         Number of breaks expected in the data.
     penalty : float
@@ -65,7 +64,7 @@ def block_pelt(
         valid_index=working_idx,
     )  # 3d array (n_breaks, y, x)
 
-    seg_mean, seg_dates = block_segment_metrics(array, year_fraction, break_idx)
+    seg_mean, seg_dates = block_segment_metrics(array, dates_timestamp, break_idx)
 
     return np.dstack([seg_mean, seg_dates])
 

@@ -6,7 +6,7 @@ from typing import Union
 import numpy as np
 import ruptures as rpt
 
-from ._dates import datetime_to_year_fraction, filter_index_by_date
+from ._dates import filter_index_by_date
 
 __all__ = ["pixel_pelt"]
 
@@ -127,7 +127,7 @@ def pixel_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
     segment_dates = np.zeros(len(break_idx) - 1, dtype=float)
     for i, (j, k) in enumerate(zip(break_idx, break_idx[1:])):
         segment_mean[i] = np.nanmean(array[j:k])
-        segment_dates[i] = datetime_to_year_fraction(dates[k])
+        segment_dates[i] = dates[k].astype("datetime64[s]").astype(float)
 
     segment_mean[-1] = np.nanmean(array[break_idx[-1] :])
 
