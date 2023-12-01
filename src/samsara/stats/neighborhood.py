@@ -4,32 +4,225 @@ import dask.array as da
 import numpy as np
 import xarray as xr
 
-__all__ = ["count", "mean", "sum", "std"]
+__all__ = ["stats", "count", "mean", "sum", "std"]
 
 
 def count(
     data: xr.Dataset, radius: int = 0, variable: str = "magnitude"
 ) -> xr.DataArray:
+    """Count the elements in moving window over an n-dimensional array.
+
+    Get the moving window count over a Dask array, which is the array named `variable` in the
+    dataset.
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        Dataset with a Dask array over which the moving window count will be calculated.
+    radius : int, optional
+        Radius of the moving window, by default 0.
+    variable : str, optional
+        Data variable of the dataset on which the count will be calculated, by default
+        'magnitude'.
+
+    Returns
+    -------
+    xr.DataArray
+        Data array containing the count on the indicated variable.
+
+    Raises
+    ------
+    ValueError
+        If the specified `radius` is larger than any dimension of the array.
+    ValueError
+        If the specified `radius` is larger than the smallest chunk in any coordinate.
+
+    See Also
+    --------
+    :func:`stats <samsara.stats.neighborhood.stats>`
+    """
     return stats(data, "count", radius, variable)
 
 
 def mean(
     data: xr.Dataset, radius: int = 0, variable: str = "magnitude"
 ) -> xr.DataArray:
+    """Calculate moving window mean over an n-dimensional array.
+
+    Get the moving window mean over a Dask array, which is the array named `variable` in the
+    dataset.
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        Dataset with a Dask array over which the moving window mean will be calculated.
+    radius : int, optional
+        Radius of the moving window, by default 0.
+    variable : str, optional
+        Data variable of the dataset on which the mean will be calculated, by default
+        'magnitude'.
+
+    Returns
+    -------
+    xr.DataArray
+        Data array containing the mean on the indicated variable.
+
+    Raises
+    ------
+    ValueError
+        If the specified `radius` is larger than any dimension of the array.
+    ValueError
+        If the specified `radius` is larger than the smallest chunk in any coordinate.
+
+    See Also
+    --------
+    :func:`stats <samsara.stats.neighborhood.stats>`
+    """
     return stats(data, "mean", radius, variable)
 
 
 def sum(data: xr.Dataset, radius: int = 0, variable: str = "magnitude") -> xr.DataArray:
+    """Sum the elements in moving window over an n-dimensional array.
+
+    Get the moving window sum over a Dask array, which is the array named `variable` in the dataset.
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        Dataset with a Dask array over which the moving window sum will be calculated.
+    radius : int, optional
+        Radius of the moving window, by default 0.
+    variable : str, optional
+        Data variable of the dataset on which the sum will be calculated, by default
+        'magnitude'.
+
+    Returns
+    -------
+    xr.DataArray
+        Data array containing the sum on the indicated variable.
+
+    Raises
+    ------
+    ValueError
+        If the specified `radius` is larger than any dimension of the array.
+    ValueError
+        If the specified `radius` is larger than the smallest chunk in any coordinate.
+
+    See Also
+    --------
+    :func:`stats <samsara.stats.neighborhood.stats>`
+    """
     return stats(data, "sum", radius, variable)
 
 
 def std(data: xr.Dataset, radius: int = 0, variable: str = "magnitude") -> xr.DataArray:
+    """Calculate moving window standard deviation over an n-dimensional array.
+
+    Get the moving window standard deviation over a Dask array, which is the array named `variable`
+    in the dataset.
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        Dataset with a Dask array over which the moving window standard deviation will be
+        calculated.
+    radius : int, optional
+        Radius of the moving window, by default 0.
+    variable : str, optional
+        Data variable of the dataset on which the standard deviation will be calculated, by default
+        'magnitude'.
+
+    Returns
+    -------
+    xr.DataArray
+        Data array containing the standard deviation on the indicated variable.
+
+    Raises
+    ------
+    ValueError
+        If the specified `radius` is larger than any dimension of the array.
+    ValueError
+        If the specified `radius` is larger than the smallest chunk in any coordinate.
+
+    See Also
+    --------
+    :func:`stats <samsara.stats.neighborhood.stats>`
+    """
     return stats(data, "std", radius, variable)
 
 
 def stats(
     data: xr.Dataset, stat: str, radius: int = 0, variable: str = "magnitude"
 ) -> xr.DataArray:
+    """Calculate moving window statistics over an n-dimensional array.
+
+    Get the moving window statistics over a Dask array, which is the array named `variable` in the
+    dataset.
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        Dataset with a Dask array over which the moving window statistic will be calculated.
+    stat : str
+        Statistic to calculate.
+    radius : int, optional
+        Radius of the moving window, by default 0.
+    variable : str, optional
+        Data variable of the dataset on which the statistics will be calculated, by default
+        'magnitude'.
+
+    Returns
+    -------
+    xr.DataArray
+        Data array with the result of the statistics on the indicated variable.
+
+    Raises
+    ------
+    ValueError
+        If the specified statistic in `stat` is invalid or not supported.
+    ValueError
+        If the specified `radius` is larger than any dimension of the array.
+    ValueError
+        If the specified `radius` is larger than the smallest chunk in any coordinate.
+
+    Examples
+    --------
+    Data creation example:
+
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> mag = da.array(
+    ...     [
+    ...         [14, 43, 0, 42],
+    ...         [28, np.nan, 33, 1],
+    ...         [38, np.nan, 20, 18],
+    ...         [19, 14, 15, np.nan],
+    ...         [np.nan, 46, np.nan, 33],
+    ...     ]
+    ... )
+    >>> ds = xr.Dataset(
+    ...     data_vars={"magnitude": (["y", "x"], mag)},
+    ...     coords={"y": np.arange(mag.shape[0]), "x": np.arange(mag.shape[1])},
+    ... )
+    >>> ds
+    <xarray.Dataset>
+    Dimensions:    (y: 5, x: 4)
+    Coordinates:
+    * y          (y) int64 0 1 2 3 4
+    * x          (x) int64 0 1 2 3
+    Data variables:
+        magnitude  (y, x) float64 dask.array<chunksize=(5, 4), meta=np.ndarray>
+
+    Use samsara to get the statistics:
+
+    >>> import samsara.stats.neighborhood as nstat
+    >>> nstat.stats(ds, "count", radius=2, variable="magnitude")
+    <xarray.DataArray '_block_stats-94fc541ce6eb03fe87862690338f73fd' (y: 5, x: 4)>
+    dask.array<_block_stats, shape=(5, 4), dtype=float64, chunksize=(5, 4), chunktype=numpy.ndarray>
+    Coordinates:
+    * y        (y) int64 0 1 2 3 4
+    * x        (x) int64 0 1 2 3
+    """
     if stat not in ["count", "mean", "sum", "std"]:
         raise ValueError(
             "Requested stat not supported. "

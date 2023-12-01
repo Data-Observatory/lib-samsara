@@ -25,7 +25,7 @@ def filter_by_variable(
     Parameters
     ----------
     data : xr.Dataset
-        Dataset to filter. Must contain two 3-dim arrays, named magnitude and date. The third
+        Dataset to filter. Must contain two 3-dim Dask arrays, named magnitude and date. The third
         dimension/coordinate will be reduced, and must be named 'break'.
     filter_type : str
         Type of filter to apply. Must be either 'negative_of_first', 'negative_of_last',
