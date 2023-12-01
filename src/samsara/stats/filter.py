@@ -24,7 +24,8 @@ def filter_by_variable(
     Parameters
     ----------
     data : xr.Dataset
-        Dataset to filter. Must contain two 3-dim arrays, named magnitude and date.
+        Dataset to filter. Must contain two 3-dim arrays, named magnitude and date. The third
+        dimension/coordinate will be reduced, and must be named 'break'.
     filter_type : str
         Type of filter to apply. Must be either 'negative_of_first', 'negative_of_last',
         'first_negative', or 'last_negative'.
@@ -62,11 +63,17 @@ def filter_by_variable(
         'negative_of_last', 'first_negative', 'last_negative'.
     """
     func = _get_func(filter_type)
+
+    other_vars = list(set(data.data_vars.keys()) - set({variable}))
+    # For now, there is only support for one other variable apart from the main one
+    variable_1 = other_vars[0]
+
     kwargs = {"variable": variable}
+
     template = xr.Dataset(
         data_vars={
-            "magnitude": data.magnitude.isel({"break": 0}).drop_vars("break"),
-            "date": data.date.isel({"break": 0}).drop_vars("break"),
+            variable: data[variable].isel({"break": 0}).drop_vars("break"),
+            variable_1: data[variable_1].isel({"break": 0}).drop_vars("break"),
         }
     )
     filter_ds = data.map_blocks(func=func, kwargs=kwargs, template=template)
@@ -86,16 +93,21 @@ def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Datase
     """
     The value of the last break in `variable` must be between -1 and 0 for each pixel
     """
-    magnitude, date = xr.apply_ufunc(
+    other_vars = list(set(data.data_vars.keys()) - set({variable}))
+    # For now, there is only support for one other variable apart from the main one
+    variable_1 = other_vars[0]
+    filter_xarray = xr.apply_ufunc(
         _pixel_negative_of_last,
-        data["magnitude"],
-        data["break"],
+        data[variable],
+        data[variable_1],
         input_core_dims=[["break"], ["break"]],
         output_core_dims=[[], []],
+        output_dtypes=[float, float],
         vectorize=True,
-        kwargs={"variable": variable},
     )
-    nol = xr.Dataset(data_vars={"magnitude": magnitude, "date": date})
+    nol = xr.Dataset(
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+    )
     return nol
 
 
@@ -103,16 +115,23 @@ def first_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
     """
     The first value where `variable` is between -1 and 0 for each pixel
     """
-    magnitude, date = xr.apply_ufunc(
+    other_vars = list(set(data.data_vars.keys()) - set({variable}))
+    # For now, there is only support for one other variable apart from the main one
+    variable_1 = other_vars[0]
+
+    filter_xarray = xr.apply_ufunc(
         _pixel_n_negative,
-        data["magnitude"],
-        data["break"],
+        data[variable],
+        data[variable_1],
         input_core_dims=[["break"], ["break"]],
         output_core_dims=[[], []],
+        output_dtypes=[float, float],
         vectorize=True,
-        kwargs={"variable": variable, "n": 0},
+        kwargs={"n": 0},
     )
-    fn = xr.Dataset(data_vars={"magnitude": magnitude, "date": date})
+    fn = xr.Dataset(
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+    )
     return fn
 
 
@@ -120,16 +139,23 @@ def last_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
     """
     The last value where `variable` is between -1 and 0 for each pixel
     """
-    magnitude, date = xr.apply_ufunc(
+    other_vars = list(set(data.data_vars.keys()) - set({variable}))
+    # For now, there is only support for one other variable apart from the main one
+    variable_1 = other_vars[0]
+
+    filter_xarray = xr.apply_ufunc(
         _pixel_n_negative,
-        data["magnitude"],
-        data["break"],
+        data[variable],
+        data[variable_1],
         input_core_dims=[["break"], ["break"]],
         output_core_dims=[[], []],
+        output_dtypes=[float, float],
         vectorize=True,
-        kwargs={"variable": variable, "n": -1},
+        kwargs={"n": -1},
     )
-    ln = xr.Dataset(data_vars={"magnitude": magnitude, "date": date})
+    ln = xr.Dataset(
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+    )
     return ln
 
 
