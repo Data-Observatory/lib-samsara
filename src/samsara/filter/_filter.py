@@ -1,4 +1,5 @@
-"""Subpackage to filter values in xarray Dataset (`samsara.stats.filter`)
+"""
+User functions to apply filters.
 """
 import numpy as np
 import xarray as xr

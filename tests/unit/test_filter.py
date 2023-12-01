@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-import samsara.stats.filter as sfilter
+import samsara.filter as sfilter
 
 
 class TestFilterVariable:

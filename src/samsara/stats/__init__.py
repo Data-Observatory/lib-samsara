@@ -1,2 +1,2 @@
-"""Subpackage for Neighborhood statistics (`samsara.stats`)
+"""Subpackage for statistics (`samsara.stats`)
 """
