@@ -62,6 +62,83 @@ def filter_by_variable(
     ValueError
         If the filter type is not supported. Currently supported types are 'negative_of_first',
         'negative_of_last', 'first_negative', 'last_negative'.
+
+    Examples
+    --------
+
+    Data creation example:
+
+    >>> import dask.array as da
+    >>> import numpy as np
+    >>> import xarray as xr
+    >>> mag = da.array(
+    ...     [
+    ...         [
+    ...             [np.nan, np.nan, np.nan],
+    ...             [0.0292, -0.3283, np.nan],
+    ...             [0.3207, -0.8798, -0.9838],
+    ...             [0.4581, np.nan, np.nan],
+    ...         ],
+    ...         [
+    ...             [0.1838, -0.3835, np.nan],
+    ...             [-0.4497, 0.9151, np.nan],
+    ...             [0.1864, -0.1234, 0.5554],
+    ...             [-0.0617, -0.8852, 0.0588],
+    ...         ],
+    ...     ]
+    ... )
+    >>> dat = da.array(
+    ...     [
+    ...         [
+    ...             [np.nan, np.nan, np.nan],
+    ...             [1107475200, 1107561600, np.nan],
+    ...             [1107734400, 1107820800, 1107907200],
+    ...             [1107993600, np.nan, np.nan],
+    ...         ],
+    ...         [
+    ...             [1108252800, 1108339200, np.nan],
+    ...             [1108512000, 1108598400, np.nan],
+    ...             [1108771200, 1108857600, 1108944000],
+    ...             [1109030400, 1109116800, 1109203200],
+    ...         ],
+    ...     ]
+    ... )
+    >>> y, x, brk = mag.shape
+    >>> ds = xr.Dataset(
+    ...     data_vars={
+    ...         "magnitude": (["y", "x", "break"], mag),
+    ...         "date": (["y", "x", "break"], dat),
+    ...     },
+    ...     coords={
+    ...         "y": np.arange(y),
+    ...         "x": np.arange(x),
+    ...         "break": np.arange(brk),
+    ...     },
+    ... )
+    >>> ds
+    <xarray.Dataset>
+    Dimensions:    (y: 2, x: 4, break: 3)
+    Coordinates:
+    * y          (y) int64 0 1
+    * x          (x) int64 0 1 2 3
+    * break      (break) int64 0 1 2
+    Data variables:
+        magnitude  (y, x, break) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+        date       (y, x, break) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+
+    Use samsara to filter the dataset:
+
+    >>> import samsara.filter as sfilter
+    >>> sfilter.filter_by_variable(ds, "negative_of_last", variable="magnitude")
+    <xarray.Dataset>
+    Dimensions:    (y: 2, x: 4)
+    Coordinates:
+    * y          (y) int64 0 1
+    * x          (x) int64 0 1 2 3
+    Data variables:
+        magnitude  (y, x) float64 dask.array<chunksize=(2, 4), meta=np.ndarray>
+        date       (y, x) float64 dask.array<chunksize=(2, 4), meta=np.ndarray>
+
     """
     func = _get_func(filter_type)
 
@@ -82,8 +159,9 @@ def filter_by_variable(
 
 
 def negative_of_first(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
-    """
-    The value of the first break in `variable` must be between -1 and 0 for each pixel
+    """Filter an in-memory dataset keeping the negatives of the first index.
+
+    The value of the first break in `variable` must be between -1 and 0 for each pixel.
     """
     first = data.isel({"break": 0})
     nof = first.where((first[variable] < 0) & (first[variable] > -1)).drop_vars("break")
@@ -91,8 +169,9 @@ def negative_of_first(data: xr.Dataset, variable: str = "magnitude") -> xr.Datas
 
 
 def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
-    """
-    The value of the last break in `variable` must be between -1 and 0 for each pixel
+    """Filter an in-memory dataset keeping the negatives of the last index.
+
+    The value of the last break in `variable` must be between -1 and 0 for each pixel.
     """
     other_vars = list(set(data.data_vars.keys()) - set({variable}))
     # For now, there is only support for one other variable apart from the main one
@@ -113,8 +192,9 @@ def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Datase
 
 
 def first_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
-    """
-    The first value where `variable` is between -1 and 0 for each pixel
+    """Filter an in-memory dataset keeping the first negative.
+
+    The first value where `variable` is between -1 and 0 for each pixel.
     """
     other_vars = list(set(data.data_vars.keys()) - set({variable}))
     # For now, there is only support for one other variable apart from the main one
@@ -137,8 +217,9 @@ def first_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
 
 
 def last_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
-    """
-    The last value where `variable` is between -1 and 0 for each pixel
+    """Filter an in-memory dataset keeping the last negative.
+
+    The last value where `variable` is between -1 and 0 for each pixel.
     """
     other_vars = list(set(data.data_vars.keys()) - set({variable}))
     # For now, there is only support for one other variable apart from the main one
