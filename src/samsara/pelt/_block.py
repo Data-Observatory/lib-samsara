@@ -127,9 +127,6 @@ def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
 
     segment_metrics(array_t, dates, break_idx_t, seg_mean, seg_date)
 
-    # seg_mean = np.transpose(seg_mean, axes=(2, 0, 1))
-    # seg_date = np.transpose(seg_date, axes=(2, 0, 1))
-
     return seg_mean, seg_date
 
 
