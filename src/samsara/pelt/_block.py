@@ -15,7 +15,7 @@ __all__ = ["block_pelt"]
 def block_pelt(
     array: np.ndarray,
     dates: np.ndarray,
-    year_fraction: np.ndarray,
+    dates_timestamp: np.ndarray,
     n_breaks: int,
     penalty: float,
     start_date: Union[str, None],
@@ -32,9 +32,8 @@ def block_pelt(
         3-dim array, with dimensions ('time', 'y', 'x'), to apply pelt over each (x, y) pair.
     dates : np.ndarray
         Array with dates of type np.datetime64.
-    year_fraction : np.ndarray
-        Array with dates of type float. Should be the `dates` array with the date as year as the
-        whole number and the day of the year as decimal.
+    dates_timestamp : np.ndarray
+        Array with dates of type float. Should be the `dates` array as UNIX time/timestamp.
     n_breaks : int
         Number of breaks expected in the data.
     penalty : float
@@ -50,8 +49,8 @@ def block_pelt(
         3-dim array, the two original positional dimensions and a new one of size equal to twice
         `n_breaks`, where the first `n_breaks` values correspond to the difference of the medians
         between two consecutive breaks, and the following `n_breaks` contain the date on which the
-        break occurred. This new dimension will be in the first position, which means that the
-        coordinates will be ('new', 'y', 'x').
+        break occurred. This new dimension will be in the last position, which means that the
+        coordinates will be ('y', 'x', 'new').
     """
     working_idx = None
     if start_date is not None:
@@ -65,9 +64,9 @@ def block_pelt(
         valid_index=working_idx,
     )  # 3d array (n_breaks, y, x)
 
-    seg_mean, seg_dates = block_segment_metrics(array, year_fraction, break_idx)
+    seg_mean, seg_dates = block_segment_metrics(array, dates_timestamp, break_idx)
 
-    return np.vstack([seg_mean, seg_dates])
+    return np.dstack([seg_mean, seg_dates])
 
 
 def block_breakpoints_index(
@@ -127,9 +126,6 @@ def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
     seg_date = np.full_like(break_idx_t, np.nan)
 
     segment_metrics(array_t, dates, break_idx_t, seg_mean, seg_date)
-
-    seg_mean = np.transpose(seg_mean, axes=(2, 0, 1))
-    seg_date = np.transpose(seg_date, axes=(2, 0, 1))
 
     return seg_mean, seg_date
 

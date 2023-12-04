@@ -6,7 +6,7 @@ from typing import Union
 import numpy as np
 import ruptures as rpt
 
-from ._dates import datetime_to_year_fraction, filter_index_by_date
+from ._dates import filter_index_by_date
 
 __all__ = ["pixel_pelt"]
 
@@ -20,7 +20,7 @@ def pixel_pelt(
     model: str = "rbf",
     min_size: int = 3,
     jump: int = 1,
-) -> np.ndarray:
+) -> tuple:
     """Apply the linearly penalized segmentation (Pelt) over a NumPy Array.
 
     Parameters
@@ -44,10 +44,10 @@ def pixel_pelt(
 
     Returns
     -------
-    np.ndarray
-        1-dim array, with length equal to twice `n_breaks`, where the first `n_breaks` values
-        correspond to the difference of the medians between two consecutive breaks, and the
-        following `n_breaks` contain the date on which the break occurred.
+    tuple
+        Tuple of 2 1-dim arrays, each with length equal to `n_breaks`. The first array correspond to
+        the difference of the medians between two consecutive breaks, known as magnitude. The second
+        array contains the dates on which each break occurred.
 
     Notes
     -----
@@ -68,7 +68,7 @@ def pixel_pelt(
 
     # Return mean magnitude and segment dates
     if len(break_idx) == 0:
-        return np.full((n_breaks * 2), np.nan)
+        return np.full(n_breaks, np.nan), np.full(n_breaks, np.nan)
 
     segment_mean_mag, segment_dates = pixel_segment_metrics(array, dates, break_idx)
 
@@ -87,12 +87,12 @@ def pixel_pelt(
             mode="constant",
             constant_values=np.nan,
         )
-        return np.hstack([segment_mean_mag, segment_dates])
+        return segment_mean_mag, segment_dates
 
     if len_segment > n_breaks:
-        return np.hstack([segment_mean_mag[:n_breaks], segment_dates[:n_breaks]])
+        return segment_mean_mag[:n_breaks], segment_dates[:n_breaks]
 
-    return np.hstack([segment_mean_mag, segment_dates])
+    return segment_mean_mag, segment_dates
 
 
 def pixel_breakpoints_index(
@@ -127,7 +127,7 @@ def pixel_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
     segment_dates = np.zeros(len(break_idx) - 1, dtype=float)
     for i, (j, k) in enumerate(zip(break_idx, break_idx[1:])):
         segment_mean[i] = np.nanmean(array[j:k])
-        segment_dates[i] = datetime_to_year_fraction(dates[k])
+        segment_dates[i] = dates[k].astype("datetime64[s]").astype(float)
 
     segment_mean[-1] = np.nanmean(array[break_idx[-1] :])
 
