@@ -12,9 +12,8 @@ def plus_minus(p: np.ndarray, px_plus_y: np.ndarray, px_minus_y: np.ndarray) -> 
     n = p.shape[0]
 
     for i in range(n):
-        for j in range(n):
-            px_plus_y[i + j] += p[i, j]
-            px_minus_y[abs(i - j)] += p[i, j]
+        px_plus_y[i : i + n] += p[i, :]
+        px_minus_y[abs(i - np.arange(n))] += p[i, :]
 
     return px_plus_y, px_minus_y
 
