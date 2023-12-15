@@ -70,12 +70,19 @@ def features(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
     px_minus_y = np.full(maxv, fill_value=0, dtype=np.double)
     px_plus_y, px_minus_y = plus_minus(p, px_plus_y, px_minus_y)
 
-    fts[0] = np.dot(pravel, pravel)  # 1. ASM
-    fts[1] = np.dot(k2, px_minus_y)  # 2. Contrast
-    fts[2] = correlation(sx, sy, ux, uy, pravel, ij)  # 3. Correlation
-    fts[3] = vx  # 4. Variance
-    fts[4] = np.dot(i_j2_p1, pravel)  # 5. Inverse Difference Moment
-    fts[5] = np.dot(tk, px_plus_y)  # 6. Sum Average
-    fts[6] = entropy(pravel)  # 9. Entropy
+    fts = [
+        np.dot(pravel, pravel),  # 1. ASM
+        np.dot(k2, px_minus_y),  # 2. Contrast
+        correlation(sx, sy, ux, uy, pravel, ij),  # 3. Correlation
+        vx,  # 4. Variance
+        np.dot(i_j2_p1, pravel),  # 5. Inverse Difference Moment
+        np.dot(tk, px_plus_y),  # 6. Sum Average
+        entropy(pravel),  # 9. Entropy
+    ]
 
-    return fts
+    if len(fts) < n_feats:
+        return np.pad(
+            np.array(fts, dtype=float), (0, n_feats - len(fts)), constant_values=np.nan
+        )
+
+    return fts[:n_feats]
