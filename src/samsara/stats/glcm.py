@@ -2,6 +2,7 @@ import math
 from itertools import product
 from typing import Union
 
+import dask.array as da
 import numpy as np
 import xarray as xr
 from skimage.feature import graycomatrix
@@ -9,20 +10,78 @@ from skimage.feature import graycomatrix
 from ._features import correlation, entropy, plus_minus
 
 
-def glcm(array: xr.DataArray, radius: int):
-    # mb_kwargs = {
-    #     "dtype": float,  # Review
-    #     "chunks": chunks_,  # Done
-    #     "drop_axis": None,  # Done
-    #     "new_axis": 0,  # Done
-    #     "radius": radius,  # Done, func kwarg
-    #     "distances": distances,  # Done
-    #     "angles": angles,  # Done
-    #     "levels": levels,  # Done
-    #     "symmetric": True,
-    #     "normed": True,
-    # }
-    pass
+def glcm(
+    array: xr.DataArray, radius: int, n_feats: int = 7, **kwargs
+) -> Union[da.Array, np.ndarray]:
+    """Calculate texture properties of an image.
+
+    For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
+    and the properties of that glcm. The properties are the following:
+    - ASM
+    - Contrast
+    - Correlation
+    - Variance
+    - Inverse Difference Moment
+    - Sum Average
+    - Entropy
+
+    Parameters
+    ----------
+    array : xr.DataArray
+        2-dim DataArray image.
+    radius : int
+        Radius of the moving window.
+    n_feats : int, optional
+        Number of features or properties computed, by default 7.
+    kwargs :
+        Other keyword arguments to pass to function :func:`textures <samsara.stats.glcm.textures>`.
+
+    Returns
+    -------
+    Union[da.Array, np.ndarray]
+        3-dim array with the texture properties for each pixel. The new axis is located at the first
+        dimension, and indexes the property.
+
+    Raises
+    ------
+    ValueError
+        If array is not 2-dimensional.
+
+    See Also
+    --------
+    :func:`textures <samsara.stats.glcm.textures>`
+    :func:`graycomatrix <skimage.feature.graycomatrix>`
+
+    """
+    data = array.data
+
+    if data.ndim != 2:
+        raise ValueError(f"Expected 2-dimensional data, got {data.ndim} dimensions")
+
+    kwargs["radius"] = radius
+    kwargs["n_feats"] = n_feats
+
+    if isinstance(data, da.Array):
+        chunks_ = ((n_feats,), *list(data.chunks))
+        glcm_cube = da.map_overlap(
+            textures,
+            data,
+            depth=radius,
+            boundary=0,
+            trim=False,
+            align_arrays=False,
+            allow_rechunk=False,
+            dtype=float,
+            chunks=chunks_,
+            drop_axis=None,
+            new_axis=0,
+            **kwargs,
+        )
+        return glcm_cube
+    # Non-chunked
+    data_pad = np.pad(data, ((radius, radius), (radius, radius)))
+    glcm_cube = textures(data_pad, radius, **kwargs)
+    return glcm_cube
 
 
 def matrix(
@@ -104,17 +163,17 @@ def features(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
     return fts[:n_feats]
 
 
-def texture(
+def textures(
     array: np.array,
     radius: int = 1,
-    distances: Union[list, None] = None,
-    angles: Union[list, None] = None,
+    n_feats: int = 7,
     nan_supression: int = 0,
     skip_nan: bool = True,
     rescale_normed: bool = False,
-    n_feats: int = 7,
+    distances: Union[list, None] = None,
+    angles: Union[list, None] = None,
     **kwargs,
-):
+) -> np.ndarray:
     if distances is None:
         distances = range(-1, 2)
     if angles is None:
