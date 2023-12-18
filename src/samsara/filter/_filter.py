@@ -158,7 +158,9 @@ def filter_by_variable(
         data_vars={
             variable: data[variable].isel({"bkp": 0}).drop_vars("bkp"),
             variable_1: data[variable_1].isel({"bkp": 0}).drop_vars("bkp"),
-        }
+        },
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     filter_ds = data.map_blocks(func=func, kwargs=kwargs, template=template)
     return filter_ds
@@ -198,7 +200,9 @@ def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Datase
         vectorize=True,
     )
     nol = xr.Dataset(
-        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]},
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     return nol
 
@@ -223,7 +227,9 @@ def first_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
         kwargs={"n": 0},
     )
     fn = xr.Dataset(
-        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]},
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     return fn
 
@@ -248,7 +254,9 @@ def last_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
         kwargs={"n": -1},
     )
     ln = xr.Dataset(
-        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]},
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     return ln
 
