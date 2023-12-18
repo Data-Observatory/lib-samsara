@@ -1,3 +1,5 @@
+"""Subpackage for statistics from gray level co-occurrence matrix (`samsara.stats.glcm`)
+"""
 import math
 from itertools import product
 from typing import Union
@@ -93,11 +95,51 @@ def matrix(
     normed: bool = False,
     nan_supression: int = 0,
     rescale_normed: bool = False,
-):
-    # nan_supression: 0 nothing
-    # nan_supression: 1 position 0,0 is replaced with 0
-    # nan_supression: 2 row and column 0 are replaced with 0
-    # nan_supression: 3 row and column 0 are removed # works for levels + 1 only
+) -> np.ndarray:
+    """Calculate the gray level co-occurrence matrix.
+
+    Parameters
+    ----------
+    array : np.ndarray
+        2-dimensional array. Input image.
+    distances : np.ndarray
+        List of pixel pair distance offsets.
+    angles : np.ndarray
+        List of pixel pair angles in radians.
+    levels : Union[int, None], optional
+        Number of gray-levels counted, by default None. This argument is required for 16-bit images
+        or higher and is typically the maximum of the image.
+    symmetric : bool, optional
+        Whether or not the output is symmetric, by default False.
+    normed : bool, optional
+        Whether or not to normalize each offset matrix, by default False.
+    nan_supression : int, optional
+        Method used to replace values in each glcm, by default 0.
+
+        - 0
+            Do nothing to glcm.
+        - 1
+            Position (0,0) in the glcm is replaced with 0s.
+        - 2
+            Row and column 0 in the glcm are replaced with 0s.
+        - 3
+            Row and column 0 are removed from the glcm. Only works for `levels` + 1.
+        - other
+            Do nothing to glcm.
+
+    rescale_normed : bool, optional
+        Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
+        even after `nan_supression`, by default False.
+
+    Returns
+    -------
+    np.ndarray
+        4-dimensional array. The gray level co-occurrence matrix/histogram.
+
+    See Also
+    --------
+    :func:`graycomatrix <skimage.feature.graycomatrix>`
+    """
     glcm_ = graycomatrix(
         array, distances, angles, levels=levels, symmetric=symmetric, normed=normed
     )
@@ -114,13 +156,42 @@ def matrix(
 
 
 def features(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
+    """Calculate texture features of a gray level co-occurrence matrix.
+
+    From a gray level co-occurrence matrix compute the following properties:
+    - ASM
+    - Contrast
+    - Correlation
+    - Variance
+    - Inverse Difference Moment
+    - Sum Average
+    - Entropy
+
+    Parameters
+    ----------
+    array : np.ndarray
+        4-dimensional array. Gray level co-occurrence histogram of an image. The coordinates are
+        (levels, levels, number of distances, number of angles).
+    n_feats : int, optional
+        Number of features or properties computed with the glcm, by default 7.
+
+    Returns
+    -------
+    np.ndarray
+        1-dim array of length `n_feats` with the features or properties computed from `array`.
+
+    See Also
+    --------
+    :func:`matrix <samsara.stats.glcm.matrix>`
+    :func:`graycomatrix <skimage.feature.graycomatrix>`
+    """
     fts = np.full((n_feats,), np.nan)
 
     maxv = len(array)
     k = np.arange(maxv)
     k2 = k**2
     tk = np.arange(2 * maxv)
-    # tk2 = tk**2
+
     i, j = np.mgrid[:maxv, :maxv]
     ij = i * j
     i_j2_p1 = (i - j) ** 2
@@ -174,6 +245,65 @@ def textures(
     angles: Union[list, None] = None,
     **kwargs,
 ) -> np.ndarray:
+    """Calculate texture properties of an in-memory image.
+
+    For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
+    and the properties of that glcm. The properties are the following:
+    - ASM
+    - Contrast
+    - Correlation
+    - Variance
+    - Inverse Difference Moment
+    - Sum Average
+    - Entropy
+
+    Parameters
+    ----------
+    array : np.array
+        2-dim image.
+    radius : int, optional
+        Radius of the moving window, by default 1.
+    n_feats : int, optional
+        Number of features or properties computed, by default 7.
+    nan_supression : int, optional
+        Method used to replace values in each glcm, by default 0.
+
+        - 0
+            Do nothing to glcm.
+        - 1
+            Position (0,0) in the glcm is replaced with 0s.
+        - 2
+            Row and column 0 in the glcm are replaced with 0s.
+        - 3
+            Row and column 0 are removed from the glcm. Only works for `levels` + 1.
+        - other
+            Do nothing to glcm.
+
+    skip_nan : bool, optional
+        Whether or not to replace fill NaN the texture of a pixel if its original value (in `array`)
+        is 0, by default True.
+    rescale_normed : bool, optional
+        Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
+        even after `nan_supression`, by default False.
+    distances : Union[list, None], optional
+        List of pixel pair distance offsets, by default [-1, 0, 1, 2].
+    angles : Union[list, None], optional
+        List of pixel pair angles in radians, by default [0, :math:`$\\pi/2$`].
+    kwargs :
+        Other keywords arguments to pass to function
+        :func:`graycomatrix <skimage.feature.graycomatrix>`.
+
+    Returns
+    -------
+    np.ndarray
+        3-dim array with the texture properties for each pixel. The new axis is located at the first
+        dimension, and indexes the property.
+
+    See Also
+    --------
+    :func:`matrix <samsara.stats.glcm.matrix>`
+    :func:`graycomatrix <skimage.feature.graycomatrix>`
+    """
     if distances is None:
         distances = range(-1, 2)
     if angles is None:
@@ -182,16 +312,15 @@ def textures(
     view = np.lib.stride_tricks.sliding_window_view(
         array, (radius * 2 + 1, radius * 2 + 1)
     )
-    # print(f"array.shape = {array.shape}")
-    metrics = n_feats  # Only 7 right now
-    response = np.zeros([metrics, *list(view.shape[:2])])
+
+    response = np.zeros([n_feats, *list(view.shape[:2])])
     range_i, range_j = range(view.shape[0]), range(view.shape[1])
 
     for i, j in product(range_i, range_j):
         subarray = view[i, j, :, :]
 
         if array[i + radius, j + radius] == 0 and skip_nan:
-            response[:, i, j] = np.repeat(np.nan, metrics)
+            response[:, i, j] = np.repeat(np.nan, n_feats)
         else:
             glcm_ = matrix(
                 subarray,
@@ -209,7 +338,7 @@ def textures(
             radius : (array.shape[0] - radius), radius : (array.shape[1] - radius)
         ]
         response[
-            (np.repeat(sub_array[np.newaxis, :, :], metrics, axis=0)) == 0
+            (np.repeat(sub_array[np.newaxis, :, :], n_feats, axis=0)) == 0
         ] = np.nan
 
     return response
