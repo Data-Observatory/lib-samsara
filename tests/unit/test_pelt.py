@@ -153,9 +153,7 @@ class TestPelt:
         array_shape = pelt_signal_xarray.shape
         res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="xarray")
         assert isinstance(res, xr.Dataset)
-        assert not {"y", "x", "break"} ^ set(
-            res.coords
-        )  # only those 3 values as coords
+        assert not {"y", "x", "bkp"} ^ set(res.coords)  # only those 3 values as coords
         assert not {"magnitude", "date"} - set(
             res.variables
         )  # magnitude and date are in vars
@@ -170,9 +168,7 @@ class TestPelt:
         array_shape = pelt_signal_xarray.shape
         res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="dask")
         assert isinstance(res, xr.Dataset)
-        assert not {"y", "x", "break"} ^ set(
-            res.coords
-        )  # only those 3 values as coords
+        assert not {"y", "x", "bkp"} ^ set(res.coords)  # only those 3 values as coords
         assert not {"magnitude", "date"} - set(
             res.variables
         )  # magnitude and date are in vars

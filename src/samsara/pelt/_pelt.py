@@ -56,7 +56,7 @@ def pelt(
         3-dim array dataset. Contains two arrays, magnitude and date. The magnitude array correspond
         to the difference of the medians between two consecutive breaks. The date array contains the
         date on which the break occurred. Both arrays have the same dimensions, which will be
-        ('y', 'x', 'break') if the original array has dimensions ('time', 'y', 'x'). The length of
+        ('y', 'x', 'bkp') if the original array has dimensions ('time', 'y', 'x'). The length of
         the break dimension is equal to `n_breaks`.
 
     Raises
@@ -95,14 +95,14 @@ def pelt(
     >>> import samsara.pelt as pelt
     >>> pelt.pelt(a, 3, 1)
     <xarray.Dataset>
-    Dimensions:    (y: 4, x: 5, break: 3)
+    Dimensions:    (y: 4, x: 5, bkp: 3)
     Coordinates:
     * y          (y) int64 0 1 2 3
     * x          (x) int64 0 1 2 3 4
-    * break      (break) int64 0 1 2
+    * bkp      (bkp) int64 0 1 2
     Data variables:
-        magnitude  (y, x, break) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
-        date       (y, x, break) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
+        magnitude  (y, x, bkp) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
+        date       (y, x, bkp) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
 
     """
     if model != "rbf":
@@ -166,13 +166,13 @@ def pelt_dask(
     date = da.take(break_cubes, np.arange(n_breaks, n_breaks * 2), axis=-1)
     pelt_ds = xr.Dataset(
         data_vars={
-            "magnitude": ([coord_0, coord_1, "break"], magnitude),
-            "date": ([coord_0, coord_1, "break"], date),
+            "magnitude": ([coord_0, coord_1, "bkp"], magnitude),
+            "date": ([coord_0, coord_1, "bkp"], date),
         },
         coords={
             coord_0: array.coords[coord_0].data,
             coord_1: array.coords[coord_1].data,
-            "break": np.arange(n_breaks),
+            "bkp": np.arange(n_breaks),
         },
     )
     return pelt_ds
@@ -203,12 +203,12 @@ def pelt_xarray(
         pixel_pelt,
         array,
         input_core_dims=[["time"]],
-        output_core_dims=[["break"], ["break"]],
+        output_core_dims=[["bkp"], ["bkp"]],
         exclude_dims={"time"},
         vectorize=True,
         output_dtypes=[float, float],
         dask_gufunc_kwargs={
-            "output_sizes": {"break": n_breaks},
+            "output_sizes": {"bkp": n_breaks},
             "allow_rechunk": True,
         },
         dask="parallelized",
@@ -220,7 +220,7 @@ def pelt_xarray(
             "date": break_xarrays[1],
         },
         coords={
-            "break": np.arange(n_breaks),
+            "bkp": np.arange(n_breaks),
         },
     )
 

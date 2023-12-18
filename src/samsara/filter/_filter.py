@@ -26,25 +26,25 @@ def filter_by_variable(
     ----------
     data : xr.Dataset
         Dataset to filter. Must contain two 3-dim Dask arrays, named magnitude and date. The third
-        dimension/coordinate will be reduced, and must be named 'break'.
+        dimension/coordinate will be reduced, and must be named 'bkp'.
     filter_type : str
         Type of filter to apply. Must be either 'negative_of_first', 'negative_of_last',
         'first_negative', or 'last_negative'.
 
         - 'negative_of_first'
-            Will evaluate that the value in the first index of the 'break' coordinate of the array
+            Will evaluate that the value in the first index of the 'bkp' coordinate of the array
             `variable` is between -1 and 0, then it for each array return it values, otherwise the
             returned value is nan.
         - 'negative_of_last'
-            Will evaluate that the last value that is not nan in the 'break' coordinate of the array
+            Will evaluate that the last value that is not nan in the 'bkp' coordinate of the array
             `variable` is between -1 and 0, then it for each array return it values, otherwise the
             returned value is nan.
         - 'first_negative'
-            Will return the values that are in the index of the first value in the 'break'
+            Will return the values that are in the index of the first value in the 'bkp'
             coordinate of the array `variable` that is between -1 and 0. If no value meets this
             criteria, then the returned value is nan.
         - 'last_negative'
-            Will return the values that are in the index of the last value in the 'break'
+            Will return the values that are in the index of the last value in the 'bkp'
             coordinate of the array `variable` that is between -1 and 0. If no value meets this
             criteria, then the returned value is nan.
 
@@ -106,25 +106,25 @@ def filter_by_variable(
     >>> y, x, brk = mag.shape
     >>> ds = xr.Dataset(
     ...     data_vars={
-    ...         "magnitude": (["y", "x", "break"], mag),
-    ...         "date": (["y", "x", "break"], dat),
+    ...         "magnitude": (["y", "x", "bkp"], mag),
+    ...         "date": (["y", "x", "bkp"], dat),
     ...     },
     ...     coords={
     ...         "y": np.arange(y),
     ...         "x": np.arange(x),
-    ...         "break": np.arange(brk),
+    ...         "bkp": np.arange(brk),
     ...     },
     ... )
     >>> ds
     <xarray.Dataset>
-    Dimensions:    (y: 2, x: 4, break: 3)
+    Dimensions:    (y: 2, x: 4, bkp: 3)
     Coordinates:
     * y          (y) int64 0 1
     * x          (x) int64 0 1 2 3
-    * break      (break) int64 0 1 2
+    * bkp      (bkp) int64 0 1 2
     Data variables:
-        magnitude  (y, x, break) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
-        date       (y, x, break) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+        magnitude  (y, x, bkp) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+        date       (y, x, bkp) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
 
     Use samsara to filter the dataset:
 
@@ -150,8 +150,8 @@ def filter_by_variable(
 
     template = xr.Dataset(
         data_vars={
-            variable: data[variable].isel({"break": 0}).drop_vars("break"),
-            variable_1: data[variable_1].isel({"break": 0}).drop_vars("break"),
+            variable: data[variable].isel({"bkp": 0}).drop_vars("bkp"),
+            variable_1: data[variable_1].isel({"bkp": 0}).drop_vars("bkp"),
         }
     )
     filter_ds = data.map_blocks(func=func, kwargs=kwargs, template=template)
@@ -163,8 +163,8 @@ def negative_of_first(data: xr.Dataset, variable: str = "magnitude") -> xr.Datas
 
     The value of the first break in `variable` must be between -1 and 0 for each pixel.
     """
-    first = data.isel({"break": 0})
-    nof = first.where((first[variable] < 0) & (first[variable] > -1)).drop_vars("break")
+    first = data.isel({"bkp": 0})
+    nof = first.where((first[variable] < 0) & (first[variable] > -1)).drop_vars("bkp")
     return nof
 
 
@@ -180,7 +180,7 @@ def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Datase
         _pixel_negative_of_last,
         data[variable],
         data[variable_1],
-        input_core_dims=[["break"], ["break"]],
+        input_core_dims=[["bkp"], ["bkp"]],
         output_core_dims=[[], []],
         output_dtypes=[float, float],
         vectorize=True,
@@ -204,7 +204,7 @@ def first_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
         _pixel_n_negative,
         data[variable],
         data[variable_1],
-        input_core_dims=[["break"], ["break"]],
+        input_core_dims=[["bkp"], ["bkp"]],
         output_core_dims=[[], []],
         output_dtypes=[float, float],
         vectorize=True,
@@ -229,7 +229,7 @@ def last_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
         _pixel_n_negative,
         data[variable],
         data[variable_1],
-        input_core_dims=[["break"], ["break"]],
+        input_core_dims=[["bkp"], ["bkp"]],
         output_core_dims=[[], []],
         output_dtypes=[float, float],
         vectorize=True,

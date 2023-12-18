@@ -44,13 +44,13 @@ class TestFilterVariable:
         y, x, brk = mag.shape
         ds = xr.Dataset(
             data_vars={
-                "magnitude": (["y", "x", "break"], mag),
-                "date": (["y", "x", "break"], dat),
+                "magnitude": (["y", "x", "bkp"], mag),
+                "date": (["y", "x", "bkp"], dat),
             },
             coords={
                 "y": np.arange(y),
                 "x": np.arange(x),
-                "break": np.arange(brk),
+                "bkp": np.arange(brk),
             },
         )
         return ds
