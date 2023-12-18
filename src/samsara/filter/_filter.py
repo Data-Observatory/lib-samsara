@@ -6,7 +6,7 @@ import xarray as xr
 
 __all__ = [
     "filter_by_variable",
-    "negative_of_first",
+    "negative_of",
     "negative_of_last",
     "first_negative",
     "last_negative",
@@ -14,7 +14,7 @@ __all__ = [
 
 
 def filter_by_variable(
-    data: xr.Dataset, filter_type: str, variable: str = "magnitude"
+    data: xr.Dataset, filter_type: str, bkp_index: int = 0, variable: str = "magnitude"
 ) -> xr.Dataset:
     """Keep the values that meet a condition on a variable of a Dataset.
 
@@ -28,11 +28,11 @@ def filter_by_variable(
         Dataset to filter. Must contain two 3-dim Dask arrays, named magnitude and date. The third
         dimension/coordinate will be reduced, and must be named 'bkp'.
     filter_type : str
-        Type of filter to apply. Must be either 'negative_of_first', 'negative_of_last',
+        Type of filter to apply. Must be either 'negative_of', 'negative_of_last',
         'first_negative', or 'last_negative'.
 
-        - 'negative_of_first'
-            Will evaluate that the value in the first index of the 'bkp' coordinate of the array
+        - 'negative_of'
+            Will evaluate that the value in the `bkp_index` index of the 'bkp' coordinate of the array
             `variable` is between -1 and 0, then it for each array return it values, otherwise the
             returned value is nan.
         - 'negative_of_last'
@@ -47,7 +47,9 @@ def filter_by_variable(
             Will return the values that are in the index of the last value in the 'bkp'
             coordinate of the array `variable` that is between -1 and 0. If no value meets this
             criteria, then the returned value is nan.
-
+    bkp_index : int, optional
+        Used in 'negative_of'. The index of the bkp coordinate from which the values will be
+        obtained only if they meet the negativity condition, by default 0.
     variable : str, optional
         Name of the array on which the conditions will be evaluated, by default 'magnitude'.
 
@@ -148,6 +150,10 @@ def filter_by_variable(
 
     kwargs = {"variable": variable}
 
+    # Add bkp_index to kwargs only if it's used
+    if filter_type == "negative_of":
+        kwargs["bkp_index"] = bkp_index
+
     template = xr.Dataset(
         data_vars={
             variable: data[variable].isel({"bkp": 0}).drop_vars("bkp"),
@@ -158,14 +164,20 @@ def filter_by_variable(
     return filter_ds
 
 
-def negative_of_first(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
-    """Filter an in-memory dataset keeping the negatives of the first index.
+def negative_of(
+    data: xr.Dataset, bkp_index: int = 0, variable: str = "magnitude"
+) -> xr.Dataset:
+    """Filter an in-memory dataset keeping the negatives of the `bkp_index` index.
 
-    The value of the first break in `variable` must be between -1 and 0 for each pixel.
+    The value of the `bkp_index`-th break in `variable` must be between -1 and 0 for each pixel.
     """
-    first = data.isel({"bkp": 0})
-    nof = first.where((first[variable] < 0) & (first[variable] > -1)).drop_vars("bkp")
-    return nof
+    if bkp_index >= len(data["bkp"]):
+        raise IndexError(
+            f"Invalid bkp_index. Got index {bkp_index} for coordinate of length {len(data['bkp'])}"
+        )
+    of = data.isel({"bkp": bkp_index})
+    neg_of = of.where((of[variable] < 0) & (of[variable] > -1)).drop_vars("bkp")
+    return neg_of
 
 
 def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
@@ -245,8 +257,8 @@ def _get_func(filter_type: str) -> callable:
     """
     Get the function for the requested filter type
     """
-    if filter_type == "negative_of_first":
-        return negative_of_first
+    if filter_type == "negative_of":
+        return negative_of
     elif filter_type == "negative_of_last":
         return negative_of_last
     elif filter_type == "first_negative":
