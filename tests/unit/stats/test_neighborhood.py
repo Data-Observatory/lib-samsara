@@ -26,10 +26,10 @@ class TestStatsNeighborhood:
 
     def test_stats_error(self, data):
         with pytest.raises(ValueError, match="Requested stat not supported."):
-            ssn.stats(data, "half", radius=1, variable="magnitude")
+            ssn.stats(data, "half", kernel=1, variable="magnitude")
 
     @pytest.mark.parametrize(
-        ("radius", "expected"),
+        ("kernel", "expected"),
         [
             (
                 2,
@@ -69,15 +69,15 @@ class TestStatsNeighborhood:
             ),
         ],
     )
-    def test_stats_window_bigger_than_chunk_1c(self, data, radius, expected):
+    def test_stats_window_bigger_than_chunk_1c(self, data, kernel, expected):
         # Window is bigger than the chunk
-        res = ssn.stats(data, "count", radius=radius)
+        res = ssn.stats(data, "count", kernel=kernel)
         assert res.shape == data.magnitude.shape
         res_data = res.data.compute()
         np.testing.assert_array_almost_equal(res_data, expected)
 
     @pytest.mark.parametrize(
-        ("radius", "expected"),
+        ("kernel", "expected"),
         [
             (
                 2,
@@ -93,38 +93,39 @@ class TestStatsNeighborhood:
             ),
         ],
     )
-    def test_stats_chunks(self, data, radius, expected):
+    def test_stats_chunks(self, data, kernel, expected):
         # Window is bigger than the chunk
         data.magnitude.data = data.magnitude.data.rechunk((3, 2))
-        res = ssn.stats(data, "count", radius=radius)
+        res = ssn.stats(data, "count", kernel=kernel)
         assert res.shape == data.magnitude.shape
         res_data = res.data.compute()
         np.testing.assert_array_almost_equal(res_data, expected)
 
     @pytest.mark.parametrize(
-        ("radius"),
+        ("kernel"),
         [5, 6, 7],
     )
-    def test_stats_error_radius_bigger_than_shape(self, data, radius):
+    def test_stats_error_kernel_bigger_than_shape(self, data, kernel):
         with pytest.raises(
-            ValueError, match="Specified radius is larger than your array"
+            ValueError, match="Specified kernel radius is larger than your array"
         ):
-            ssn.stats(data, "count", radius=radius)
+            ssn.stats(data, "count", kernel=kernel)
 
     @pytest.mark.parametrize(
-        ("radius", "chunks"),
+        ("kernel", "chunks"),
         [(3, (3, 2)), (4, (3, 2)), (2, (2, 2))],
     )
-    def test_stats_error_radius_bigger_than_chunk(self, data, radius, chunks):
+    def test_stats_error_kernel_bigger_than_chunk(self, data, kernel, chunks):
         # Window is bigger than the chunk
         data.magnitude.data = data.magnitude.data.rechunk(chunks)
         with pytest.raises(
-            ValueError, match="Specified radius is larger than the smallest chunk"
+            ValueError,
+            match="Specified kernel radius is larger than the smallest chunk",
         ):
-            ssn.stats(data, "count", radius=radius)
+            ssn.stats(data, "count", kernel=kernel)
 
     @pytest.mark.parametrize(
-        ("radius", "expected"),
+        ("kernel", "expected"),
         [
             (
                 0,
@@ -152,14 +153,14 @@ class TestStatsNeighborhood:
             ),
         ],
     )
-    def test_std(self, data, radius, expected):
-        res = ssn.std(data, radius, variable="magnitude")
+    def test_std(self, data, kernel, expected):
+        res = ssn.std(data, kernel, variable="magnitude")
         assert res.shape == data.magnitude.shape
         res_data = res.data.compute()
         np.testing.assert_array_almost_equal(res_data, expected)
 
     @pytest.mark.parametrize(
-        ("radius", "expected"),
+        ("kernel", "expected"),
         [
             (
                 0,
@@ -187,14 +188,14 @@ class TestStatsNeighborhood:
             ),
         ],
     )
-    def test_count(self, data, radius, expected):
-        res = ssn.count(data, radius, variable="magnitude")
+    def test_count(self, data, kernel, expected):
+        res = ssn.count(data, kernel, variable="magnitude")
         assert res.shape == data.magnitude.shape
         res_data = res.data.compute()
         np.testing.assert_array_almost_equal(res_data, expected)
 
     @pytest.mark.parametrize(
-        ("radius", "expected"),
+        ("kernel", "expected"),
         [
             (
                 0,
@@ -222,14 +223,14 @@ class TestStatsNeighborhood:
             ),
         ],
     )
-    def test_mean(self, data, radius, expected):
-        res = ssn.mean(data, radius, variable="magnitude")
+    def test_mean(self, data, kernel, expected):
+        res = ssn.mean(data, kernel, variable="magnitude")
         assert res.shape == data.magnitude.shape
         res_data = res.data.compute()
         np.testing.assert_array_almost_equal(res_data, expected)
 
     @pytest.mark.parametrize(
-        ("radius", "expected"),
+        ("kernel", "expected"),
         [
             (
                 0,
@@ -257,8 +258,8 @@ class TestStatsNeighborhood:
             ),
         ],
     )
-    def test_sum(self, data, radius, expected):
-        res = ssn.sum(data, radius, variable="magnitude")
+    def test_sum(self, data, kernel, expected):
+        res = ssn.sum(data, kernel, variable="magnitude")
         assert res.shape == data.magnitude.shape
         res_data = res.data.compute()
         np.testing.assert_array_almost_equal(res_data, expected)
