@@ -19,13 +19,14 @@ def glcm(
 
     For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
     and the properties of that glcm. The properties are the following:
-    - ASM
-    - Contrast
-    - Correlation
-    - Variance
-    - Inverse Difference Moment
-    - Sum Average
-    - Entropy
+
+        - ASM
+        - Contrast
+        - Correlation
+        - Variance
+        - Inverse Difference Moment
+        - Sum Average
+        - Entropy
 
     Parameters
     ----------
@@ -52,7 +53,7 @@ def glcm(
     See Also
     --------
     :func:`textures <samsara.stats.glcm.textures>`
-    :func:`graycomatrix <skimage.feature.graycomatrix>`
+    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
 
     """
     data = array.data
@@ -138,7 +139,7 @@ def matrix(
 
     See Also
     --------
-    :func:`graycomatrix <skimage.feature.graycomatrix>`
+    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
     """
     glcm_ = graycomatrix(
         array, distances, angles, levels=levels, symmetric=symmetric, normed=normed
@@ -159,13 +160,14 @@ def features(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
     """Calculate texture features of a gray level co-occurrence matrix.
 
     From a gray level co-occurrence matrix compute the following properties:
-    - ASM
-    - Contrast
-    - Correlation
-    - Variance
-    - Inverse Difference Moment
-    - Sum Average
-    - Entropy
+
+        - ASM
+        - Contrast
+        - Correlation
+        - Variance
+        - Inverse Difference Moment
+        - Sum Average
+        - Entropy
 
     Parameters
     ----------
@@ -183,7 +185,7 @@ def features(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
     See Also
     --------
     :func:`matrix <samsara.stats.glcm.matrix>`
-    :func:`graycomatrix <skimage.feature.graycomatrix>`
+    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
     """
     fts = np.full((n_feats,), np.nan)
 
@@ -249,13 +251,14 @@ def textures(
 
     For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
     and the properties of that glcm. The properties are the following:
-    - ASM
-    - Contrast
-    - Correlation
-    - Variance
-    - Inverse Difference Moment
-    - Sum Average
-    - Entropy
+
+        - ASM
+        - Contrast
+        - Correlation
+        - Variance
+        - Inverse Difference Moment
+        - Sum Average
+        - Entropy
 
     Parameters
     ----------
@@ -288,10 +291,10 @@ def textures(
     distances : Union[list, None], optional
         List of pixel pair distance offsets, by default [-1, 0, 1, 2].
     angles : Union[list, None], optional
-        List of pixel pair angles in radians, by default [0, :math:`$\\pi/2$`].
+        List of pixel pair angles in radians, by default [0, :math:`\\pi/2`].
     kwargs :
         Other keywords arguments to pass to function
-        :func:`graycomatrix <skimage.feature.graycomatrix>`.
+        :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`.
 
     Returns
     -------
@@ -302,7 +305,7 @@ def textures(
     See Also
     --------
     :func:`matrix <samsara.stats.glcm.matrix>`
-    :func:`graycomatrix <skimage.feature.graycomatrix>`
+    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
     """
     if distances is None:
         distances = range(-1, 2)
