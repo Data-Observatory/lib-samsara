@@ -40,9 +40,11 @@ def count(
     Raises
     ------
     ValueError
-        If the specified `radius` is larger than any dimension of the array.
+        If the type of `kernel` is neither Kernel or int.
     ValueError
-        If the specified `radius` is larger than the smallest chunk in any coordinate.
+        If the specified `kernel` radius is larger than any dimension of the array.
+    ValueError
+        If the specified `kernel` radius is larger than the smallest chunk in any coordinate.
 
     See Also
     --------
@@ -79,9 +81,11 @@ def mean(
     Raises
     ------
     ValueError
-        If the specified `radius` is larger than any dimension of the array.
+        If the type of `kernel` is neither Kernel or int.
     ValueError
-        If the specified `radius` is larger than the smallest chunk in any coordinate.
+        If the specified `kernel` radius is larger than any dimension of the array.
+    ValueError
+        If the specified `kernel` radius is larger than the smallest chunk in any coordinate.
 
     See Also
     --------
@@ -117,9 +121,11 @@ def sum(
     Raises
     ------
     ValueError
-        If the specified `radius` is larger than any dimension of the array.
+        If the type of `kernel` is neither Kernel or int.
     ValueError
-        If the specified `radius` is larger than the smallest chunk in any coordinate.
+        If the specified `kernel` radius is larger than any dimension of the array.
+    ValueError
+        If the specified `kernel` radius is larger than the smallest chunk in any coordinate.
 
     See Also
     --------
@@ -157,15 +163,58 @@ def std(
     Raises
     ------
     ValueError
-        If the specified `radius` is larger than any dimension of the array.
+        If the type of `kernel` is neither Kernel or int.
     ValueError
-        If the specified `radius` is larger than the smallest chunk in any coordinate.
+        If the specified `kernel` radius is larger than any dimension of the array.
+    ValueError
+        If the specified `kernel` radius is larger than the smallest chunk in any coordinate.
 
     See Also
     --------
     :func:`stats <samsara.stats.neighborhood.stats>`
     """
     return stats(data, "std", kernel, variable)
+
+
+def max(
+    data: xr.Dataset, kernel: Union[Kernel, int] = 0, variable: str = "magnitude"
+) -> xr.DataArray:
+    """Calculate moving window maximum over an n-dimensional array.
+
+    Get the moving window maximum over a Dask array, which is the array named `variable` in the
+    dataset.
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        Dataset with a Dask array over which the moving window maximum will be calculated.
+    kernel : Union[Kernel, int], optional
+        Kernel used as the moving window and the max is calculated considering only the valid
+        values in it. If the value is an int, a square kernel of radius equal to that value is used,
+        by default 0.
+    variable : str, optional
+        Data variable of the dataset on which the maximum will be calculated, by default
+        'magnitude'.
+
+    Returns
+    -------
+    xr.DataArray
+        Data array containing the maximum on the indicated variable.
+
+    Raises
+    ------
+    ValueError
+        If the type of `kernel` is neither Kernel or int.
+    ValueError
+        If the specified `kernel` radius is larger than any dimension of the array.
+    ValueError
+        If the specified `kernel` radius is larger than the smallest chunk in any coordinate.
+
+    See Also
+    --------
+    :func:`stats <samsara.stats.neighborhood.stats>`
+    """
+    return stats(data, "max", kernel, variable)
 
 
 def stats(
@@ -247,10 +296,10 @@ def stats(
     * y        (y) int64 0 1 2 3 4
     * x        (x) int64 0 1 2 3
     """
-    if stat not in ["count", "mean", "sum", "std"]:
+    if stat not in ["count", "mean", "sum", "std", "max"]:
         raise ValueError(
             "Requested stat not supported. "
-            "Currently supported stats are 'count', 'mean', 'sum', 'std'"
+            "Currently supported stats are 'count', 'mean', 'sum', 'std', 'max'"
         )
 
     kernel = _check_kernel(kernel)  # Check kernel type
@@ -323,6 +372,8 @@ def _get_window_func(stat_type: str) -> callable:
         return _view_window_sum
     elif stat_type == "std":
         return _view_window_std
+    elif stat_type == "max":
+        return _view_window_max
     else:
         raise ValueError("Invalid stat type.")
 
@@ -383,4 +434,17 @@ def _view_window_mean(view: np.ndarray, kernel: np.ndarray) -> np.ndarray:
                 result[i, j] = np.nan
             else:
                 result[i, j] = np.nanmean(kernel * subarray)
+    return result
+
+
+@njit
+def _view_window_max(view: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    result = np.zeros((view.shape[0], view.shape[1]))
+    for i in prange(view.shape[0]):
+        for j in range(view.shape[1]):
+            subarray = view[i, j, :, :]
+            if np.isnan(subarray[kernel.shape[0] // 2][kernel.shape[1] // 2]):
+                result[i, j] = np.nan
+            else:
+                result[i, j] = np.nanmax(kernel * subarray)
     return result
