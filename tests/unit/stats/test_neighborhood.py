@@ -28,6 +28,11 @@ class TestStatsNeighborhood:
         with pytest.raises(ValueError, match="Requested stat not supported."):
             ssn.stats(data, "half", kernel=1, variable="magnitude")
 
+    @pytest.mark.parametrize(("kernel"), [10.5, "square", (3, 2)])
+    def test_start_error_kernel_type(self, data, kernel):
+        with pytest.raises(ValueError, match="Expected kernel of type Kernel or int,"):
+            ssn.stats(data, "sum", kernel=kernel, variable="magnitude")
+
     @pytest.mark.parametrize(
         ("kernel", "expected"),
         [
