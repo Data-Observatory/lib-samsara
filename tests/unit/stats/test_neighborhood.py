@@ -263,3 +263,38 @@ class TestStatsNeighborhood:
         assert res.shape == data.magnitude.shape
         res_data = res.data.compute()
         np.testing.assert_array_almost_equal(res_data, expected)
+
+    @pytest.mark.parametrize(
+        ("kernel", "expected"),
+        [
+            (
+                0,
+                np.array(
+                    [
+                        [14, 43, 0, 42],
+                        [28, np.nan, 33, 1],
+                        [38, np.nan, 20, 18],
+                        [19, 14, 15, np.nan],
+                        [np.nan, 46, np.nan, 33],
+                    ]
+                ),
+            ),
+            (
+                1,
+                np.array(
+                    [
+                        [43, 43, 43, 42],
+                        [43, np.nan, 43, 42],
+                        [38, np.nan, 33, 33],
+                        [46, 46, 46, np.nan],
+                        [np.nan, 46, np.nan, 33],
+                    ]
+                ),
+            ),
+        ],
+    )
+    def test_max(self, data, kernel, expected):
+        res = ssn.max(data, kernel, variable="magnitude")
+        assert res.shape == data.magnitude.shape
+        res_data = res.data.compute()
+        np.testing.assert_array_almost_equal(res_data, expected)
