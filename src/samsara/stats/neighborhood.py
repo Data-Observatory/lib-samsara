@@ -318,57 +318,69 @@ def _get_window_func(stat_type: str) -> callable:
     if stat_type == "count":
         return _view_window_count
     elif stat_type == "mean":
-        return _window_mean
+        return _view_window_mean
     elif stat_type == "sum":
-        return _window_sum
+        return _view_window_sum
     elif stat_type == "std":
-        return _window_std
+        return _view_window_std
     else:
         raise ValueError("Invalid stat type.")
 
 
 def _block_stats(array: np.ndarray, wfunc: callable, kernel: Kernel) -> np.ndarray:
     view = np.lib.stride_tricks.sliding_window_view(array, kernel.shape)
-    return wfunc(view, kernel)
+    kernel_data = kernel.data
+    kernel_data[kernel_data == 0] = np.nan
+    return wfunc(view, kernel_data)
 
 
 @njit
-def _view_window_count(view: np.ndarray, kernel: Kernel) -> np.ndarray:
+def _view_window_count(view: np.ndarray, kernel: np.ndarray) -> np.ndarray:
     result = np.zeros((view.shape[0], view.shape[1]))
-    center = tuple(i // 2 for i in kernel.shape)
     for i in prange(view.shape[0]):
         for j in range(view.shape[1]):
             subarray = view[i, j, :, :]
-            if np.isnan(subarray[center]):
+            if np.isnan(subarray[kernel.shape[0] // 2][kernel.shape[1] // 2]):
                 result[i, j] = np.nan
             else:
-                result[i, j] = np.count_nonzero(kernel * ~np.isnan(subarray))
+                result[i, j] = np.count_nonzero(~np.isnan(kernel * subarray))
     return result
 
 
-def _window_count(array: np.ndarray, kernel: Kernel) -> float:
-    center = tuple(i // 2 for i in array.shape)
-    if np.isnan(array[center]):
-        return np.nan
-    return np.count_nonzero(~np.isnan(array))
+@njit
+def _view_window_sum(view: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    result = np.zeros((view.shape[0], view.shape[1]))
+    for i in prange(view.shape[0]):
+        for j in range(view.shape[1]):
+            subarray = view[i, j, :, :]
+            if np.isnan(subarray[kernel.shape[0] // 2][kernel.shape[1] // 2]):
+                result[i, j] = np.nan
+            else:
+                result[i, j] = np.nansum(kernel * subarray)
+    return result
 
 
-def _window_sum(array: np.ndarray, kernel: Kernel) -> float:
-    center = tuple(i // 2 for i in array.shape)
-    if np.isnan(array[center]):
-        return np.nan
-    return np.nansum(array)
+@njit
+def _view_window_std(view: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    result = np.zeros((view.shape[0], view.shape[1]))
+    for i in prange(view.shape[0]):
+        for j in range(view.shape[1]):
+            subarray = view[i, j, :, :]
+            if np.isnan(subarray[kernel.shape[0] // 2][kernel.shape[1] // 2]):
+                result[i, j] = np.nan
+            else:
+                result[i, j] = np.nanstd(kernel * subarray)
+    return result
 
 
-def _window_std(array: np.ndarray, kernel: Kernel) -> float:
-    center = tuple(i // 2 for i in array.shape)
-    if np.isnan(array[center]):
-        return np.nan
-    return np.nanstd(array)
-
-
-def _window_mean(array: np.ndarray, kernel: Kernel) -> float:
-    center = tuple(i // 2 for i in array.shape)
-    if np.isnan(array[center]):
-        return np.nan
-    return np.nanmean(array)
+@njit
+def _view_window_mean(view: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+    result = np.zeros((view.shape[0], view.shape[1]))
+    for i in prange(view.shape[0]):
+        for j in range(view.shape[1]):
+            subarray = view[i, j, :, :]
+            if np.isnan(subarray[kernel.shape[0] // 2][kernel.shape[1] // 2]):
+                result[i, j] = np.nan
+            else:
+                result[i, j] = np.nanmean(kernel * subarray)
+    return result
