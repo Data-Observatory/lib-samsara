@@ -164,16 +164,14 @@ def pelt_dask(
     )
     magnitude = da.take(break_cubes, np.arange(0, n_breaks), axis=-1)
     date = da.take(break_cubes, np.arange(n_breaks, n_breaks * 2), axis=-1)
+    new_coords = array.drop_vars("time").coords.assign({"bkp": np.arange(n_breaks)})
     pelt_ds = xr.Dataset(
         data_vars={
             "magnitude": ([coord_0, coord_1, "bkp"], magnitude),
             "date": ([coord_0, coord_1, "bkp"], date),
         },
-        coords={
-            coord_0: array.coords[coord_0].data,
-            coord_1: array.coords[coord_1].data,
-            "bkp": np.arange(n_breaks),
-        },
+        coords=new_coords,
+        attrs=array.drop_vars("time").attrs,
     )
     return pelt_ds
 
@@ -214,14 +212,14 @@ def pelt_xarray(
         dask="parallelized",
         kwargs=func_kwargs,
     )
+    new_coords = array.drop_vars("time").coords.assign({"bkp": np.arange(n_breaks)})
     pelt_ds = xr.Dataset(
         data_vars={
             "magnitude": break_xarrays[0],
             "date": break_xarrays[1],
         },
-        coords={
-            "bkp": np.arange(n_breaks),
-        },
+        coords=new_coords,
+        attrs=array.drop_vars("time").attrs,
     )
 
     return pelt_ds
