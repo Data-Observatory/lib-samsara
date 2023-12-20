@@ -88,6 +88,11 @@ def block_breakpoints_index(
         # Filter original array to values that are not NaN
         arr_nnan_idx = np.where(~np.isnan(array_1d))[0]  # Not NaN indices
         arr_nnan = array_1d[arr_nnan_idx]  # Non Nan array
+        # Check if its possible to have breaks
+        if len(arr_nnan) < 1 or not rpt.utils.sanity_check(
+            len(arr_nnan), 1, algo_rpt.jump, algo_rpt.min_size
+        ):
+            return breaks
         breaks_nnan = algo_rpt.fit(arr_nnan).predict(
             pen=penalty
         )  # Predict breaks in not NaN indices
