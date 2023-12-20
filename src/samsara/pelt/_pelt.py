@@ -134,8 +134,11 @@ def pelt_dask(
     """
     data = array.data  # 3d
     dates = array.time.data  # 1d
+    # Save coords and attrs
+    array_coords = array.drop_vars("time").coords.copy()
+    array_attrs = array.drop_vars("time").attrs.copy()
     # Recognize coordinates
-    notime_dims = [i for i in array.dims if i != "time"]
+    notime_dims = [i for i in array.dims if i != "time"]  # Loop to preserve order
     coord_0 = notime_dims[0]
     coord_1 = notime_dims[1]
     idx_c0 = array.dims.index(coord_0)
@@ -164,21 +167,13 @@ def pelt_dask(
     )
     magnitude = da.take(break_cubes, np.arange(0, n_breaks), axis=-1)
     date = da.take(break_cubes, np.arange(n_breaks, n_breaks * 2), axis=-1)
-
-    other_coords = set(array.coords) - {"time", coord_0, coord_1}
-    print(other_coords)
     pelt_ds = xr.Dataset(
         data_vars={
             "magnitude": ([coord_0, coord_1, "bkp"], magnitude),
             "date": ([coord_0, coord_1, "bkp"], date),
         },
-        coords={
-            "bkp": np.arange(n_breaks),
-            coord_0: array.coords[coord_0],
-            coord_1: array.coords[coord_1],
-            **{k: array.coords[k] for k in other_coords},
-        },
-        # attrs=array.drop_vars("time").attrs,
+        coords={"bkp": np.arange(n_breaks), **array_coords},
+        attrs=array_attrs,
     )
     return pelt_ds
 
