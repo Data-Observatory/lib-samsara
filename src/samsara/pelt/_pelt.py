@@ -22,7 +22,7 @@ def pelt(
     model: str = "rbf",
     min_size: int = 3,
     jump: int = 1,
-    backend: str = "dask",
+    backend: str = "xarray",
 ) -> xr.Dataset:
     """Apply the linearly penalized segmentation (Pelt) over a DataArray.
 
@@ -47,8 +47,8 @@ def pelt(
     jump : int, optional
         Subsample (one every `jump` points), used by ruptures KernelCPD, by default 1.
     backend : str, optional
-        Package used to run pelt over the entire array, by default 'dask'. Only 'dask' and 'xarray'
-        are supported.
+        Package used to run pelt over the entire array, by default 'xarray'. Only 'dask' and
+        'xarray' are supported.
 
     Returns
     -------
