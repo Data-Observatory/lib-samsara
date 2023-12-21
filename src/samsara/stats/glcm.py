@@ -104,12 +104,12 @@ def glcm_textures(
         dims=["prop", *array_dims],
         coords={
             "prop": [
-                "ASM",
+                "asm",
                 "contrast",
-                "correlation",
-                "variance",
+                "corr",
+                "var",
                 "idm",
-                "sumavg",
+                "savg",
                 "entropy",
             ][:n_feats],
             **array_coords,
