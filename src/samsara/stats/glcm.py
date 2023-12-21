@@ -9,12 +9,12 @@ import numpy as np
 import xarray as xr
 from skimage.feature import graycomatrix
 
-from ._features import correlation, entropy, plus_minus
+from ._properties import correlation, entropy, plus_minus
 
 
-def glcm(
+def glcm_textures(
     array: xr.DataArray, radius: int, n_feats: int = 7, **kwargs
-) -> Union[da.Array, np.ndarray]:
+) -> xr.DataArray:
     """Calculate texture properties of an image.
 
     For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
@@ -37,22 +37,25 @@ def glcm(
     n_feats : int, optional
         Number of features or properties computed, by default 7.
     kwargs :
-        Other keyword arguments to pass to function :func:`textures <samsara.stats.glcm.textures>`.
+        Other keyword arguments to pass to function
+        :func:`block_glcm_textures <samsara.stats.glcm.block_glcm_textures>`.
 
     Returns
     -------
-    Union[da.Array, np.ndarray]
+    xr.DataArray
         3-dim array with the texture properties for each pixel. The new axis is located at the first
         dimension, and indexes the property.
 
     Raises
     ------
     ValueError
-        If array is not 2-dimensional.
+        If `array` is not 2-dimensional.
+    TypeError
+        If the data in `array` is neither da.Array or np.ndarray.
 
     See Also
     --------
-    :func:`textures <samsara.stats.glcm.textures>`
+    :func:`block_glcm_textures <samsara.stats.glcm.block_glcm_textures>`
     :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
 
     """
@@ -61,13 +64,24 @@ def glcm(
     if data.ndim != 2:
         raise ValueError(f"Expected 2-dimensional data, got {data.ndim} dimensions")
 
+    if not isinstance(data, (da.Array, np.ndarray)):
+        raise TypeError(
+            "Invalid type of data array in input. Expected either dask.Array or numpy.ndarray, got"
+            f" {type(data)}."
+        )
+
+    # Save coords and attrs
+    array_coords = array.coords.copy()
+    array_attrs = array.attrs.copy()
+    array_dims = array.dims
+
     kwargs["radius"] = radius
     kwargs["n_feats"] = n_feats
 
     if isinstance(data, da.Array):
         chunks_ = ((n_feats,), *list(data.chunks))
         glcm_cube = da.map_overlap(
-            textures,
+            block_glcm_textures,
             data,
             depth=radius,
             boundary=0,
@@ -80,164 +94,34 @@ def glcm(
             new_axis=0,
             **kwargs,
         )
-        return glcm_cube
-    # Non-chunked
-    data_pad = np.pad(data, ((radius, radius), (radius, radius)))
-    glcm_cube = textures(data_pad, radius, **kwargs)
-    return glcm_cube
+    else:
+        # Non-chunked
+        data_pad = np.pad(data, ((radius, radius), (radius, radius)))
+        glcm_cube = block_glcm_textures(data_pad, radius, **kwargs)
 
-
-def matrix(
-    array: np.ndarray,
-    distances: np.ndarray,
-    angles: np.ndarray,
-    levels: Union[int, None] = None,
-    symmetric: bool = False,
-    normed: bool = False,
-    nan_supression: int = 0,
-    rescale_normed: bool = False,
-) -> np.ndarray:
-    """Calculate the gray level co-occurrence matrix.
-
-    Parameters
-    ----------
-    array : np.ndarray
-        2-dimensional array. Input image.
-    distances : np.ndarray
-        List of pixel pair distance offsets.
-    angles : np.ndarray
-        List of pixel pair angles in radians.
-    levels : Union[int, None], optional
-        Number of gray-levels counted, by default None. This argument is required for 16-bit images
-        or higher and is typically the maximum of the image.
-    symmetric : bool, optional
-        Whether or not the output is symmetric, by default False.
-    normed : bool, optional
-        Whether or not to normalize each offset matrix, by default False.
-    nan_supression : int, optional
-        Method used to replace values in each glcm, by default 0.
-
-        - 0
-            Do nothing to glcm.
-        - 1
-            Position (0,0) in the glcm is replaced with 0s.
-        - 2
-            Row and column 0 in the glcm are replaced with 0s.
-        - 3
-            Row and column 0 are removed from the glcm. Only works for `levels` + 1.
-        - other
-            Do nothing to glcm.
-
-    rescale_normed : bool, optional
-        Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
-        even after `nan_supression`, by default False.
-
-    Returns
-    -------
-    np.ndarray
-        4-dimensional array. The gray level co-occurrence matrix/histogram.
-
-    See Also
-    --------
-    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
-    """
-    glcm_ = graycomatrix(
-        array, distances, angles, levels=levels, symmetric=symmetric, normed=normed
+    glcm_datacube = xr.DataArray(
+        data=glcm_cube,
+        dims=["prop", *array_dims],
+        coords={
+            "prop": [
+                "ASM",
+                "contrast",
+                "correlation",
+                "variance",
+                "idm",
+                "sumavg",
+                "entropy",
+            ][:n_feats],
+            **array_coords,
+        },
+        attrs=array_attrs,
     )
-    if nan_supression == 1:
-        glcm_[0, 0, :, :] = 0
-    if nan_supression == 2:
-        glcm_[:, 0, :, :] = 0
-        glcm_[0, :, :, :] = 0
-    if nan_supression == 3:
-        glcm_ = glcm_[1:, 1:, :, :]
-    if rescale_normed is True:
-        glcm_ = glcm_ / np.sum(glcm_, axis=(0, 1))
-    return glcm_
+
+    return glcm_datacube
 
 
-def features(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
-    """Calculate texture features of a gray level co-occurrence matrix.
-
-    From a gray level co-occurrence matrix compute the following properties:
-
-        - ASM
-        - Contrast
-        - Correlation
-        - Variance
-        - Inverse Difference Moment
-        - Sum Average
-        - Entropy
-
-    Parameters
-    ----------
-    array : np.ndarray
-        4-dimensional array. Gray level co-occurrence histogram of an image. The coordinates are
-        (levels, levels, number of distances, number of angles).
-    n_feats : int, optional
-        Number of features or properties computed with the glcm, by default 7.
-
-    Returns
-    -------
-    np.ndarray
-        1-dim array of length `n_feats` with the features or properties computed from `array`.
-
-    See Also
-    --------
-    :func:`matrix <samsara.stats.glcm.matrix>`
-    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
-    """
-    fts = np.full((n_feats,), np.nan)
-
-    maxv = len(array)
-    k = np.arange(maxv)
-    k2 = k**2
-    tk = np.arange(2 * maxv)
-
-    i, j = np.mgrid[:maxv, :maxv]
-    ij = i * j
-    i_j2_p1 = (i - j) ** 2
-    i_j2_p1 += 1
-    i_j2_p1 = 1.0 / i_j2_p1
-    i_j2_p1 = i_j2_p1.ravel()
-
-    p = array / float(array.sum())
-    pravel = p.ravel()
-    px = p.sum(0)
-    py = p.sum(1)
-
-    ux = np.dot(px, k)
-    uy = np.dot(py, k)
-    vx = np.dot(px, k2) - ux**2
-    vy = np.dot(py, k2) - uy**2
-
-    sx = np.sqrt(vx)
-    sy = np.sqrt(vy)
-
-    px_plus_y = np.full(2 * maxv, fill_value=0, dtype=np.double)
-    px_minus_y = np.full(maxv, fill_value=0, dtype=np.double)
-    px_plus_y, px_minus_y = plus_minus(p, px_plus_y, px_minus_y)
-
-    fts = [
-        np.dot(pravel, pravel),  # 1. ASM
-        np.dot(k2, px_minus_y),  # 2. Contrast
-        correlation(sx, sy, ux, uy, pravel, ij),  # 3. Correlation
-        vx,  # 4. Variance
-        np.dot(i_j2_p1, pravel),  # 5. Inverse Difference Moment
-        np.dot(tk, px_plus_y),  # 6. Sum Average
-        entropy(pravel),  # 9. Entropy
-    ]
-
-    if len(fts) < n_feats:
-        return np.pad(
-            np.array(fts, dtype=float), (0, n_feats - len(fts)), constant_values=np.nan
-        )
-
-    return fts[:n_feats]
-
-
-def textures(
-    array: np.array,
+def block_glcm_textures(
+    array: np.ndarray,
     radius: int = 1,
     n_feats: int = 7,
     nan_supression: int = 0,
@@ -334,7 +218,7 @@ def textures(
                 **kwargs,
             )
 
-            response[:, i, j] = features(glcm_, n_feats=n_feats)
+            response[:, i, j] = properties(glcm_, n_feats=n_feats)
 
     if nan_supression > 0:
         sub_array = array[
@@ -345,3 +229,215 @@ def textures(
         ] = np.nan
 
     return response
+
+
+def matrix(
+    array: np.ndarray,
+    distances: np.ndarray,
+    angles: np.ndarray,
+    levels: Union[int, None] = None,
+    symmetric: bool = False,
+    normed: bool = False,
+    nan_supression: int = 0,
+    rescale_normed: bool = False,
+) -> np.ndarray:
+    """Calculate the gray level co-occurrence matrix.
+
+    Parameters
+    ----------
+    array : np.ndarray
+        2-dimensional array. Input image.
+    distances : np.ndarray
+        List of pixel pair distance offsets.
+    angles : np.ndarray
+        List of pixel pair angles in radians.
+    levels : Union[int, None], optional
+        Number of gray-levels counted, by default None. This argument is required for 16-bit images
+        or higher and is typically the maximum of the image.
+    symmetric : bool, optional
+        Whether or not the output is symmetric, by default False.
+    normed : bool, optional
+        Whether or not to normalize each offset matrix, by default False.
+    nan_supression : int, optional
+        Method used to replace values in each glcm, by default 0.
+
+        - 0
+            Do nothing to glcm.
+        - 1
+            Position (0,0) in the glcm is replaced with 0s.
+        - 2
+            Row and column 0 in the glcm are replaced with 0s.
+        - 3
+            Row and column 0 are removed from the glcm. Only works for `levels` + 1.
+        - other
+            Do nothing to glcm.
+
+    rescale_normed : bool, optional
+        Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
+        even after `nan_supression`, by default False.
+
+    Returns
+    -------
+    np.ndarray
+        4-dimensional array. The gray level co-occurrence matrix/histogram.
+
+    See Also
+    --------
+    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+    """
+    glcm_ = graycomatrix(
+        array, distances, angles, levels=levels, symmetric=symmetric, normed=normed
+    )
+    if nan_supression == 1:
+        glcm_[0, 0, :, :] = 0
+    if nan_supression == 2:
+        glcm_[:, 0, :, :] = 0
+        glcm_[0, :, :, :] = 0
+    if nan_supression == 3:
+        glcm_ = glcm_[1:, 1:, :, :]
+    if rescale_normed is True:
+        glcm_ = glcm_ / np.sum(glcm_, axis=(0, 1))
+    return glcm_
+
+
+def properties(
+    array: np.ndarray, n_feats: int = 7, summarize: str = "mean"
+) -> np.ndarray:
+    """Calculate texture features of a gray level co-occurrence matrix.
+
+    From a gray level co-occurrence matrix compute the following properties:
+
+        - ASM
+        - Contrast
+        - Correlation
+        - Variance
+        - Inverse Difference Moment
+        - Sum Average
+        - Entropy
+
+    Parameters
+    ----------
+    array : np.ndarray
+        4-dimensional array. Gray level co-occurrence histogram of an image. The number of times a
+        level in the first coordinate occurs at a distance `d` at an angle `t` from another level in
+        the second coordinate. The coordinates are (levels, levels, number of distances, number of
+        angles).
+    n_feats : int, optional
+        Number of features or properties computed with the glcm, by default 7.
+    summarize: str, optional
+        Method to summarize the values of each property, by default 'mean'.
+
+    Returns
+    -------
+    np.ndarray
+        1-dim array of length `n_feats` with the features or properties computed from `array`.
+
+    Raises
+    ------
+    ValueError
+        If `array` is not 4-dimensional.
+
+    See Also
+    --------
+    :func:`matrix <samsara.stats.glcm.matrix>`
+    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+    """
+    if array.ndim != 4:
+        raise ValueError(f"Matrix should be of 4 dimensions: {array.shape} detected.")
+
+    n_dis = array.shape[2]
+    n_ang = array.shape[3]
+
+    # TODO: should be an array of 0s of float32 instead of floeat64?
+    ans = np.empty((n_feats, n_dis, n_ang))
+
+    for d in range(n_dis):
+        for a in range(n_ang):
+            ans[:, d, a] = level_properties(array[:, :, d, a], n_feats)
+
+    if summarize != "mean":
+        raise ValueError(
+            f"Method to summarize not supported. Expected 'mean', got {summarize}."
+        )
+
+    return ans.mean(axis=(1, 2)).astype(np.float32)
+
+
+def level_properties(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
+    """Calculate texture features of a pair of levels gray level co-occurrence matrix.
+
+    From a gray level co-occurrence matrix compute the following properties:
+
+        - ASM
+        - Contrast
+        - Correlation
+        - Variance
+        - Inverse Difference Moment
+        - Sum Average
+        - Entropy
+
+    Parameters
+    ----------
+    array : np.ndarray
+        2-dimensional array. Occurrence histogram of levels at every distance and angle for one pair
+        of levels. The coordinates are (number of distances, number of angles).
+    n_feats : int, optional
+        Number of features or properties computed, by default 7.
+
+    Returns
+    -------
+    np.ndarray
+        1-dim array of length `n_feats` with the features or properties computed from `array`.
+
+    See Also
+    --------
+    :func:`matrix <samsara.stats.glcm.matrix>`
+    :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+    """
+    fts = np.full((n_feats,), np.nan)
+
+    maxv = len(array)
+    k = np.arange(maxv)
+    k2 = k**2
+    tk = np.arange(2 * maxv)
+
+    i, j = np.mgrid[:maxv, :maxv]
+    ij = i * j
+    i_j2_p1 = (i - j) ** 2
+    i_j2_p1 += 1
+    i_j2_p1 = 1.0 / i_j2_p1
+    i_j2_p1 = i_j2_p1.ravel()
+
+    p = array / float(array.sum())
+    pravel = p.ravel()
+    px = p.sum(0)
+    py = p.sum(1)
+
+    ux = np.dot(px, k)
+    uy = np.dot(py, k)
+    vx = np.dot(px, k2) - ux**2
+    vy = np.dot(py, k2) - uy**2
+
+    sx = np.sqrt(vx)
+    sy = np.sqrt(vy)
+
+    px_plus_y = np.full(2 * maxv, fill_value=0, dtype=np.double)
+    px_minus_y = np.full(maxv, fill_value=0, dtype=np.double)
+    px_plus_y, px_minus_y = plus_minus(p, px_plus_y, px_minus_y)
+
+    fts = [
+        np.dot(pravel, pravel),  # 1. ASM
+        np.dot(k2, px_minus_y),  # 2. Contrast
+        correlation(sx, sy, ux, uy, pravel, ij),  # 3. Correlation
+        vx,  # 4. Variance
+        np.dot(i_j2_p1, pravel),  # 5. Inverse Difference Moment
+        np.dot(tk, px_plus_y),  # 6. Sum Average
+        entropy(pravel),  # 9. Entropy
+    ]
+
+    if len(fts) < n_feats:
+        return np.pad(
+            np.array(fts, dtype=float), (0, n_feats - len(fts)), constant_values=np.nan
+        )
+
+    return fts[:n_feats]
