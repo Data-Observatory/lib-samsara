@@ -97,7 +97,7 @@ def glcm_textures(
     else:
         # Non-chunked
         data_pad = np.pad(data, ((radius, radius), (radius, radius)))
-        glcm_cube = block_glcm_textures(data_pad, radius, **kwargs)
+        glcm_cube = block_glcm_textures(data_pad, **kwargs)
 
     glcm_datacube = xr.DataArray(
         data=glcm_cube,
