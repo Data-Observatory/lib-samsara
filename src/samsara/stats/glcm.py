@@ -184,12 +184,13 @@ def block_glcm_textures(
     -------
     np.ndarray
         3-dim array with the texture properties for each pixel. The new axis is located at the first
-        dimension, and indexes the property.
+        coordinate, and indexes the properties.
 
     See Also
     --------
     :func:`matrix <samsara.stats.glcm.matrix>`
     :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+    :func:`properties <samsara.stats.glcm.properties>`
     """
     if distances is None:
         distances = range(-1, 2)
@@ -366,7 +367,8 @@ def properties(
 def level_properties(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
     """Calculate texture features of a pair of levels gray level co-occurrence matrix.
 
-    From a gray level co-occurrence matrix compute the following properties:
+    From a slice (of a pair of levels) of the gray level co-occurrence matrix compute the following
+    properties:
 
         - ASM
         - Contrast
@@ -391,6 +393,7 @@ def level_properties(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
 
     See Also
     --------
+    :func:`properties <samsara.stats.glcm.properties>`
     :func:`matrix <samsara.stats.glcm.matrix>`
     :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
     """
