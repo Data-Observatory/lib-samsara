@@ -297,7 +297,10 @@ def matrix(
     if nan_supression == 3:
         glcm_ = glcm_[1:, 1:, :, :]
     if rescale_normed is True:
-        glcm_ = glcm_ / np.sum(glcm_, axis=(0, 1))
+        glcm_sum = np.sum(glcm_, axis=(0, 1))
+        glcm_ = np.divide(
+            glcm_, glcm_sum, np.zeros_like(glcm_, dtype=float), where=glcm_sum != 0
+        )
     return glcm_
 
 
