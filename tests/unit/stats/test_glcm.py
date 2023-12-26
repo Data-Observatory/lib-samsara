@@ -335,3 +335,14 @@ class TestGLCM:
         assert res.shape == (7, 4, 4)
         assert set(res.dims) - {"prop", "y", "x"} == set()
         assert set(res.coords) - {"prop", "y", "x"} == set()
+
+    @pytest.mark.parametrize(("data"), [np.zeros((2, 2, 2)), da.ones((3, 4, 5, 6))])
+    def test_glcm_textures_error_ndim(self, data):
+        array = xr.DataArray(data=data)
+        with pytest.raises(ValueError, match="Expected 2-dimensional data, "):
+            glcm.glcm_textures(array, radius=2)
+
+    @pytest.mark.parametrize(("data"), [np.ones((5, 5))])
+    def test_glcm_textures_error_type(self, data):
+        with pytest.raises(TypeError, match="Invalid type of data array in input."):
+            glcm.glcm_textures(data, radius=2)
