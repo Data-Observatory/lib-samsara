@@ -252,3 +252,22 @@ class TestGLCM:
         assert res.ndim == 4
         assert res.shape == expected.shape
         np.testing.assert_array_almost_equal(res, expected)
+
+    @pytest.mark.parametrize(("advanced_idx"), [True, False])
+    def test_properties_plus_minus(self, advanced_idx):
+        array = np.arange(4, dtype=np.float64).reshape((2, 2))
+        p = array / array.sum()
+        xpy = np.full(4, fill_value=0, dtype=np.double)
+        xmy = np.full(2, fill_value=0, dtype=np.double)
+
+        xpy, xmy = glcm.plus_minus(p, xpy, xmy, advanced_idx=advanced_idx)
+        np.testing.assert_array_almost_equal(xpy, np.array([0, 0.5, 0.5, 0]))
+        np.testing.assert_array_almost_equal(xmy, np.array([0.5, 0.5]))
+
+    def test_properties_plus_minus_error(self):
+        array = np.arange(6, dtype=np.float64).reshape((2, 3))
+        p = array / array.sum()
+        xpy = np.full(4, fill_value=0, dtype=np.double)
+        xmy = np.full(2, fill_value=0, dtype=np.double)
+        with pytest.raises(ValueError, match="p array is not square."):
+            glcm.plus_minus(p, xpy, xmy)
