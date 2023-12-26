@@ -50,7 +50,7 @@ def block_pelt(
         `n_breaks`, where the first `n_breaks` values correspond to the difference of the medians
         between two consecutive breaks, and the following `n_breaks` contain the date on which the
         break occurred. This new dimension will be in the last position, which means that the
-        coordinates will be ('y', 'x', 'new').
+        coordinates will be ('y', 'x', 'bkp').
     """
     working_idx = None
     if start_date is not None:
@@ -88,6 +88,11 @@ def block_breakpoints_index(
         # Filter original array to values that are not NaN
         arr_nnan_idx = np.where(~np.isnan(array_1d))[0]  # Not NaN indices
         arr_nnan = array_1d[arr_nnan_idx]  # Non Nan array
+        # Check if its possible to have breaks
+        if len(arr_nnan) < 1 or not rpt.utils.sanity_check(
+            len(arr_nnan), 1, algo_rpt.jump, algo_rpt.min_size
+        ):
+            return breaks
         breaks_nnan = algo_rpt.fit(arr_nnan).predict(
             pen=penalty
         )  # Predict breaks in not NaN indices
@@ -135,7 +140,7 @@ def block_segment_metrics(array: np.ndarray, dates: np.ndarray, break_idx: np.nd
         (float32[:], float32[:], float32[:]),
         (float64[:], float64[:], float64[:]),
     ],
-    "(times),(break)->(break)",
+    "(times),(bkp)->(bkp)",
     nopython=True,
 )
 def segment_mean(array, break_idx, seg_mean):
@@ -181,7 +186,7 @@ def segment_mean(array, break_idx, seg_mean):
         (float32[:], float32[:], float32[:]),
         (float64[:], float64[:], float64[:]),
     ],
-    "(times),(break)->(break)",
+    "(times),(bkp)->(bkp)",
     nopython=True,
 )
 def segment_dates(dates, break_idx, seg_date):
@@ -200,7 +205,7 @@ def segment_dates(dates, break_idx, seg_date):
         (float32[:], float32[:], float32[:], float32[:], float32[:]),
         (float64[:], float64[:], float64[:], float64[:], float64[:]),
     ],
-    "(times),(times),(break)->(break),(break)",
+    "(times),(times),(bkp)->(bkp),(bkp)",
     nopython=True,
 )
 def segment_metrics(array, dates, break_idx, seg_mean, seg_date):

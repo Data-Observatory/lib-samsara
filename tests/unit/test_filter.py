@@ -44,13 +44,13 @@ class TestFilterVariable:
         y, x, brk = mag.shape
         ds = xr.Dataset(
             data_vars={
-                "magnitude": (["y", "x", "break"], mag),
-                "date": (["y", "x", "break"], dat),
+                "magnitude": (["y", "x", "bkp"], mag),
+                "date": (["y", "x", "bkp"], dat),
             },
             coords={
                 "y": np.arange(y),
                 "x": np.arange(x),
-                "break": np.arange(brk),
+                "bkp": np.arange(brk),
             },
         )
         return ds
@@ -78,11 +78,74 @@ class TestFilterVariable:
         ],
     )
     def test_negative_of_first(self, dataset, variable, expected):
-        ds = sfilter.negative_of_first(dataset, variable=variable)
+        ds = sfilter.negative_of(dataset, bkp_index=0, variable=variable)
         assert ds.magnitude.shape == (2, 4)
         assert ds.date.shape == (2, 4)
         np.testing.assert_array_almost_equal(ds.magnitude.data, expected[0])
         np.testing.assert_array_almost_equal(ds.date.data, expected[1])
+
+    @pytest.mark.parametrize(
+        ("variable", "expected"),
+        [
+            (
+                "magnitude",
+                (
+                    np.array(
+                        [
+                            [np.nan, -0.3283, -0.8798, np.nan],
+                            [-0.3835, np.nan, -0.1234, -0.8852],
+                        ]
+                    ),
+                    np.array(
+                        [
+                            [np.nan, 1107561600, 1107820800, np.nan],
+                            [1108339200, np.nan, 1108857600, 1109116800],
+                        ]
+                    ),
+                ),
+            )
+        ],
+    )
+    def test_negative_of_second(self, dataset, variable, expected):
+        ds = sfilter.negative_of(dataset, bkp_index=1, variable=variable)
+        assert ds.magnitude.shape == (2, 4)
+        assert ds.date.shape == (2, 4)
+        np.testing.assert_array_almost_equal(ds.magnitude.data, expected[0])
+        np.testing.assert_array_almost_equal(ds.date.data, expected[1])
+
+    @pytest.mark.parametrize(
+        ("variable", "expected"),
+        [
+            (
+                "magnitude",
+                (
+                    np.array(
+                        [
+                            [np.nan, np.nan, -0.9838, np.nan],
+                            [np.nan, np.nan, np.nan, np.nan],
+                        ]
+                    ),
+                    np.array(
+                        [
+                            [np.nan, np.nan, 1107907200, np.nan],
+                            [np.nan, np.nan, np.nan, np.nan],
+                        ]
+                    ),
+                ),
+            )
+        ],
+    )
+    def test_negative_of_third(self, dataset, variable, expected):
+        ds = sfilter.negative_of(dataset, bkp_index=2, variable=variable)
+        assert ds.magnitude.shape == (2, 4)
+        assert ds.date.shape == (2, 4)
+        np.testing.assert_array_almost_equal(ds.magnitude.data, expected[0])
+        np.testing.assert_array_almost_equal(ds.date.data, expected[1])
+
+    @pytest.mark.parametrize(("bkp_index"), [3, 4, 5])
+    def test_negative_of_error(self, dataset, bkp_index):
+        with pytest.raises(IndexError, match="Invalid bkp_index"):
+            sfilter.negative_of(dataset, bkp_index=bkp_index, variable="magnitude")
 
     @pytest.mark.parametrize(
         ("variable", "expected"),
@@ -179,7 +242,7 @@ class TestFilterVariable:
         ("filter_type", "expected"),
         [
             (
-                "negative_of_first",
+                "negative_of",
                 (
                     np.array(
                         [

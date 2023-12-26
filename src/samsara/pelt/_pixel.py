@@ -108,7 +108,13 @@ def pixel_breakpoints_index(
     # array: array 1dim
     arr_nnan_idx = np.where(~np.isnan(array))[0]  # Not NaN indices
     arr_nnan = array[arr_nnan_idx]  # Non Nan array
+    # Check if its possible to have breaks
+    if len(arr_nnan) < 1:
+        return np.array([])
     algo = rpt.KernelCPD(kernel=model, min_size=min_size, jump=jump).fit(arr_nnan)
+    # Check if a segmentation configuration is possible
+    if not rpt.utils.sanity_check(len(arr_nnan), 1, algo.jump, algo.min_size):
+        return np.array([])
     breaks_ = algo.predict(pen=penalty)  # Index of breakpoints
     breaks_nnan = np.array(breaks_[:-1], dtype=int) - 1  # Fix breaks to indices values
     breaks = arr_nnan_idx[breaks_nnan]  # Break indices in the original array

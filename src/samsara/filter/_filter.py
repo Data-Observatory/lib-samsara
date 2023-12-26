@@ -6,7 +6,7 @@ import xarray as xr
 
 __all__ = [
     "filter_by_variable",
-    "negative_of_first",
+    "negative_of",
     "negative_of_last",
     "first_negative",
     "last_negative",
@@ -14,7 +14,7 @@ __all__ = [
 
 
 def filter_by_variable(
-    data: xr.Dataset, filter_type: str, variable: str = "magnitude"
+    data: xr.Dataset, filter_type: str, bkp_index: int = 0, variable: str = "magnitude"
 ) -> xr.Dataset:
     """Keep the values that meet a condition on a variable of a Dataset.
 
@@ -26,28 +26,30 @@ def filter_by_variable(
     ----------
     data : xr.Dataset
         Dataset to filter. Must contain two 3-dim Dask arrays, named magnitude and date. The third
-        dimension/coordinate will be reduced, and must be named 'break'.
+        dimension/coordinate will be reduced, and must be named 'bkp'.
     filter_type : str
-        Type of filter to apply. Must be either 'negative_of_first', 'negative_of_last',
+        Type of filter to apply. Must be either 'negative_of', 'negative_of_last',
         'first_negative', or 'last_negative'.
 
-        - 'negative_of_first'
-            Will evaluate that the value in the first index of the 'break' coordinate of the array
+        - 'negative_of'
+            Will evaluate that the value in the `bkp_index` index of the 'bkp' coordinate of the array
             `variable` is between -1 and 0, then it for each array return it values, otherwise the
             returned value is nan.
         - 'negative_of_last'
-            Will evaluate that the last value that is not nan in the 'break' coordinate of the array
+            Will evaluate that the last value that is not nan in the 'bkp' coordinate of the array
             `variable` is between -1 and 0, then it for each array return it values, otherwise the
             returned value is nan.
         - 'first_negative'
-            Will return the values that are in the index of the first value in the 'break'
+            Will return the values that are in the index of the first value in the 'bkp'
             coordinate of the array `variable` that is between -1 and 0. If no value meets this
             criteria, then the returned value is nan.
         - 'last_negative'
-            Will return the values that are in the index of the last value in the 'break'
+            Will return the values that are in the index of the last value in the 'bkp'
             coordinate of the array `variable` that is between -1 and 0. If no value meets this
             criteria, then the returned value is nan.
-
+    bkp_index : int, optional
+        Used in 'negative_of'. The index of the bkp coordinate from which the values will be
+        obtained only if they meet the negativity condition, by default 0.
     variable : str, optional
         Name of the array on which the conditions will be evaluated, by default 'magnitude'.
 
@@ -106,25 +108,25 @@ def filter_by_variable(
     >>> y, x, brk = mag.shape
     >>> ds = xr.Dataset(
     ...     data_vars={
-    ...         "magnitude": (["y", "x", "break"], mag),
-    ...         "date": (["y", "x", "break"], dat),
+    ...         "magnitude": (["y", "x", "bkp"], mag),
+    ...         "date": (["y", "x", "bkp"], dat),
     ...     },
     ...     coords={
     ...         "y": np.arange(y),
     ...         "x": np.arange(x),
-    ...         "break": np.arange(brk),
+    ...         "bkp": np.arange(brk),
     ...     },
     ... )
     >>> ds
     <xarray.Dataset>
-    Dimensions:    (y: 2, x: 4, break: 3)
+    Dimensions:    (y: 2, x: 4, bkp: 3)
     Coordinates:
     * y          (y) int64 0 1
     * x          (x) int64 0 1 2 3
-    * break      (break) int64 0 1 2
+    * bkp      (bkp) int64 0 1 2
     Data variables:
-        magnitude  (y, x, break) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
-        date       (y, x, break) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+        magnitude  (y, x, bkp) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+        date       (y, x, bkp) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
 
     Use samsara to filter the dataset:
 
@@ -148,24 +150,36 @@ def filter_by_variable(
 
     kwargs = {"variable": variable}
 
+    # Add bkp_index to kwargs only if it's used
+    if filter_type == "negative_of":
+        kwargs["bkp_index"] = bkp_index
+
     template = xr.Dataset(
         data_vars={
-            variable: data[variable].isel({"break": 0}).drop_vars("break"),
-            variable_1: data[variable_1].isel({"break": 0}).drop_vars("break"),
-        }
+            variable: data[variable].isel({"bkp": 0}).drop_vars("bkp"),
+            variable_1: data[variable_1].isel({"bkp": 0}).drop_vars("bkp"),
+        },
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     filter_ds = data.map_blocks(func=func, kwargs=kwargs, template=template)
     return filter_ds
 
 
-def negative_of_first(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
-    """Filter an in-memory dataset keeping the negatives of the first index.
+def negative_of(
+    data: xr.Dataset, bkp_index: int = 0, variable: str = "magnitude"
+) -> xr.Dataset:
+    """Filter an in-memory dataset keeping the negatives of the `bkp_index` index.
 
-    The value of the first break in `variable` must be between -1 and 0 for each pixel.
+    The value of the `bkp_index`-th break in `variable` must be between -1 and 0 for each pixel.
     """
-    first = data.isel({"break": 0})
-    nof = first.where((first[variable] < 0) & (first[variable] > -1)).drop_vars("break")
-    return nof
+    if bkp_index >= len(data["bkp"]):
+        raise IndexError(
+            f"Invalid bkp_index. Got index {bkp_index} for coordinate of length {len(data['bkp'])}"
+        )
+    of = data.isel({"bkp": bkp_index})
+    neg_of = of.where((of[variable] < 0) & (of[variable] > -1)).drop_vars("bkp")
+    return neg_of
 
 
 def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
@@ -180,13 +194,15 @@ def negative_of_last(data: xr.Dataset, variable: str = "magnitude") -> xr.Datase
         _pixel_negative_of_last,
         data[variable],
         data[variable_1],
-        input_core_dims=[["break"], ["break"]],
+        input_core_dims=[["bkp"], ["bkp"]],
         output_core_dims=[[], []],
         output_dtypes=[float, float],
         vectorize=True,
     )
     nol = xr.Dataset(
-        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]},
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     return nol
 
@@ -204,14 +220,16 @@ def first_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
         _pixel_n_negative,
         data[variable],
         data[variable_1],
-        input_core_dims=[["break"], ["break"]],
+        input_core_dims=[["bkp"], ["bkp"]],
         output_core_dims=[[], []],
         output_dtypes=[float, float],
         vectorize=True,
         kwargs={"n": 0},
     )
     fn = xr.Dataset(
-        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]},
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     return fn
 
@@ -229,14 +247,16 @@ def last_negative(data: xr.Dataset, variable: str = "magnitude") -> xr.Dataset:
         _pixel_n_negative,
         data[variable],
         data[variable_1],
-        input_core_dims=[["break"], ["break"]],
+        input_core_dims=[["bkp"], ["bkp"]],
         output_core_dims=[[], []],
         output_dtypes=[float, float],
         vectorize=True,
         kwargs={"n": -1},
     )
     ln = xr.Dataset(
-        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]}
+        data_vars={variable: filter_xarray[0], variable_1: filter_xarray[1]},
+        coords=data.drop_dims("bkp").coords,
+        attrs=data.drop_dims("bkp").attrs,
     )
     return ln
 
@@ -245,8 +265,8 @@ def _get_func(filter_type: str) -> callable:
     """
     Get the function for the requested filter type
     """
-    if filter_type == "negative_of_first":
-        return negative_of_first
+    if filter_type == "negative_of":
+        return negative_of
     elif filter_type == "negative_of_last":
         return negative_of_last
     elif filter_type == "first_negative":

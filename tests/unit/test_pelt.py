@@ -105,7 +105,7 @@ class TestPelt:
         assert res[0].shape == (n_breaks,)
         assert res[1].shape == (n_breaks,)
         assert np.count_nonzero(np.isnan(res[0])) == n_nan
-        assert np.count_nonzero(np.isnan(res[0])) == n_nan
+        assert np.count_nonzero(np.isnan(res[1])) == n_nan
 
     @pytest.mark.parametrize(
         ("n_breaks", "start_date", "n_nan"),
@@ -153,9 +153,7 @@ class TestPelt:
         array_shape = pelt_signal_xarray.shape
         res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="xarray")
         assert isinstance(res, xr.Dataset)
-        assert not {"y", "x", "break"} ^ set(
-            res.coords
-        )  # only those 3 values as coords
+        assert not {"y", "x", "bkp"} ^ set(res.coords)  # only those 3 values as coords
         assert not {"magnitude", "date"} - set(
             res.variables
         )  # magnitude and date are in vars
@@ -170,9 +168,7 @@ class TestPelt:
         array_shape = pelt_signal_xarray.shape
         res = pelt.pelt(pelt_signal_xarray, n_breaks, 1, start_date, backend="dask")
         assert isinstance(res, xr.Dataset)
-        assert not {"y", "x", "break"} ^ set(
-            res.coords
-        )  # only those 3 values as coords
+        assert not {"y", "x", "bkp"} ^ set(res.coords)  # only those 3 values as coords
         assert not {"magnitude", "date"} - set(
             res.variables
         )  # magnitude and date are in vars
@@ -191,3 +187,81 @@ class TestPelt:
             match="Incorrect backend value. Only 'dask' and 'xarray' are accepted",
         ):
             pelt.pelt(pelt_signal_xarray, 5, 1, backend="other")
+
+    def test_pixel_pelt_empty_array(self):
+        array = np.full((30,), np.nan)
+        dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(30)])
+        n_breaks = 5
+        res = pelt.pixel_pelt(
+            array=array,
+            dates=dates,
+            n_breaks=n_breaks,
+            penalty=30,
+            min_size=3,
+            jump=5,
+        )
+        assert isinstance(res, tuple)
+        assert len(res) == 2
+        assert res[0].shape == (n_breaks,)
+        assert res[1].shape == (n_breaks,)
+        np.testing.assert_array_equal(res[0], np.full(n_breaks, np.nan))
+        np.testing.assert_array_equal(res[1], np.full(n_breaks, np.nan))
+
+    def test_pixel_pelt_low_data_array(self):
+        # Low amm of data compared to the min_size param, resulting in no possible cofiguration of
+        # breakpoints
+        array = np.full((30,), np.nan)
+        array[-3:] = 10
+        dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(30)])
+        n_breaks = 5
+        res = pelt.pixel_pelt(
+            array=array,
+            dates=dates,
+            n_breaks=n_breaks,
+            penalty=30,
+            min_size=3,
+            jump=5,
+        )
+        assert isinstance(res, tuple)
+        assert len(res) == 2
+        assert res[0].shape == (n_breaks,)
+        assert res[1].shape == (n_breaks,)
+        np.testing.assert_array_equal(res[0], np.full(n_breaks, np.nan))
+        np.testing.assert_array_equal(res[1], np.full(n_breaks, np.nan))
+
+    def test_block_pelt_empty_array(self):
+        array = np.full((30, 1, 1), np.nan)
+        dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(30)])
+        dates_timestamp = dates.astype("datetime64[s]").astype(float)
+        algo_rpt = KernelCPD(kernel="rbf", min_size=3, jump=5)
+        n_breaks = 5
+        res = pelt.block_pelt(
+            array=array,
+            dates=dates,
+            dates_timestamp=dates_timestamp,
+            n_breaks=n_breaks,
+            penalty=30,
+            start_date=None,
+            algo_rpt=algo_rpt,
+        )
+        assert res.shape == (1, 1, n_breaks * 2)
+        np.testing.assert_array_equal(res, np.full((1, 1, n_breaks * 2), np.nan))
+
+    def test_block_pelt_low_data_array(self):
+        array = np.full((30, 1, 1), np.nan)
+        array[-3:] = 10
+        dates = np.array([np.datetime64("2010-01-01") + 10 * i for i in range(30)])
+        dates_timestamp = dates.astype("datetime64[s]").astype(float)
+        algo_rpt = KernelCPD(kernel="rbf", min_size=3, jump=5)
+        n_breaks = 5
+        res = pelt.block_pelt(
+            array=array,
+            dates=dates,
+            dates_timestamp=dates_timestamp,
+            n_breaks=n_breaks,
+            penalty=30,
+            start_date=None,
+            algo_rpt=algo_rpt,
+        )
+        assert res.shape == (1, 1, n_breaks * 2)
+        np.testing.assert_array_equal(res, np.full((1, 1, n_breaks * 2), np.nan))
