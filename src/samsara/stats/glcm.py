@@ -129,6 +129,7 @@ def block_glcm_textures(
     rescale_normed: bool = False,
     distances: Union[list, None] = None,
     angles: Union[list, None] = None,
+    advanced_idx: bool = False,
     **kwargs,
 ) -> np.ndarray:
     """Calculate texture properties of an in-memory image.
@@ -176,6 +177,9 @@ def block_glcm_textures(
         List of pixel pair distance offsets, by default [-1, 0, 1, 2].
     angles : Union[list, None], optional
         List of pixel pair angles in radians, by default [0, :math:`\\pi/2`].
+    advanced_idx : bool, optional
+        Use advanced indexing operations instead of loops when calculating properties that allow it,
+        by default False.
     kwargs :
         Other keywords arguments to pass to function
         :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`.
@@ -219,7 +223,9 @@ def block_glcm_textures(
                 **kwargs,
             )
 
-            response[:, i, j] = properties(glcm_, n_feats=n_feats)
+            response[:, i, j] = properties(
+                glcm_, n_feats=n_feats, advanced_idx=advanced_idx
+            )
 
     if nan_supression > 0:
         sub_array = array[
@@ -305,7 +311,10 @@ def matrix(
 
 
 def properties(
-    array: np.ndarray, n_feats: int = 7, summarize: str = "mean"
+    array: np.ndarray,
+    n_feats: int = 7,
+    summarize: str = "mean",
+    advanced_idx: bool = False,
 ) -> np.ndarray:
     """Calculate texture features of a gray level co-occurrence matrix.
 
@@ -330,6 +339,9 @@ def properties(
         Number of features or properties computed with the glcm, by default 7.
     summarize: str, optional
         Method to summarize the values of each property, by default 'mean'.
+    advanced_idx : bool, optional
+        Use advanced indexing operations instead of loops when calculating properties that allow it,
+        by default False.
 
     Returns
     -------
@@ -357,7 +369,9 @@ def properties(
 
     for d in range(n_dis):
         for a in range(n_ang):
-            ans[:, d, a] = level_properties(array[:, :, d, a], n_feats)
+            ans[:, d, a] = level_properties(
+                array[:, :, d, a], n_feats, advanced_idx=advanced_idx
+            )
 
     if summarize != "mean":
         raise ValueError(
@@ -367,7 +381,9 @@ def properties(
     return ans.mean(axis=(1, 2)).astype(np.float32)
 
 
-def level_properties(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
+def level_properties(
+    array: np.ndarray, n_feats: int = 7, advanced_idx: bool = False
+) -> np.ndarray:
     """Calculate texture features of a pair of levels gray level co-occurrence matrix.
 
     From a slice (of a pair of levels) of the gray level co-occurrence matrix compute the following
@@ -388,6 +404,9 @@ def level_properties(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
         of levels. The coordinates are (number of distances, number of angles).
     n_feats : int, optional
         Number of features or properties computed, by default 7.
+    advanced_idx : bool, optional
+        Use advanced indexing operations instead of loops when calculating properties that allow it,
+        by default False.
 
     Returns
     -------
@@ -414,7 +433,7 @@ def level_properties(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
     i_j2_p1 = 1.0 / i_j2_p1
     i_j2_p1 = i_j2_p1.ravel()
 
-    p = array / float(array.sum())
+    p = array / float(array.sum())  # TODO check/handle div by 0
     pravel = p.ravel()
     px = p.sum(0)
     py = p.sum(1)
@@ -429,7 +448,7 @@ def level_properties(array: np.ndarray, n_feats: int = 7) -> np.ndarray:
 
     px_plus_y = np.full(2 * maxv, fill_value=0, dtype=np.double)
     px_minus_y = np.full(maxv, fill_value=0, dtype=np.double)
-    px_plus_y, px_minus_y = plus_minus(p, px_plus_y, px_minus_y)
+    px_plus_y, px_minus_y = plus_minus(p, px_plus_y, px_minus_y, advanced_idx)
 
     fts = [
         np.dot(pravel, pravel),  # 1. ASM

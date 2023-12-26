@@ -5,15 +5,28 @@ import numpy as np
 __all__ = ["correlation", "entropy", "plus_minus"]
 
 
-def plus_minus(p: np.ndarray, px_plus_y: np.ndarray, px_minus_y: np.ndarray) -> tuple:
+def plus_minus(
+    p: np.ndarray,
+    px_plus_y: np.ndarray,
+    px_minus_y: np.ndarray,
+    advanced_idx: bool = False,
+) -> tuple:
     if p.shape[0] != p.shape[1]:
         raise ValueError("p array is not square.")
 
     n = p.shape[0]
 
+    if advanced_idx is True:
+        for i in range(n):
+            px_plus_y[i : i + n] += p[i, :]
+            px_minus_y[abs(i - np.arange(n))] += p[i, :]
+        return px_plus_y, px_minus_y
+
+    # Without advanced indexing
     for i in range(n):
-        px_plus_y[i : i + n] += p[i, :]
-        px_minus_y[abs(i - np.arange(n))] += p[i, :]
+        for j in range(n):
+            px_plus_y[i + j] += p[i, j]
+            px_minus_y[abs(i - j)] += p[i, j]
 
     return px_plus_y, px_minus_y
 
