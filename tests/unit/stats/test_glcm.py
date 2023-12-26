@@ -1,7 +1,9 @@
 import math
 
+import dask.array as da
 import numpy as np
 import pytest
+import xarray as xr
 
 import samsara.stats.glcm as glcm
 
@@ -271,3 +273,65 @@ class TestGLCM:
         xmy = np.full(2, fill_value=0, dtype=np.double)
         with pytest.raises(ValueError, match="p array is not square."):
             glcm.plus_minus(p, xpy, xmy)
+
+    @pytest.mark.parametrize(
+        ("data", "okwarg"),
+        [
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), {}),
+            (da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))), {}),
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), {"advanced_idx": True}),
+            (
+                da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))),
+                {"advanced_idx": True},
+            ),
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), {"nan_supression": 1}),
+            (
+                da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))),
+                {"nan_supression": 1},
+            ),
+            (
+                np.arange(4).repeat(4, axis=0).reshape((4, 4)),
+                {"skip_nan": False},
+            ),
+            (
+                da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))),
+                {"skip_nan": False},
+            ),
+            (
+                np.arange(4).repeat(4, axis=0).reshape((4, 4)),
+                {
+                    "nan_supression": 1,
+                    "skip_nan": False,
+                    "rescale_normed": True,
+                    "advanced_idx": True,
+                },
+            ),
+            (
+                da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))),
+                {
+                    "nan_supression": 1,
+                    "skip_nan": False,
+                    "rescale_normed": True,
+                    "advanced_idx": True,
+                },
+            ),
+        ],
+    )
+    def test_glcm_textures_run(self, data, okwarg):
+        array = xr.DataArray(
+            data=data, dims=("x", "y"), coords={"x": np.arange(4), "y": np.arange(4)}
+        )
+        distances = [1, 2]
+        angles = [0, math.pi]
+        levels = 4
+        radius = 2
+        bgkwargs = {
+            "distances": distances,
+            "angles": angles,
+            "levels": levels,
+            **okwarg,
+        }
+        res = glcm.glcm_textures(array=array, radius=radius, n_feats=7, **bgkwargs)
+        assert res.shape == (7, 4, 4)
+        assert set(res.dims) - {"prop", "y", "x"} == set()
+        assert set(res.coords) - {"prop", "y", "x"} == set()
