@@ -2,24 +2,36 @@
 Changelog
 =========
 
+0.2.1 (2024-01-08)
+------------------
+
+Features
+
+* Fix properties values when dealing with division by zero and nan values in statistics in
+  :code:`stats.glcm`.
+
+Pull request merged
+
+* #5: Fix division values in stats.glcm
+
 0.2.0 (2023-12-26)
 ------------------
 
 Features
 
 * Publish subpackages :code:`stats.glcm`.
-* Refactor one filter type in :code:`filter` to allow filtering according to values at different 
+* Refactor one filter type in :code:`filter` to allow filtering according to values at different
   breakpoints.
-* Add a new statistic, refactor to Kernel usage for pixel neighborhood and change vectorization to 
-  Numba usage. All this in the :code:`stats.neighborhood` subpackage. 
-* Fix bug in :code:`pelt` subpackage. Avoid exception in cases where data for breakpoint prediction 
+* Add a new statistic, refactor to Kernel usage for pixel neighborhood and change vectorization to
+  Numba usage. All this in the :code:`stats.neighborhood` subpackage.
+* Fix bug in :code:`pelt` subpackage. Avoid exception in cases where data for breakpoint prediction
   is not sufficient.
-* Fix error that did not preserve all of the array coordinates and attributes in subpackages 
+* Fix error that did not preserve all of the array coordinates and attributes in subpackages
   :code:`pelt` and :code:`filter`.
 
 Pull request merged
 
-* #4: Add GLCM and Fix Pelt 
+* #4: Add GLCM and Fix Pelt
 
 
 0.1.0 (2023-12-04)
