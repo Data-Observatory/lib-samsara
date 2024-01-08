@@ -26,7 +26,7 @@ try:
     version = release = get_distribution("samsara").version
 except Exception:
     traceback.print_exc()
-    version = release = "0.2.0"
+    version = release = "0.2.1"
 
 pygments_style = "trac"
 templates_path = ["."]
