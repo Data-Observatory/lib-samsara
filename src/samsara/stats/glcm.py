@@ -440,7 +440,6 @@ def level_properties(
     i_j2_p1 = 1.0 / i_j2_p1
     i_j2_p1 = i_j2_p1.ravel()
 
-    # p = array / float(array.sum())  # TODO check/handle div by 0
     array_sum = float(np.sum(array))
     p = np.divide(
         array, array_sum, np.zeros_like(array, dtype=float), where=array_sum != 0
