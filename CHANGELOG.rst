@@ -2,6 +2,26 @@
 Changelog
 =========
 
+0.2.0 (2023-12-26)
+------------------
+
+Features
+
+* Publish subpackages :code:`stats.glcm`.
+* Refactor one filter type in :code:`filter` to allow filtering according to values at different 
+  breakpoints.
+* Add a new statistic, refactor to Kernel usage for pixel neighborhood and change vectorization to 
+  Numba usage. All this in the :code:`stats.neighborhood` subpackage. 
+* Fix bug in :code:`pelt` subpackage. Avoid exception in cases where data for breakpoint prediction 
+  is not sufficient.
+* Fix error that did not preserve all of the array coordinates and attributes in subpackages 
+  :code:`pelt` and :code:`filter`.
+
+Pull request merged
+
+* #4: Add GLCM and Fix Pelt 
+
+
 0.1.0 (2023-12-04)
 ------------------
 
