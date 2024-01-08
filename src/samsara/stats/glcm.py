@@ -315,6 +315,7 @@ def properties(
     n_feats: int = 7,
     summarize: str = "mean",
     advanced_idx: bool = False,
+    skip_nan: bool = True,
 ) -> np.ndarray:
     """Calculate texture features of a gray level co-occurrence matrix.
 
@@ -342,6 +343,9 @@ def properties(
     advanced_idx : bool, optional
         Use advanced indexing operations instead of loops when calculating properties that allow it,
         by default False.
+    skip_nan : bool, optional
+        When computing the average of each texture for all directions and angles, nan will
+        be ignored, by default True.
 
     Returns
     -------
@@ -378,7 +382,10 @@ def properties(
             f"Method to summarize not supported. Expected 'mean', got {summarize}."
         )
 
-    return ans.mean(axis=(1, 2)).astype(np.float32)
+    if skip_nan:
+        return np.nanmean(ans, axis=(1, 2)).astype(np.float32)
+    else:
+        return np.mean(ans, axis=(1, 2)).astype(np.float32)
 
 
 def level_properties(
@@ -433,7 +440,11 @@ def level_properties(
     i_j2_p1 = 1.0 / i_j2_p1
     i_j2_p1 = i_j2_p1.ravel()
 
-    p = array / float(array.sum())  # TODO check/handle div by 0
+    array_sum = float(np.sum(array))
+    p = np.divide(
+        array, array_sum, np.zeros_like(array, dtype=float), where=array_sum != 0
+    )
+
     pravel = p.ravel()
     px = p.sum(0)
     py = p.sum(1)
