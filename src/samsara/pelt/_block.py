@@ -2,6 +2,7 @@
 Functions for Pelt applied over blocks/cubes of data.
 """
 from typing import Union
+
 import numpy as np
 import ruptures as rpt
 from numba import float32, float64, guvectorize, vectorize
