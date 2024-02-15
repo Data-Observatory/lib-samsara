@@ -160,7 +160,7 @@ def pelt_dask(
         penalty,
         start_date,
         algo_rpt,
-        dtype=float,
+        dtype=np.float32,
         chunks=chunks,
         drop_axis=0,
         new_axis=2,
@@ -210,7 +210,7 @@ def pelt_xarray(
         output_core_dims=[["bkp"], ["bkp"]],
         exclude_dims={"time"},
         vectorize=True,
-        output_dtypes=[float, float],
+        output_dtypes=[np.float32, np.float32],
         dask_gufunc_kwargs={
             "output_sizes": {"bkp": n_breaks},
             "allow_rechunk": True,
