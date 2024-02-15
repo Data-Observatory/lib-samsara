@@ -1,11 +1,12 @@
 """
 Functions for Pelt applied over blocks/cubes of data.
 """
+
 from typing import Union
 
 import numpy as np
 import ruptures as rpt
-from numba import float32, float64, guvectorize, vectorize
+from numba import float32, float64, guvectorize
 
 from ._dates import filter_index_by_date
 
@@ -68,6 +69,7 @@ def block_pelt(
 
     return np.dstack([seg_mean, seg_dates])
 
+
 def block_breakpoints_index(
     array: np.ndarray,
     n_breaks: int,
@@ -78,7 +80,7 @@ def block_breakpoints_index(
     """
     Get the index of each breakpoint for every pixel/geo-location.
     """
-    
+
     # Non-jagged output
     def predict_unique_index(array_1d, valid_index):
         algo_rpt.cost.gamma = None
