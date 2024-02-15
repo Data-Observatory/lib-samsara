@@ -66,7 +66,7 @@ def xr_transform(xarray, levels, dtype=None):
     max = np.nanmax(xr.data)
     zi = (xr - min) / (max - min)
     li = zi * (levels - 1)
-    if xr.isnull().any().data == True:
+    if xr.isnull().any().data is True:
         li = np.nan_to_num(li + 1)
     xr.data = li.round().astype(dtype)
     return xr
