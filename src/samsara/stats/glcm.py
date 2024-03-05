@@ -27,6 +27,8 @@ def glcm_textures(
         - Inverse Difference Moment
         - Sum Average
         - Entropy
+        - Difference variance
+        - Dissimilarity
 
     Parameters
     ----------
@@ -111,6 +113,8 @@ def glcm_textures(
                 "idm",
                 "savg",
                 "entropy",
+                "diffvar",
+                "dissimilarity",
             ][:n_feats],
             **array_coords,
         },
@@ -144,6 +148,8 @@ def block_glcm_textures(
         - Inverse Difference Moment
         - Sum Average
         - Entropy
+        - Difference variance
+        - Dissimilarity
 
     Parameters
     ----------
@@ -328,6 +334,8 @@ def properties(
         - Inverse Difference Moment
         - Sum Average
         - Entropy
+        - Difference variance
+        - Dissimilarity
 
     Parameters
     ----------
@@ -403,6 +411,8 @@ def level_properties(
         - Inverse Difference Moment
         - Sum Average
         - Entropy
+        - Difference variance
+        - Dissimilarity
 
     Parameters
     ----------
@@ -469,6 +479,8 @@ def level_properties(
         np.dot(i_j2_p1, pravel),  # 5. Inverse Difference Moment
         np.dot(tk, px_plus_y),  # 6. Sum Average
         entropy(pravel),  # 9. Entropy
+        px_minus_y.var(),  # Difference variance
+        np.dot(k, px_minus_y),  # Dissimilarity
     ]
 
     if len(fts) < n_feats:
