@@ -1,5 +1,6 @@
 """Subpackage for neighborhood statistics (`samsara.stats.neighborhood`)
 """
+
 from typing import Union
 
 import dask.array as da
