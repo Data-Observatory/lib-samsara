@@ -10,7 +10,7 @@ from numba import njit, prange
 
 from ..kernel import Kernel, square
 
-__all__ = ["stats", "count", "mean", "sum", "std"]
+__all__ = ["stats", "count", "mean", "sum", "std", "quantile"]
 
 
 def count(
@@ -218,11 +218,58 @@ def max(
     return stats(data, "max", kernel, variable)
 
 
+def quantile(
+    data: xr.Dataset,
+    q: float,
+    kernel: Union[Kernel, int] = 0,
+    variable: str = "magnitude",
+) -> xr.DataArray:
+    """Calculate moving window 'q' quantile over an n-dimensional array.
+
+    Get the moving window 'q' quantile over a Dask array, which is the array named `variable` in the
+    dataset.
+
+    Parameters
+    ----------
+    data : xr.Dataset
+        Dataset with a Dask array over which the moving window maximum will be calculated.
+    q : float
+        Probability for the quantile to compute. Value must be between 0 and 1 inclusive.
+    kernel : Union[Kernel, int], optional
+        Kernel used as the moving window and the max is calculated considering only the valid
+        values in it. If the value is an int, a square kernel of radius equal to that value is used,
+        by default 0.
+    variable : str, optional
+        Data variable of the dataset on which the maximum will be calculated, by default
+        'magnitude'.
+
+    Returns
+    -------
+    xr.DataArray
+        Data array containing the maximum on the indicated variable.
+
+    Raises
+    ------
+    ValueError
+        If the type of `kernel` is neither Kernel or int.
+    ValueError
+        If the specified `kernel` radius is larger than any dimension of the array.
+    ValueError
+        If the specified `kernel` radius is larger than the smallest chunk in any coordinate.
+
+    See Also
+    --------
+    :func:`stats <samsara.stats.neighborhood.stats>`
+    """
+    return stats(data, "quantile", kernel, variable, q)
+
+
 def stats(
     data: xr.Dataset,
     stat: str,
     kernel: Union[Kernel, int] = 0,
     variable: str = "magnitude",
+    q: Union[float, None] = None,
 ) -> xr.DataArray:
     """Calculate moving window statistics over an n-dimensional array.
 
@@ -242,6 +289,7 @@ def stats(
     variable : str, optional
         Data variable of the dataset on which the statistics will be calculated, by default
         'magnitude'.
+        #TODO ADD Q
 
     Returns
     -------
@@ -265,6 +313,7 @@ def stats(
 
     >>> import numpy as np
     >>> import xarray as xr
+    >>> import dask.array as da
     >>> mag = da.array(
     ...     [
     ...         [14, 43, 0, 42],
@@ -290,22 +339,22 @@ def stats(
     Use samsara to get the statistics:
 
     >>> import samsara.stats.neighborhood as nstat
-    >>> nstat.stats(ds, "count", radius=2, variable="magnitude")
+    >>> nstat.stats(ds, "count", kernel=2, variable="magnitude")
     <xarray.DataArray '_block_stats-94fc541ce6eb03fe87862690338f73fd' (y: 5, x: 4)>
     dask.array<_block_stats, shape=(5, 4), dtype=float64, chunksize=(5, 4), chunktype=numpy.ndarray>
     Coordinates:
     * y        (y) int64 0 1 2 3 4
     * x        (x) int64 0 1 2 3
     """
-    if stat not in ["count", "mean", "sum", "std", "max"]:
+    if stat not in ["count", "mean", "sum", "std", "max", "quantile"]:
         raise ValueError(
             "Requested stat not supported. "
-            "Currently supported stats are 'count', 'mean', 'sum', 'std', 'max'"
+            "Currently supported stats are 'count', 'mean', 'sum', 'std', 'max', 'quantile'"
         )
 
     kernel = _check_kernel(kernel)  # Check kernel type
     wfunc = _get_window_func(stat)  # Get function used by stats
-    kwargs = {"wfunc": wfunc, "kernel": kernel}
+    kwargs = {"wfunc": wfunc, "kernel": kernel, "q": q}
 
     # Kernel radius
     radius = tuple([(i - 1) // 2 for i in kernel.shape])
@@ -375,14 +424,20 @@ def _get_window_func(stat_type: str) -> callable:
         return _view_window_std
     elif stat_type == "max":
         return _view_window_max
+    elif stat_type == "quantile":
+        return _view_window_quantile
     else:
         raise ValueError("Invalid stat type.")
 
 
-def _block_stats(array: np.ndarray, wfunc: callable, kernel: Kernel) -> np.ndarray:
+def _block_stats(
+    array: np.ndarray, wfunc: callable, kernel: Kernel, q: Union[float, None] = None
+) -> np.ndarray:
     view = np.lib.stride_tricks.sliding_window_view(array, kernel.shape)
     kernel_data = kernel.data
     kernel_data[kernel_data == 0] = np.nan
+    if q is not None:
+        return wfunc(view, kernel_data, q)
     return wfunc(view, kernel_data)
 
 
@@ -448,4 +503,17 @@ def _view_window_max(view: np.ndarray, kernel: np.ndarray) -> np.ndarray:
                 result[i, j] = np.nan
             else:
                 result[i, j] = np.nanmax(kernel * subarray)
+    return result
+
+
+@njit
+def _view_window_quantile(view: np.ndarray, kernel: np.ndarray, q: float) -> np.ndarray:
+    result = np.zeros((view.shape[0], view.shape[1]))
+    for i in prange(view.shape[0]):
+        for j in range(view.shape[1]):
+            subarray = view[i, j, :, :]
+            if np.isnan(subarray[kernel.shape[0] // 2][kernel.shape[1] // 2]):
+                result[i, j] = np.nan
+            else:
+                result[i, j] = np.nanquantile(kernel * subarray, q)
     return result
