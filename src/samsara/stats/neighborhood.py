@@ -289,7 +289,8 @@ def stats(
     variable : str, optional
         Data variable of the dataset on which the statistics will be calculated, by default
         'magnitude'.
-        #TODO ADD Q
+    q : Union[float, None], optional
+        Probability for the quantile to compute. Value must be between 0 and 1 inclusive.
 
     Returns
     -------
