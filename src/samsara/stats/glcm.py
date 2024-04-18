@@ -14,7 +14,11 @@ from ._properties import correlation, entropy, plus_minus
 
 
 def glcm_textures(
-    array: xr.DataArray, radius: int, n_feats: int = 7, **kwargs
+    array: xr.DataArray,
+    radius: int,
+    n_feats: int = 7,
+    feats: Union[list, None] = None,
+    **kwargs,
 ) -> xr.DataArray:
     """Calculate texture properties of an image.
 
@@ -39,6 +43,9 @@ def glcm_textures(
         Radius of the moving window.
     n_feats : int, optional
         Number of features or properties computed, by default 7.
+    feats: Union[list, None], optional
+        List of features or properties computed. by default None.
+        Use 'asm', 'contrast', 'corr', 'var', 'idm', 'savg', 'entropy', 'diffvar', 'diss' for the properties listed above.
     kwargs :
         Other keyword arguments to pass to function
         :func:`block_glcm_textures <samsara.stats.glcm.block_glcm_textures>`.
@@ -80,6 +87,7 @@ def glcm_textures(
 
     kwargs["radius"] = radius
     kwargs["n_feats"] = n_feats
+    kwargs["feats"] = feats
 
     if isinstance(data, da.Array):
         chunks_ = ((n_feats,), *list(data.chunks))
@@ -106,17 +114,21 @@ def glcm_textures(
         data=glcm_cube,
         dims=["prop", *array_dims],
         coords={
-            "prop": [
-                "asm",
-                "contrast",
-                "corr",
-                "var",
-                "idm",
-                "savg",
-                "entropy",
-                "diffvar",
-                "dissimilarity",
-            ][:n_feats],
+            "prop": (
+                feats
+                if feats is not None
+                else [
+                    "asm",
+                    "contrast",
+                    "corr",
+                    "var",
+                    "idm",
+                    "savg",
+                    "entropy",
+                    "diffvar",
+                    "diss",
+                ][:n_feats]
+            ),
             **array_coords,
         },
         attrs=array_attrs,
@@ -135,6 +147,7 @@ def block_glcm_textures(
     distances: Union[list, None] = None,
     angles: Union[list, None] = None,
     advanced_idx: bool = False,
+    feats: Union[list, None] = None,
     **kwargs,
 ) -> np.ndarray:
     """Calculate texture properties of an in-memory image.
@@ -187,6 +200,9 @@ def block_glcm_textures(
     advanced_idx : bool, optional
         Use advanced indexing operations instead of loops when calculating properties that allow it,
         by default False.
+    feats: Union[list, None], optional
+        List of features or properties computed. by default None.
+        Use 'asm', 'contrast', 'corr', 'var', 'idm', 'savg', 'entropy', 'diffvar', 'diss' for the properties listed above.
     kwargs :
         Other keywords arguments to pass to function
         :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`.
@@ -212,14 +228,18 @@ def block_glcm_textures(
         array, (radius * 2 + 1, radius * 2 + 1)
     )
 
-    response = np.zeros([n_feats, *list(view.shape[:2])])
+    response = np.zeros(
+        [(n_feats if feats is None else len(feats)), *list(view.shape[:2])]
+    )
     range_i, range_j = range(view.shape[0]), range(view.shape[1])
 
     for i, j in product(range_i, range_j):
         subarray = view[i, j, :, :]
 
         if array[i + radius, j + radius] == 0 and skip_nan:
-            response[:, i, j] = np.repeat(np.nan, n_feats)
+            response[:, i, j] = np.repeat(
+                np.nan, (n_feats if feats is None else len(feats))
+            )
         else:
             glcm_ = matrix(
                 subarray,
@@ -231,16 +251,23 @@ def block_glcm_textures(
             )
 
             response[:, i, j] = properties(
-                glcm_, n_feats=n_feats, advanced_idx=advanced_idx
+                glcm_, n_feats=n_feats, advanced_idx=advanced_idx, feats=feats
             )
 
     if nan_supression > 0:
         sub_array = array[
             radius : (array.shape[0] - radius), radius : (array.shape[1] - radius)
         ]
-        response[(np.repeat(sub_array[np.newaxis, :, :], n_feats, axis=0)) == 0] = (
-            np.nan
-        )
+        response[
+            (
+                np.repeat(
+                    sub_array[np.newaxis, :, :],
+                    (n_feats if feats is None else len(feats)),
+                    axis=0,
+                )
+            )
+            == 0
+        ] = np.nan
 
     return response
 
@@ -323,6 +350,7 @@ def properties(
     summarize: str = "mean",
     advanced_idx: bool = False,
     skip_nan: bool = True,
+    feats: Union[list, None] = None,
 ) -> np.ndarray:
     """Calculate texture features of a gray level co-occurrence matrix.
 
@@ -355,6 +383,9 @@ def properties(
     skip_nan : bool, optional
         When computing the average of each texture for all directions and angles, nan will
         be ignored, by default True.
+    feats: Union[list, None], optional
+        List of features or properties computed. by default None.
+        Use 'asm', 'contrast', 'corr', 'var', 'idm', 'savg', 'entropy', 'diffvar', 'diss' for the properties listed above.
 
     Returns
     -------
@@ -378,12 +409,12 @@ def properties(
     n_ang = array.shape[3]
 
     # TODO: should be an array of 0s of float32 instead of floeat64?
-    ans = np.empty((n_feats, n_dis, n_ang))
+    ans = np.empty(((n_feats if feats is None else len(feats)), n_dis, n_ang))
 
     for d in range(n_dis):
         for a in range(n_ang):
             ans[:, d, a] = level_properties(
-                array[:, :, d, a], n_feats, advanced_idx=advanced_idx
+                array[:, :, d, a], n_feats, advanced_idx=advanced_idx, feats=feats
             )
 
     if summarize != "mean":
@@ -398,7 +429,10 @@ def properties(
 
 
 def level_properties(
-    array: np.ndarray, n_feats: int = 7, advanced_idx: bool = False
+    array: np.ndarray,
+    n_feats: int = 7,
+    advanced_idx: bool = False,
+    feats: Union[list, None] = None,
 ) -> np.ndarray:
     """Calculate texture features of a pair of levels gray level co-occurrence matrix.
 
@@ -425,6 +459,9 @@ def level_properties(
     advanced_idx : bool, optional
         Use advanced indexing operations instead of loops when calculating properties that allow it,
         by default False.
+    feats: Union[list, None], optional
+        List of features or properties computed. by default None.
+        Use 'asm', 'contrast', 'corr', 'var', 'idm', 'savg', 'entropy', 'diffvar', 'diss' for the properties listed above.
 
     Returns
     -------
@@ -437,56 +474,108 @@ def level_properties(
     :func:`matrix <samsara.stats.glcm.matrix>`
     :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
     """
-    fts = np.full((n_feats,), np.nan)
 
-    maxv = len(array)
-    k = np.arange(maxv)
-    k2 = k**2
-    tk = np.arange(2 * maxv)
+    def texture_asm(pravel):
+        return np.dot(pravel, pravel)
 
-    i, j = np.mgrid[:maxv, :maxv]
-    ij = i * j
-    i_j2_p1 = (i - j) ** 2
-    i_j2_p1 += 1
-    i_j2_p1 = 1.0 / i_j2_p1
-    i_j2_p1 = i_j2_p1.ravel()
+    def texture_contrast(k, px_minus_y):
+        return np.dot(k**2, px_minus_y)
+
+    def texture_corr(p, pravel, i, j, vx, ux, k):
+        ij = i * j
+        sx = np.sqrt(vx)
+        py = p.sum(1)
+        uy = np.dot(py, k)
+        vy = np.dot(py, k**2) - uy**2
+        sy = np.sqrt(vy)
+        return correlation(sx, sy, ux, uy, pravel, ij)
+
+    def texture_var(vx):
+        return vx
+
+    def texture_idm(pravel, i, j):
+        i_j2_p1 = (i - j) ** 2
+        i_j2_p1 += 1
+        i_j2_p1 = 1.0 / i_j2_p1
+        i_j2_p1 = i_j2_p1.ravel()
+        return np.dot(i_j2_p1, pravel)
+
+    def texture_savg(maxv, px_plus_y):
+        tk = np.arange(2 * maxv)
+        return np.dot(tk, px_plus_y)
+
+    def texture_entropy(pravel):
+        return entropy(pravel)
+
+    def texture_diffvar(px_minus_y):
+        return px_minus_y.var()
+
+    def texture_diss(k, px_minus_y):
+        return np.dot(k, px_minus_y)
+
+    # TODO Check if both n_feats and feats are provided
+    if feats is None:
+        feats = [
+            "asm",
+            "contrast",
+            "corr",
+            "var",
+            "idm",
+            "savg",
+            "entropy",
+            "diffvar",
+            "diss",
+        ][:n_feats]
+    if n_feats < len(feats):
+        feats = feats[:n_feats]
 
     array_sum = float(np.sum(array))
     p = np.divide(
         array, array_sum, np.zeros_like(array, dtype=float), where=array_sum != 0
     )
 
-    pravel = p.ravel()
-    px = p.sum(0)
-    py = p.sum(1)
+    kwargs = {"p": p, "pravel": p.ravel(), "maxv": len(array)}
+    kwargs.update({"k": np.arange(kwargs["maxv"])})
 
-    ux = np.dot(px, k)
-    uy = np.dot(py, k)
-    vx = np.dot(px, k2) - ux**2
-    vy = np.dot(py, k2) - uy**2
+    if any(map(feats.count, ["contrast", "savg", "diffvar", "diss"])):
+        px_plus_y = np.full(2 * kwargs["maxv"], fill_value=0, dtype=np.double)
+        px_minus_y = np.full(kwargs["maxv"], fill_value=0, dtype=np.double)
+        px_plus_y, px_minus_y = plus_minus(p, px_plus_y, px_minus_y, advanced_idx)
+        kwargs.update({"px_minus_y": px_minus_y, "px_plus_y": px_plus_y})
 
-    sx = np.sqrt(vx)
-    sy = np.sqrt(vy)
+    if any(map(feats.count, ["idm", "corr"])):
+        i, j = np.mgrid[: kwargs["maxv"], : kwargs["maxv"]]
+        kwargs.update({"i": i, "j": j})
 
-    px_plus_y = np.full(2 * maxv, fill_value=0, dtype=np.double)
-    px_minus_y = np.full(maxv, fill_value=0, dtype=np.double)
-    px_plus_y, px_minus_y = plus_minus(p, px_plus_y, px_minus_y, advanced_idx)
+    if any(map(feats.count, ["corr", "var"])):
+        kwargs.update({"px": p.sum(0)})
+        kwargs.update({"ux": np.dot(kwargs["px"], kwargs["k"])})
+        kwargs.update(
+            {"vx": np.dot(kwargs["px"], kwargs["k"] ** 2) - kwargs["ux"] ** 2}
+        )
 
-    fts = [
-        np.dot(pravel, pravel),  # 1. ASM
-        np.dot(k2, px_minus_y),  # 2. Contrast
-        correlation(sx, sy, ux, uy, pravel, ij),  # 3. Correlation
-        vx,  # 4. Variance
-        np.dot(i_j2_p1, pravel),  # 5. Inverse Difference Moment
-        np.dot(tk, px_plus_y),  # 6. Sum Average
-        entropy(pravel),  # 9. Entropy
-        px_minus_y.var(),  # Difference variance
-        np.dot(k, px_minus_y),  # Dissimilarity
-    ]
+    textures = {
+        "asm": texture_asm,
+        "contrast": texture_contrast,
+        "corr": texture_corr,
+        "var": texture_var,
+        "idm": texture_idm,
+        "savg": texture_savg,
+        "entropy": texture_entropy,
+        "diffvar": texture_diffvar,
+        "diss": texture_diss,
+    }
 
-    if len(fts) < n_feats:
+    def filter_kwargs(func, dict):
+        args_ = list(func.__code__.co_varnames[: func.__code__.co_argcount])
+        kwargs_ = {k: dict[k] for k in args_}
+        return kwargs_
+
+    fts = [textures[feat](**filter_kwargs(textures[feat], kwargs)) for feat in feats]
+
+    if (len(fts) < n_feats) & (feats is None):
         return np.pad(
             np.array(fts, dtype=float), (0, n_feats - len(fts)), constant_values=np.nan
         )
 
-    return fts[:n_feats]
+    return fts
