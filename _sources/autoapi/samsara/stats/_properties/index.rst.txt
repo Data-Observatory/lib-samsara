@@ -1,0 +1,32 @@
+:orphan:
+
+:py:mod:`samsara.stats._properties`
+===================================
+
+.. py:module:: samsara.stats._properties
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.stats._properties.plus_minus
+   samsara.stats._properties.entropy
+   samsara.stats._properties.correlation
+
+
+
+.. py:function:: plus_minus(p: numpy.ndarray, px_plus_y: numpy.ndarray, px_minus_y: numpy.ndarray, advanced_idx: bool = False) -> tuple
+
+
+.. py:function:: entropy(p: numpy.array) -> Union[int, float]
+
+
+.. py:function:: correlation(sx: Union[int, float], sy: Union[int, float], ux: Union[int, float], uy: Union[int, float], pravel: numpy.ndarray, ij: numpy.ndarray) -> Union[int, float]
+
+

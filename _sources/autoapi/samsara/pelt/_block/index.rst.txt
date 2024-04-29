@@ -1,0 +1,60 @@
+:orphan:
+
+:py:mod:`samsara.pelt._block`
+=============================
+
+.. py:module:: samsara.pelt._block
+
+.. autoapi-nested-parse::
+
+   Functions for Pelt applied over blocks/cubes of data.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.pelt._block.block_pelt
+
+
+
+.. py:function:: block_pelt(array: numpy.ndarray, dates: numpy.ndarray, dates_timestamp: numpy.ndarray, n_breaks: int, penalty: float, start_date: Union[str, None], algo_rpt: ruptures.KernelCPD) -> numpy.ndarray
+
+   Apply the linearly penalized segmentation (Pelt) over a NumPy Array.
+
+   Apply the Pelt algorithm over every geo-coordinate to find the optimal segmentation in a time
+   series.
+
+   Parameters
+   ----------
+   array : np.ndarray
+       3-dim array, with dimensions ('time', 'y', 'x'), to apply pelt over each (x, y) pair.
+   dates : np.ndarray
+       Array with dates of type np.datetime64.
+   dates_timestamp : np.ndarray
+       Array with dates of type float. Should be the `dates` array as UNIX time/timestamp.
+   n_breaks : int
+       Number of breaks expected in the data.
+   penalty : float
+       Penalty value for the KernelCPD prediction.
+   start_date : Union[str, None]
+       Dates from which breaks are calculated.
+   algo_rpt : rpt.KernelCPD
+       KernelCPD instance to use in the search of breakpoints. Must be defined with 'rbf' as model.
+
+   Returns
+   -------
+   np.ndarray
+       3-dim array, the two original positional dimensions and a new one of size equal to twice
+       `n_breaks`, where the first `n_breaks` values correspond to the difference of the medians
+       between two consecutive breaks, and the following `n_breaks` contain the date on which the
+       break occurred. This new dimension will be in the last position, which means that the
+       coordinates will be ('y', 'x', 'bkp').
+
+

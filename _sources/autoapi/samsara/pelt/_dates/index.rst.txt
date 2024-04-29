@@ -1,0 +1,54 @@
+:orphan:
+
+:py:mod:`samsara.pelt._dates`
+=============================
+
+.. py:module:: samsara.pelt._dates
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.pelt._dates.filter_index_by_date
+   samsara.pelt._dates.datetime_to_year_fraction
+
+
+
+.. py:function:: filter_index_by_date(dates: numpy.ndarray, start_date: str) -> numpy.ndarray
+
+   Return indices of dates greater than start_date
+
+   Parameters
+   ----------
+   dates : np.ndarray
+       Array of dates to filter.
+   start_date : str
+       String with the starting date.
+
+   Returns
+   -------
+   np.ndarray
+       Index array of type int with the indices of the dates grater than the starting date.
+
+
+.. py:function:: datetime_to_year_fraction(dates: numpy.ndarray) -> Union[numpy.ndarray, float]
+
+   Convert an array of dates to year and fraction.
+
+   Parameters
+   ----------
+   dates : np.ndarray
+       Array of type datetime64 to be converted.
+
+   Returns
+   -------
+   Union[np.ndarray, float]
+       Converted float or array with date as the year and percentage of the year as a decimal.
+
+

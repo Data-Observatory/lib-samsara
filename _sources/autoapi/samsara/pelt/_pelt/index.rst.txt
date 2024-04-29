@@ -1,0 +1,110 @@
+:orphan:
+
+:py:mod:`samsara.pelt._pelt`
+============================
+
+.. py:module:: samsara.pelt._pelt
+
+.. autoapi-nested-parse::
+
+   User functions to apply Pelt.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.pelt._pelt.pelt
+
+
+
+.. py:function:: pelt(array: xarray.DataArray, n_breaks: int = 5, penalty: float = 30, start_date: Union[str, None] = None, model: str = 'rbf', min_size: int = 3, jump: int = 1, backend: str = 'xarray') -> xarray.Dataset
+
+   Apply the linearly penalized segmentation (Pelt) over a DataArray.
+
+   Apply the Pelt algorithm over every geo-coordinate to find the optimal segmentation in a time
+   series.
+
+   Parameters
+   ----------
+   array : xr.DataArray
+       3-dim DataArray, with dimensions ('time', 'y', 'x'), to apply pelt over each (x, y) pair.
+   n_breaks : int, optional
+       Number of breaks expected in the data, by default 5.
+   penalty : float, optional
+       Penalty value for the KernelCPD prediction, by default 30.
+   start_date : Union[str, None], optional
+       Dates from which breaks are calculated, by default None.
+   model : str, optional
+       Model used by ruptures KernelCPD, by default 'rbf'. Only 'rbf' is supported in the current
+       version.
+   min_size : int, optional
+       Minimum segment length used by ruptures KernelCPD, by default 3.
+   jump : int, optional
+       Subsample (one every `jump` points), used by ruptures KernelCPD, by default 1.
+   backend : str, optional
+       Package used to run pelt over the entire array, by default 'xarray'. Only 'dask' and
+       'xarray' are supported.
+
+   Returns
+   -------
+   xr.Dataset
+       3-dim array dataset. Contains two arrays, magnitude and date. The magnitude array correspond
+       to the difference of the medians between two consecutive breaks. The date array contains the
+       date on which the break occurred. Both arrays have the same dimensions, which will be
+       ('y', 'x', 'bkp') if the original array has dimensions ('time', 'y', 'x'). The length of
+       the break dimension is equal to `n_breaks`.
+
+   Raises
+   ------
+   ValueError
+       If the value of `model` is other than 'rbf'.
+   ValueError
+       If the value of `model` is other than 'dask' or 'xarray'.
+
+   Notes
+   -----
+   The value of `jump` is set to 1 due to ruptures setting not accepting values other than 1 for
+   KernelCPD.
+
+   Examples
+   --------
+   Data creation example:
+
+   >>> import dask.array as da
+   >>> import numpy as np
+   >>> import xarray as xr
+   >>> start_date = np.datetime64('2020-01-01')
+   >>> stop_date = np.datetime64('2020-07-01')
+   >>> a = xr.DataArray(
+   ...     data=da.from_array(np.random.rand(10, 4, 5)),
+   ...     dims=["time", "y", "x"],
+   ...     coords={
+   ...         "time": np.arange(start_date, stop_date, np.timedelta64(20, 'D')).astype("datetime64[ns]"),
+   ...         "y":np.arange(4),
+   ...         "x":np.arange(5)
+   ...     }
+   ... )
+
+   Use pelt:
+
+   >>> import samsara.pelt as pelt
+   >>> pelt.pelt(a, 3, 1)
+   <xarray.Dataset>
+   Dimensions:    (y: 4, x: 5, bkp: 3)
+   Coordinates:
+   * y          (y) int64 0 1 2 3
+   * x          (x) int64 0 1 2 3 4
+   * bkp      (bkp) int64 0 1 2
+   Data variables:
+       magnitude  (y, x, bkp) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
+       date       (y, x, bkp) float64 dask.array<chunksize=(4, 5, 3), meta=np.ndarray>
+
+
+

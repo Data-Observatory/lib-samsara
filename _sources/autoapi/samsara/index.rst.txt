@@ -1,0 +1,39 @@
+:py:mod:`samsara`
+=================
+
+.. py:module:: samsara
+
+.. autoapi-nested-parse::
+
+   SAMSARA: Package for the Satellite Alert and Monitoring System for Areas of Environmental Relevance
+
+   Using any of these subpackages requires an explicit import. For example,
+   ``import samsara.pelt`` or ``from samsara import pelt``.
+
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   filter/index.rst
+   kernel/index.rst
+   pelt/index.rst
+   stats/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   cli/index.rst
+
+
+Package Contents
+----------------
+
+

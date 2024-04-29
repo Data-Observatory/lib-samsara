@@ -1,0 +1,853 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>samsara.filter._filter &#8212; SAMSARA 0.2.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d10597a4" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../../_static/documentation_options.js?v=37f418d5"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/samsara/filter/_filter';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="Apr 29, 2024"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">SAMSARA 0.2.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../readme.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../authors.html">
+                        Authors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Data-Observatory/lib-samsara/" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../readme.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../authors.html">
+                        Authors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../autoapi/index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Data-Observatory/lib-samsara/" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<div id="searchbox"></div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../index.html">Table of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">samsara.filt...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for samsara.filter._filter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">User functions to apply filters.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;filter_by_variable&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;negative_of&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;negative_of_last&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;first_negative&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;last_negative&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="filter_by_variable">
+<a class="viewcode-back" href="../../../autoapi/samsara/filter/index.html#samsara.filter._filter.filter_by_variable">[docs]</a>
+<span class="k">def</span> <span class="nf">filter_by_variable</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">filter_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bkp_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;magnitude&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep the values that meet a condition on a variable of a Dataset.</span>
+
+<span class="sd">    Given a Dataset, for each pixel in every variable/array, find the value that meets the condition</span>
+<span class="sd">    specified by `filter_type` in the `variable` array. This process reduces the dimensionality of</span>
+<span class="sd">    each array by 1.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : xr.Dataset</span>
+<span class="sd">        Dataset to filter. Must contain two 3-dim Dask arrays, named magnitude and date. The third</span>
+<span class="sd">        dimension/coordinate will be reduced, and must be named &#39;bkp&#39;.</span>
+<span class="sd">    filter_type : str</span>
+<span class="sd">        Type of filter to apply. Must be either &#39;negative_of&#39;, &#39;negative_of_last&#39;,</span>
+<span class="sd">        &#39;first_negative&#39;, or &#39;last_negative&#39;.</span>
+
+<span class="sd">        - &#39;negative_of&#39;</span>
+<span class="sd">            Will evaluate that the value in the `bkp_index` index of the &#39;bkp&#39; coordinate of the array</span>
+<span class="sd">            `variable` is between -1 and 0, then it for each array return it values, otherwise the</span>
+<span class="sd">            returned value is nan.</span>
+<span class="sd">        - &#39;negative_of_last&#39;</span>
+<span class="sd">            Will evaluate that the last value that is not nan in the &#39;bkp&#39; coordinate of the array</span>
+<span class="sd">            `variable` is between -1 and 0, then it for each array return it values, otherwise the</span>
+<span class="sd">            returned value is nan.</span>
+<span class="sd">        - &#39;first_negative&#39;</span>
+<span class="sd">            Will return the values that are in the index of the first value in the &#39;bkp&#39;</span>
+<span class="sd">            coordinate of the array `variable` that is between -1 and 0. If no value meets this</span>
+<span class="sd">            criteria, then the returned value is nan.</span>
+<span class="sd">        - &#39;last_negative&#39;</span>
+<span class="sd">            Will return the values that are in the index of the last value in the &#39;bkp&#39;</span>
+<span class="sd">            coordinate of the array `variable` that is between -1 and 0. If no value meets this</span>
+<span class="sd">            criteria, then the returned value is nan.</span>
+<span class="sd">    bkp_index : int, optional</span>
+<span class="sd">        Used in &#39;negative_of&#39;. The index of the bkp coordinate from which the values will be</span>
+<span class="sd">        obtained only if they meet the negativity condition, by default 0.</span>
+<span class="sd">    variable : str, optional</span>
+<span class="sd">        Name of the array on which the conditions will be evaluated, by default &#39;magnitude&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xr.Dataset</span>
+<span class="sd">        2-dim array dataset. Contains two arrays, magnitude and date. Each cell of the arrays</span>
+<span class="sd">        contains the value that meets the condition of the selected filter.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the filter type is not supported. Currently supported types are &#39;negative_of_first&#39;,</span>
+<span class="sd">        &#39;negative_of_last&#39;, &#39;first_negative&#39;, &#39;last_negative&#39;.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    Data creation example:</span>
+
+<span class="sd">    &gt;&gt;&gt; import dask.array as da</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; import xarray as xr</span>
+<span class="sd">    &gt;&gt;&gt; mag = da.array(</span>
+<span class="sd">    ...     [</span>
+<span class="sd">    ...         [</span>
+<span class="sd">    ...             [np.nan, np.nan, np.nan],</span>
+<span class="sd">    ...             [0.0292, -0.3283, np.nan],</span>
+<span class="sd">    ...             [0.3207, -0.8798, -0.9838],</span>
+<span class="sd">    ...             [0.4581, np.nan, np.nan],</span>
+<span class="sd">    ...         ],</span>
+<span class="sd">    ...         [</span>
+<span class="sd">    ...             [0.1838, -0.3835, np.nan],</span>
+<span class="sd">    ...             [-0.4497, 0.9151, np.nan],</span>
+<span class="sd">    ...             [0.1864, -0.1234, 0.5554],</span>
+<span class="sd">    ...             [-0.0617, -0.8852, 0.0588],</span>
+<span class="sd">    ...         ],</span>
+<span class="sd">    ...     ]</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; dat = da.array(</span>
+<span class="sd">    ...     [</span>
+<span class="sd">    ...         [</span>
+<span class="sd">    ...             [np.nan, np.nan, np.nan],</span>
+<span class="sd">    ...             [1107475200, 1107561600, np.nan],</span>
+<span class="sd">    ...             [1107734400, 1107820800, 1107907200],</span>
+<span class="sd">    ...             [1107993600, np.nan, np.nan],</span>
+<span class="sd">    ...         ],</span>
+<span class="sd">    ...         [</span>
+<span class="sd">    ...             [1108252800, 1108339200, np.nan],</span>
+<span class="sd">    ...             [1108512000, 1108598400, np.nan],</span>
+<span class="sd">    ...             [1108771200, 1108857600, 1108944000],</span>
+<span class="sd">    ...             [1109030400, 1109116800, 1109203200],</span>
+<span class="sd">    ...         ],</span>
+<span class="sd">    ...     ]</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; y, x, brk = mag.shape</span>
+<span class="sd">    &gt;&gt;&gt; ds = xr.Dataset(</span>
+<span class="sd">    ...     data_vars={</span>
+<span class="sd">    ...         &quot;magnitude&quot;: ([&quot;y&quot;, &quot;x&quot;, &quot;bkp&quot;], mag),</span>
+<span class="sd">    ...         &quot;date&quot;: ([&quot;y&quot;, &quot;x&quot;, &quot;bkp&quot;], dat),</span>
+<span class="sd">    ...     },</span>
+<span class="sd">    ...     coords={</span>
+<span class="sd">    ...         &quot;y&quot;: np.arange(y),</span>
+<span class="sd">    ...         &quot;x&quot;: np.arange(x),</span>
+<span class="sd">    ...         &quot;bkp&quot;: np.arange(brk),</span>
+<span class="sd">    ...     },</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; ds</span>
+<span class="sd">    &lt;xarray.Dataset&gt;</span>
+<span class="sd">    Dimensions:    (y: 2, x: 4, bkp: 3)</span>
+<span class="sd">    Coordinates:</span>
+<span class="sd">    * y          (y) int64 0 1</span>
+<span class="sd">    * x          (x) int64 0 1 2 3</span>
+<span class="sd">    * bkp      (bkp) int64 0 1 2</span>
+<span class="sd">    Data variables:</span>
+<span class="sd">        magnitude  (y, x, bkp) float64 dask.array&lt;chunksize=(2, 4, 3), meta=np.ndarray&gt;</span>
+<span class="sd">        date       (y, x, bkp) float64 dask.array&lt;chunksize=(2, 4, 3), meta=np.ndarray&gt;</span>
+
+<span class="sd">    Use samsara to filter the dataset:</span>
+
+<span class="sd">    &gt;&gt;&gt; import samsara.filter as sfilter</span>
+<span class="sd">    &gt;&gt;&gt; sfilter.filter_by_variable(ds, &quot;negative_of_last&quot;, variable=&quot;magnitude&quot;)</span>
+<span class="sd">    &lt;xarray.Dataset&gt;</span>
+<span class="sd">    Dimensions:    (y: 2, x: 4)</span>
+<span class="sd">    Coordinates:</span>
+<span class="sd">    * y          (y) int64 0 1</span>
+<span class="sd">    * x          (x) int64 0 1 2 3</span>
+<span class="sd">    Data variables:</span>
+<span class="sd">        magnitude  (y, x) float64 dask.array&lt;chunksize=(2, 4), meta=np.ndarray&gt;</span>
+<span class="sd">        date       (y, x) float64 dask.array&lt;chunksize=(2, 4), meta=np.ndarray&gt;</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">func</span> <span class="o">=</span> <span class="n">_get_func</span><span class="p">(</span><span class="n">filter_type</span><span class="p">)</span>
+
+    <span class="n">other_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">({</span><span class="n">variable</span><span class="p">}))</span>
+    <span class="c1"># For now, there is only support for one other variable apart from the main one</span>
+    <span class="n">variable_1</span> <span class="o">=</span> <span class="n">other_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;variable&quot;</span><span class="p">:</span> <span class="n">variable</span><span class="p">}</span>
+
+    <span class="c1"># Add bkp_index to kwargs only if it&#39;s used</span>
+    <span class="k">if</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;negative_of&quot;</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bkp_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bkp_index</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="p">{</span>
+            <span class="n">variable</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s2">&quot;bkp&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">),</span>
+            <span class="n">variable_1</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">variable_1</span><span class="p">]</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s2">&quot;bkp&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
+        <span class="n">coords</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">filter_ds</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="n">func</span><span class="p">,</span> <span class="n">kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="n">template</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">filter_ds</span></div>
+
+
+
+<div class="viewcode-block" id="negative_of">
+<a class="viewcode-back" href="../../../autoapi/samsara/filter/index.html#samsara.filter._filter.negative_of">[docs]</a>
+<span class="k">def</span> <span class="nf">negative_of</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">bkp_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;magnitude&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter an in-memory dataset keeping the negatives of the `bkp_index` index.</span>
+
+<span class="sd">    The value of the `bkp_index`-th break in `variable` must be between -1 and 0 for each pixel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">bkp_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;bkp&quot;</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Invalid bkp_index. Got index </span><span class="si">{</span><span class="n">bkp_index</span><span class="si">}</span><span class="s2"> for coordinate of length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;bkp&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">of</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">isel</span><span class="p">({</span><span class="s2">&quot;bkp&quot;</span><span class="p">:</span> <span class="n">bkp_index</span><span class="p">})</span>
+    <span class="n">neg_of</span> <span class="o">=</span> <span class="n">of</span><span class="o">.</span><span class="n">where</span><span class="p">((</span><span class="n">of</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">of</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">drop_vars</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">neg_of</span></div>
+
+
+
+<div class="viewcode-block" id="negative_of_last">
+<a class="viewcode-back" href="../../../autoapi/samsara/filter/index.html#samsara.filter._filter.negative_of_last">[docs]</a>
+<span class="k">def</span> <span class="nf">negative_of_last</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;magnitude&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter an in-memory dataset keeping the negatives of the last index.</span>
+
+<span class="sd">    The value of the last break in `variable` must be between -1 and 0 for each pixel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">other_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">({</span><span class="n">variable</span><span class="p">}))</span>
+    <span class="c1"># For now, there is only support for one other variable apart from the main one</span>
+    <span class="n">variable_1</span> <span class="o">=</span> <span class="n">other_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">filter_xarray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
+        <span class="n">_pixel_negative_of_last</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">variable</span><span class="p">],</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">variable_1</span><span class="p">],</span>
+        <span class="n">input_core_dims</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;bkp&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;bkp&quot;</span><span class="p">]],</span>
+        <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[[],</span> <span class="p">[]],</span>
+        <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">vectorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">nol</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="p">{</span><span class="n">variable</span><span class="p">:</span> <span class="n">filter_xarray</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">variable_1</span><span class="p">:</span> <span class="n">filter_xarray</span><span class="p">[</span><span class="mi">1</span><span class="p">]},</span>
+        <span class="n">coords</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">nol</span></div>
+
+
+
+<div class="viewcode-block" id="first_negative">
+<a class="viewcode-back" href="../../../autoapi/samsara/filter/index.html#samsara.filter._filter.first_negative">[docs]</a>
+<span class="k">def</span> <span class="nf">first_negative</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;magnitude&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter an in-memory dataset keeping the first negative.</span>
+
+<span class="sd">    The first value where `variable` is between -1 and 0 for each pixel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">other_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">({</span><span class="n">variable</span><span class="p">}))</span>
+    <span class="c1"># For now, there is only support for one other variable apart from the main one</span>
+    <span class="n">variable_1</span> <span class="o">=</span> <span class="n">other_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">filter_xarray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
+        <span class="n">_pixel_n_negative</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">variable</span><span class="p">],</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">variable_1</span><span class="p">],</span>
+        <span class="n">input_core_dims</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;bkp&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;bkp&quot;</span><span class="p">]],</span>
+        <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[[],</span> <span class="p">[]],</span>
+        <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">vectorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">fn</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="p">{</span><span class="n">variable</span><span class="p">:</span> <span class="n">filter_xarray</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">variable_1</span><span class="p">:</span> <span class="n">filter_xarray</span><span class="p">[</span><span class="mi">1</span><span class="p">]},</span>
+        <span class="n">coords</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">fn</span></div>
+
+
+
+<div class="viewcode-block" id="last_negative">
+<a class="viewcode-back" href="../../../autoapi/samsara/filter/index.html#samsara.filter._filter.last_negative">[docs]</a>
+<span class="k">def</span> <span class="nf">last_negative</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">variable</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;magnitude&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter an in-memory dataset keeping the last negative.</span>
+
+<span class="sd">    The last value where `variable` is between -1 and 0 for each pixel.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">other_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">data_vars</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">({</span><span class="n">variable</span><span class="p">}))</span>
+    <span class="c1"># For now, there is only support for one other variable apart from the main one</span>
+    <span class="n">variable_1</span> <span class="o">=</span> <span class="n">other_vars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">filter_xarray</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">apply_ufunc</span><span class="p">(</span>
+        <span class="n">_pixel_n_negative</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">variable</span><span class="p">],</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">variable_1</span><span class="p">],</span>
+        <span class="n">input_core_dims</span><span class="o">=</span><span class="p">[[</span><span class="s2">&quot;bkp&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;bkp&quot;</span><span class="p">]],</span>
+        <span class="n">output_core_dims</span><span class="o">=</span><span class="p">[[],</span> <span class="p">[]],</span>
+        <span class="n">output_dtypes</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">vectorize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">ln</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span>
+        <span class="n">data_vars</span><span class="o">=</span><span class="p">{</span><span class="n">variable</span><span class="p">:</span> <span class="n">filter_xarray</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">variable_1</span><span class="p">:</span> <span class="n">filter_xarray</span><span class="p">[</span><span class="mi">1</span><span class="p">]},</span>
+        <span class="n">coords</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">coords</span><span class="p">,</span>
+        <span class="n">attrs</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">drop_dims</span><span class="p">(</span><span class="s2">&quot;bkp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ln</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_get_func</span><span class="p">(</span><span class="n">filter_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">callable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the function for the requested filter type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;negative_of&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">negative_of</span>
+    <span class="k">elif</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;negative_of_last&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">negative_of_last</span>
+    <span class="k">elif</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;first_negative&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">first_negative</span>
+    <span class="k">elif</span> <span class="n">filter_type</span> <span class="o">==</span> <span class="s2">&quot;last_negative&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">last_negative</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid filter type.&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_pixel_negative_of_last</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+    <span class="n">last_not_nan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">data</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">last_not_nan</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">last_not_nan</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>  <span class="c1"># index of last not nan</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">date</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+
+<span class="k">def</span> <span class="nf">_pixel_n_negative</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">date</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">:</span>
+    <span class="n">negatives</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">((</span><span class="n">data</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">data</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">negatives</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">date</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, Data Observatory.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

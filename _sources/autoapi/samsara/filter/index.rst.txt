@@ -1,0 +1,185 @@
+:py:mod:`samsara.filter`
+========================
+
+.. py:module:: samsara.filter
+
+.. autoapi-nested-parse::
+
+   Subpackage to filter values in xarray Dataset (`samsara.filter`)
+
+
+
+Package Contents
+----------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.filter.filter_by_variable
+   samsara.filter.negative_of
+   samsara.filter.negative_of_last
+   samsara.filter.first_negative
+   samsara.filter.last_negative
+
+
+
+.. py:function:: filter_by_variable(data: xarray.Dataset, filter_type: str, bkp_index: int = 0, variable: str = 'magnitude') -> xarray.Dataset
+
+   Keep the values that meet a condition on a variable of a Dataset.
+
+   Given a Dataset, for each pixel in every variable/array, find the value that meets the condition
+   specified by `filter_type` in the `variable` array. This process reduces the dimensionality of
+   each array by 1.
+
+   Parameters
+   ----------
+   data : xr.Dataset
+       Dataset to filter. Must contain two 3-dim Dask arrays, named magnitude and date. The third
+       dimension/coordinate will be reduced, and must be named 'bkp'.
+   filter_type : str
+       Type of filter to apply. Must be either 'negative_of', 'negative_of_last',
+       'first_negative', or 'last_negative'.
+
+       - 'negative_of'
+           Will evaluate that the value in the `bkp_index` index of the 'bkp' coordinate of the array
+           `variable` is between -1 and 0, then it for each array return it values, otherwise the
+           returned value is nan.
+       - 'negative_of_last'
+           Will evaluate that the last value that is not nan in the 'bkp' coordinate of the array
+           `variable` is between -1 and 0, then it for each array return it values, otherwise the
+           returned value is nan.
+       - 'first_negative'
+           Will return the values that are in the index of the first value in the 'bkp'
+           coordinate of the array `variable` that is between -1 and 0. If no value meets this
+           criteria, then the returned value is nan.
+       - 'last_negative'
+           Will return the values that are in the index of the last value in the 'bkp'
+           coordinate of the array `variable` that is between -1 and 0. If no value meets this
+           criteria, then the returned value is nan.
+   bkp_index : int, optional
+       Used in 'negative_of'. The index of the bkp coordinate from which the values will be
+       obtained only if they meet the negativity condition, by default 0.
+   variable : str, optional
+       Name of the array on which the conditions will be evaluated, by default 'magnitude'.
+
+   Returns
+   -------
+   xr.Dataset
+       2-dim array dataset. Contains two arrays, magnitude and date. Each cell of the arrays
+       contains the value that meets the condition of the selected filter.
+
+   Raises
+   ------
+   ValueError
+       If the filter type is not supported. Currently supported types are 'negative_of_first',
+       'negative_of_last', 'first_negative', 'last_negative'.
+
+   Examples
+   --------
+
+   Data creation example:
+
+   >>> import dask.array as da
+   >>> import numpy as np
+   >>> import xarray as xr
+   >>> mag = da.array(
+   ...     [
+   ...         [
+   ...             [np.nan, np.nan, np.nan],
+   ...             [0.0292, -0.3283, np.nan],
+   ...             [0.3207, -0.8798, -0.9838],
+   ...             [0.4581, np.nan, np.nan],
+   ...         ],
+   ...         [
+   ...             [0.1838, -0.3835, np.nan],
+   ...             [-0.4497, 0.9151, np.nan],
+   ...             [0.1864, -0.1234, 0.5554],
+   ...             [-0.0617, -0.8852, 0.0588],
+   ...         ],
+   ...     ]
+   ... )
+   >>> dat = da.array(
+   ...     [
+   ...         [
+   ...             [np.nan, np.nan, np.nan],
+   ...             [1107475200, 1107561600, np.nan],
+   ...             [1107734400, 1107820800, 1107907200],
+   ...             [1107993600, np.nan, np.nan],
+   ...         ],
+   ...         [
+   ...             [1108252800, 1108339200, np.nan],
+   ...             [1108512000, 1108598400, np.nan],
+   ...             [1108771200, 1108857600, 1108944000],
+   ...             [1109030400, 1109116800, 1109203200],
+   ...         ],
+   ...     ]
+   ... )
+   >>> y, x, brk = mag.shape
+   >>> ds = xr.Dataset(
+   ...     data_vars={
+   ...         "magnitude": (["y", "x", "bkp"], mag),
+   ...         "date": (["y", "x", "bkp"], dat),
+   ...     },
+   ...     coords={
+   ...         "y": np.arange(y),
+   ...         "x": np.arange(x),
+   ...         "bkp": np.arange(brk),
+   ...     },
+   ... )
+   >>> ds
+   <xarray.Dataset>
+   Dimensions:    (y: 2, x: 4, bkp: 3)
+   Coordinates:
+   * y          (y) int64 0 1
+   * x          (x) int64 0 1 2 3
+   * bkp      (bkp) int64 0 1 2
+   Data variables:
+       magnitude  (y, x, bkp) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+       date       (y, x, bkp) float64 dask.array<chunksize=(2, 4, 3), meta=np.ndarray>
+
+   Use samsara to filter the dataset:
+
+   >>> import samsara.filter as sfilter
+   >>> sfilter.filter_by_variable(ds, "negative_of_last", variable="magnitude")
+   <xarray.Dataset>
+   Dimensions:    (y: 2, x: 4)
+   Coordinates:
+   * y          (y) int64 0 1
+   * x          (x) int64 0 1 2 3
+   Data variables:
+       magnitude  (y, x) float64 dask.array<chunksize=(2, 4), meta=np.ndarray>
+       date       (y, x) float64 dask.array<chunksize=(2, 4), meta=np.ndarray>
+
+
+
+.. py:function:: negative_of(data: xarray.Dataset, bkp_index: int = 0, variable: str = 'magnitude') -> xarray.Dataset
+
+   Filter an in-memory dataset keeping the negatives of the `bkp_index` index.
+
+   The value of the `bkp_index`-th break in `variable` must be between -1 and 0 for each pixel.
+
+
+.. py:function:: negative_of_last(data: xarray.Dataset, variable: str = 'magnitude') -> xarray.Dataset
+
+   Filter an in-memory dataset keeping the negatives of the last index.
+
+   The value of the last break in `variable` must be between -1 and 0 for each pixel.
+
+
+.. py:function:: first_negative(data: xarray.Dataset, variable: str = 'magnitude') -> xarray.Dataset
+
+   Filter an in-memory dataset keeping the first negative.
+
+   The first value where `variable` is between -1 and 0 for each pixel.
+
+
+.. py:function:: last_negative(data: xarray.Dataset, variable: str = 'magnitude') -> xarray.Dataset
+
+   Filter an in-memory dataset keeping the last negative.
+
+   The last value where `variable` is between -1 and 0 for each pixel.
+
+

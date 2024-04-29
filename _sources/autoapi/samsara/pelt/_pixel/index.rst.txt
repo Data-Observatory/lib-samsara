@@ -1,0 +1,62 @@
+:orphan:
+
+:py:mod:`samsara.pelt._pixel`
+=============================
+
+.. py:module:: samsara.pelt._pixel
+
+.. autoapi-nested-parse::
+
+   Functions for Pelt applied over a 1-dimensional array.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.pelt._pixel.pixel_pelt
+
+
+
+.. py:function:: pixel_pelt(array: numpy.ndarray, dates: numpy.ndarray, n_breaks: int = 5, penalty: float = 30.0, start_date: Union[str, None] = None, model: str = 'rbf', min_size: int = 3, jump: int = 1) -> tuple
+
+   Apply the linearly penalized segmentation (Pelt) over a NumPy Array.
+
+   Parameters
+   ----------
+   array : np.ndarray
+       1-dim array, with the data for 1 pixel or (x, y) in a time series.
+   dates : np.ndarray
+       Array with dates of type np.datetime64.
+   n_breaks : int, optional
+       Number of breaks expected in the data, by default 5
+   penalty : float, optional
+       Penalty value for the KernelCPD prediction, by default 30.0
+   start_date : Union[str, None], optional
+       Dates from which breaks are calculated, by default None
+   model : str, optional
+       Model used by ruptures KernelCPD, by default 'rbf'.
+   min_size : int, optional
+       Minimum segment length used by ruptures KernelCPD, by default 3.
+   jump : int, optional
+       Subsample (one every `jump` points), used by ruptures KernelCPD, by default 1.
+
+   Returns
+   -------
+   tuple
+       Tuple of 2 1-dim arrays, each with length equal to `n_breaks`. The first array correspond to
+       the difference of the medians between two consecutive breaks, known as magnitude. The second
+       array contains the dates on which each break occurred.
+
+   Notes
+   -----
+   The value of `jump` is set to 1 due to ruptures setting not accepting values other than 1 for
+   KernelCPD.
+
+

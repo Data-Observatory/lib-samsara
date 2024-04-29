@@ -1,0 +1,21 @@
+:py:mod:`samsara.stats`
+=======================
+
+.. py:module:: samsara.stats
+
+.. autoapi-nested-parse::
+
+   Subpackage for statistics (`samsara.stats`)
+
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   glcm/index.rst
+   neighborhood/index.rst
+
+

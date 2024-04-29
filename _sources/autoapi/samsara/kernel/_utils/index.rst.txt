@@ -1,0 +1,52 @@
+:orphan:
+
+:py:mod:`samsara.kernel._utils`
+===============================
+
+.. py:module:: samsara.kernel._utils
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.kernel._utils.is_normalized
+   samsara.kernel._utils.normalize_array
+
+
+
+.. py:function:: is_normalized(array: numpy.ndarray) -> bool
+
+   Check if an array is normalized.
+
+   Parameters
+   ----------
+   array : np.ndarray
+       Array whose norm is checked.
+
+   Returns
+   -------
+   bool
+       True if the array norm is equal to 1, False otherwise.
+
+
+.. py:function:: normalize_array(array: numpy.ndarray) -> numpy.ndarray
+
+   Scale array values so the euclidean norm is equal to 1.
+
+   Parameters
+   ----------
+   array : np.ndarray
+       Array whose values are scaled.
+
+   Returns
+   -------
+   np.ndarray
+       Normalized array.
+
+

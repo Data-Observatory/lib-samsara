@@ -1,0 +1,273 @@
+:orphan:
+
+:py:mod:`samsara.kernel._basic`
+===============================
+
+.. py:module:: samsara.kernel._basic
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.kernel._basic.circle
+   samsara.kernel._basic.cross
+   samsara.kernel._basic.custom
+   samsara.kernel._basic.ex
+   samsara.kernel._basic.octagon
+   samsara.kernel._basic.rectangle
+   samsara.kernel._basic.rhombus
+   samsara.kernel._basic.square
+
+
+
+.. py:function:: circle(radius: int, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Circle shaped kernel.
+
+   Parameters
+   ----------
+   radius : int
+       The radius of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with data array shaped as a circle.
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> x = skernel.circle(3)
+   >>> x.data
+   array([[0., 0., 0., 1., 0., 0., 0.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [0., 0., 0., 1., 0., 0., 0.]])
+   >>> y = skernel.circle(2, True)
+   >>> y.data
+   array([[0.       , 0.       , 0.2773501, 0.       , 0.       ],
+          [0.       , 0.2773501, 0.2773501, 0.2773501, 0.       ],
+          [0.2773501, 0.2773501, 0.2773501, 0.2773501, 0.2773501],
+          [0.       , 0.2773501, 0.2773501, 0.2773501, 0.       ],
+          [0.       , 0.       , 0.2773501, 0.       , 0.       ]])
+
+
+.. py:function:: cross(radius: int, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Cross shaped kernel.
+
+   Parameters
+   ----------
+   radius : int
+       The radius of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with data array shaped as a cross.
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> x = skernel.cross(3)
+   >>> x.data
+   array([[0., 0., 0., 1., 0., 0., 0.],
+          [0., 0., 0., 1., 0., 0., 0.],
+          [0., 0., 0., 1., 0., 0., 0.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [0., 0., 0., 1., 0., 0., 0.],
+          [0., 0., 0., 1., 0., 0., 0.],
+          [0., 0., 0., 1., 0., 0., 0.]])
+
+
+.. py:function:: custom(data: numpy.ndarray, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Custom kernel.
+
+   Parameters
+   ----------
+   data : np.ndarray
+       The data array of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with a custom data array.
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> import numpy as np
+   >>> data = np.array([[1, 0, 1], [0, 1, 1], [0, 0, 0]])
+   >>> x = skernel.custom(data)
+   >>> x.data
+   array([[1, 0, 1],
+          [0, 1, 1],
+          [0, 0, 0]])
+
+
+.. py:function:: ex(radius: int, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Ex (x) shaped kernel.
+
+   Parameters
+   ----------
+   radius : int
+       The radius of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with data array shaped as an ex (x).
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> x = skernel.ex(3)
+   >>> x.data
+   array([[1., 0., 0., 0., 0., 0., 1.],
+          [0., 1., 0., 0., 0., 1., 0.],
+          [0., 0., 1., 0., 1., 0., 0.],
+          [0., 0., 0., 1., 0., 0., 0.],
+          [0., 0., 1., 0., 1., 0., 0.],
+          [0., 1., 0., 0., 0., 1., 0.],
+          [1., 0., 0., 0., 0., 0., 1.]])
+
+
+.. py:function:: octagon(radius: int, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Octagon shaped kernel.
+
+   Parameters
+   ----------
+   radius : int
+       The radius of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with data array shaped as an octagon.
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> x = skernel.octagon(3)
+   >>> x.data
+   array([[0., 0., 1., 1., 1., 0., 0.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [0., 0., 1., 1., 1., 0., 0.]])
+
+
+.. py:function:: rectangle(x_radius: int, y_radius: int, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Rectangular shaped kernel.
+
+   Parameters
+   ----------
+   x_radius : int
+       The horizontal radius of the kernel to generate.
+   y_radius : int
+       The vertical radius of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with data array shaped as a rectangle.
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> x = skernel.rectangle(2, 3)
+   >>> x.data
+   array([[1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.]])
+
+
+.. py:function:: rhombus(radius: int, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Rhombus (diamond) shaped kernel.
+
+   Parameters
+   ----------
+   radius : int
+       The radius of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with data array shaped as a rhombus (diamond).
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> x = skernel.rhombus(3)
+   >>> x.data
+   array([[0., 0., 0., 1., 0., 0., 0.],
+          [0., 0., 1., 1., 1., 0., 0.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [0., 1., 1., 1., 1., 1., 0.],
+          [0., 0., 1., 1., 1., 0., 0.],
+          [0., 0., 0., 1., 0., 0., 0.]])
+
+
+.. py:function:: square(radius: int, normalize: bool = False) -> samsara.kernel._kernel.Kernel
+
+   Square shaped kernel.
+
+   Parameters
+   ----------
+   radius : int
+       The radius of the kernel to generate.
+   normalize : bool, optional
+       Normalize the kernel data values so its euclidean norm is equal to 1, by default False.
+
+   Returns
+   -------
+   Kernel
+       Kernel with data array shaped as a square.
+
+   Examples
+   --------
+   >>> import samsara.kernel as skernel
+   >>> x = skernel.square(3)
+   >>> x.data
+   array([[1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.],
+          [1., 1., 1., 1., 1., 1., 1.]])
+
+

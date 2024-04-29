@@ -1,0 +1,275 @@
+:py:mod:`samsara.stats.glcm`
+============================
+
+.. py:module:: samsara.stats.glcm
+
+.. autoapi-nested-parse::
+
+   Subpackage for statistics from gray level co-occurrence matrix (`samsara.stats.glcm`)
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   samsara.stats.glcm.glcm_textures
+   samsara.stats.glcm.block_glcm_textures
+   samsara.stats.glcm.matrix
+   samsara.stats.glcm.properties
+   samsara.stats.glcm.level_properties
+
+
+
+.. py:function:: glcm_textures(array: xarray.DataArray, radius: int, n_feats: int = 7, **kwargs) -> xarray.DataArray
+
+   Calculate texture properties of an image.
+
+   For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
+   and the properties of that glcm. The properties are the following:
+
+       - ASM
+       - Contrast
+       - Correlation
+       - Variance
+       - Inverse Difference Moment
+       - Sum Average
+       - Entropy
+
+   Parameters
+   ----------
+   array : xr.DataArray
+       2-dim DataArray image.
+   radius : int
+       Radius of the moving window.
+   n_feats : int, optional
+       Number of features or properties computed, by default 7.
+   kwargs :
+       Other keyword arguments to pass to function
+       :func:`block_glcm_textures <samsara.stats.glcm.block_glcm_textures>`.
+
+   Returns
+   -------
+   xr.DataArray
+       3-dim array with the texture properties for each pixel. The new axis is located at the first
+       dimension, and indexes the property.
+
+   Raises
+   ------
+   ValueError
+       If `array` is not 2-dimensional.
+   TypeError
+       If the data in `array` is neither da.Array or np.ndarray.
+
+   See Also
+   --------
+   :func:`block_glcm_textures <samsara.stats.glcm.block_glcm_textures>`
+   :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+
+
+
+.. py:function:: block_glcm_textures(array: numpy.ndarray, radius: int = 1, n_feats: int = 7, nan_supression: int = 0, skip_nan: bool = True, rescale_normed: bool = False, distances: Union[list, None] = None, angles: Union[list, None] = None, advanced_idx: bool = False, **kwargs) -> numpy.ndarray
+
+   Calculate texture properties of an in-memory image.
+
+   For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
+   and the properties of that glcm. The properties are the following:
+
+       - ASM
+       - Contrast
+       - Correlation
+       - Variance
+       - Inverse Difference Moment
+       - Sum Average
+       - Entropy
+
+   Parameters
+   ----------
+   array : np.array
+       2-dim image.
+   radius : int, optional
+       Radius of the moving window, by default 1.
+   n_feats : int, optional
+       Number of features or properties computed, by default 7.
+   nan_supression : int, optional
+       Method used to replace values in each glcm, by default 0.
+
+       - 0
+           Do nothing to glcm.
+       - 1
+           Position (0,0) in the glcm is replaced with 0s.
+       - 2
+           Row and column 0 in the glcm are replaced with 0s.
+       - 3
+           Row and column 0 are removed from the glcm. Only works for `levels` + 1.
+       - other
+           Do nothing to glcm.
+
+   skip_nan : bool, optional
+       Whether or not to replace fill NaN the texture of a pixel if its original value (in `array`)
+       is 0, by default True.
+   rescale_normed : bool, optional
+       Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
+       even after `nan_supression`, by default False.
+   distances : Union[list, None], optional
+       List of pixel pair distance offsets, by default [-1, 0, 1, 2].
+   angles : Union[list, None], optional
+       List of pixel pair angles in radians, by default [0, :math:`\pi/2`].
+   advanced_idx : bool, optional
+       Use advanced indexing operations instead of loops when calculating properties that allow it,
+       by default False.
+   kwargs :
+       Other keywords arguments to pass to function
+       :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`.
+
+   Returns
+   -------
+   np.ndarray
+       3-dim array with the texture properties for each pixel. The new axis is located at the first
+       coordinate, and indexes the properties.
+
+   See Also
+   --------
+   :func:`matrix <samsara.stats.glcm.matrix>`
+   :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+   :func:`properties <samsara.stats.glcm.properties>`
+
+
+.. py:function:: matrix(array: numpy.ndarray, distances: numpy.ndarray, angles: numpy.ndarray, levels: Union[int, None] = None, symmetric: bool = False, normed: bool = False, nan_supression: int = 0, rescale_normed: bool = False) -> numpy.ndarray
+
+   Calculate the gray level co-occurrence matrix.
+
+   Parameters
+   ----------
+   array : np.ndarray
+       2-dimensional array. Input image.
+   distances : np.ndarray
+       List of pixel pair distance offsets.
+   angles : np.ndarray
+       List of pixel pair angles in radians.
+   levels : Union[int, None], optional
+       Number of gray-levels counted, by default None. This argument is required for 16-bit images
+       or higher and is typically the maximum of the image.
+   symmetric : bool, optional
+       Whether or not the output is symmetric, by default False.
+   normed : bool, optional
+       Whether or not to normalize each offset matrix, by default False.
+   nan_supression : int, optional
+       Method used to replace values in each glcm, by default 0.
+
+       - 0
+           Do nothing to glcm.
+       - 1
+           Position (0,0) in the glcm is replaced with 0s.
+       - 2
+           Row and column 0 in the glcm are replaced with 0s.
+       - 3
+           Row and column 0 are removed from the glcm. Only works for `levels` + 1.
+       - other
+           Do nothing to glcm.
+
+   rescale_normed : bool, optional
+       Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
+       even after `nan_supression`, by default False.
+
+   Returns
+   -------
+   np.ndarray
+       4-dimensional array. The gray level co-occurrence matrix/histogram.
+
+   See Also
+   --------
+   :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+
+
+.. py:function:: properties(array: numpy.ndarray, n_feats: int = 7, summarize: str = 'mean', advanced_idx: bool = False, skip_nan: bool = True) -> numpy.ndarray
+
+   Calculate texture features of a gray level co-occurrence matrix.
+
+   From a gray level co-occurrence matrix compute the following properties:
+
+       - ASM
+       - Contrast
+       - Correlation
+       - Variance
+       - Inverse Difference Moment
+       - Sum Average
+       - Entropy
+
+   Parameters
+   ----------
+   array : np.ndarray
+       4-dimensional array. Gray level co-occurrence histogram of an image. The number of times a
+       level in the first coordinate occurs at a distance `d` at an angle `t` from another level in
+       the second coordinate. The coordinates are (levels, levels, number of distances, number of
+       angles).
+   n_feats : int, optional
+       Number of features or properties computed with the glcm, by default 7.
+   summarize: str, optional
+       Method to summarize the values of each property, by default 'mean'.
+   advanced_idx : bool, optional
+       Use advanced indexing operations instead of loops when calculating properties that allow it,
+       by default False.
+   skip_nan : bool, optional
+       When computing the average of each texture for all directions and angles, nan will
+       be ignored, by default True.
+
+   Returns
+   -------
+   np.ndarray
+       1-dim array of length `n_feats` with the features or properties computed from `array`.
+
+   Raises
+   ------
+   ValueError
+       If `array` is not 4-dimensional.
+
+   See Also
+   --------
+   :func:`matrix <samsara.stats.glcm.matrix>`
+   :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+
+
+.. py:function:: level_properties(array: numpy.ndarray, n_feats: int = 7, advanced_idx: bool = False) -> numpy.ndarray
+
+   Calculate texture features of a pair of levels gray level co-occurrence matrix.
+
+   From a slice (of a pair of levels) of the gray level co-occurrence matrix compute the following
+   properties:
+
+       - ASM
+       - Contrast
+       - Correlation
+       - Variance
+       - Inverse Difference Moment
+       - Sum Average
+       - Entropy
+
+   Parameters
+   ----------
+   array : np.ndarray
+       2-dimensional array. Occurrence histogram of levels at every distance and angle for one pair
+       of levels. The coordinates are (number of distances, number of angles).
+   n_feats : int, optional
+       Number of features or properties computed, by default 7.
+   advanced_idx : bool, optional
+       Use advanced indexing operations instead of loops when calculating properties that allow it,
+       by default False.
+
+   Returns
+   -------
+   np.ndarray
+       1-dim array of length `n_feats` with the features or properties computed from `array`.
+
+   See Also
+   --------
+   :func:`properties <samsara.stats.glcm.properties>`
+   :func:`matrix <samsara.stats.glcm.matrix>`
+   :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
+
+

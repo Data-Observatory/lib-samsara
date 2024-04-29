@@ -1,0 +1,959 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>samsara.stats.glcm &#8212; SAMSARA 0.2.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=d10597a4" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=fd3f3429" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../../../_static/documentation_options.js?v=37f418d5"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/samsara/stats/glcm/index';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="samsara.stats.neighborhood" href="../neighborhood/index.html" />
+    <link rel="prev" title="samsara.stats" href="../index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+    <meta name="docbuild:last-update" content="Apr 29, 2024"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">SAMSARA 0.2.1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../readme.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../authors.html">
+                        Authors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Data-Observatory/lib-samsara/" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../readme.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../usage.html">
+                        Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../tutorial.html">
+                        Tutorial
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../../contributing.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../authors.html">
+                        Authors
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../../changelog.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link dropdown-item nav-internal" href="../../../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Data-Observatory/lib-samsara/" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<div id="searchbox"></div></div>
+        <div class="sidebar-primary-item">
+<h3><a href="../../../../index.html">Table of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../readme.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">samsara</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+        <div class="sidebar-primary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../../_sources/autoapi/samsara/stats/glcm/index.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link"><code class="xref py py-mod docutils literal notranslate"><span class="pre">samsara.stats</span></code></a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><code...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-samsara.stats.glcm">
+<span id="samsara-stats-glcm"></span><h1><a class="reference internal" href="#module-samsara.stats.glcm" title="samsara.stats.glcm"><code class="xref py py-mod docutils literal notranslate"><span class="pre">samsara.stats.glcm</span></code></a><a class="headerlink" href="#module-samsara.stats.glcm" title="Link to this heading">#</a></h1>
+<p>Subpackage for statistics from gray level co-occurrence matrix (<cite>samsara.stats.glcm</cite>)</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h3>
+<table class="autosummary longtable table autosummary">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#samsara.stats.glcm.glcm_textures" title="samsara.stats.glcm.glcm_textures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">glcm_textures</span></code></a>(→ xarray.DataArray)</p></td>
+<td><p>Calculate texture properties of an image.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#samsara.stats.glcm.block_glcm_textures" title="samsara.stats.glcm.block_glcm_textures"><code class="xref py py-obj docutils literal notranslate"><span class="pre">block_glcm_textures</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>Calculate texture properties of an in-memory image.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#samsara.stats.glcm.matrix" title="samsara.stats.glcm.matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">matrix</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>Calculate the gray level co-occurrence matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#samsara.stats.glcm.properties" title="samsara.stats.glcm.properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">properties</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>Calculate texture features of a gray level co-occurrence matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#samsara.stats.glcm.level_properties" title="samsara.stats.glcm.level_properties"><code class="xref py py-obj docutils literal notranslate"><span class="pre">level_properties</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>Calculate texture features of a pair of levels gray level co-occurrence matrix.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="samsara.stats.glcm.glcm_textures">
+<span class="sig-prename descclassname"><span class="pre">samsara.stats.glcm.</span></span><span class="sig-name descname"><span class="pre">glcm_textures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.DataArray</span></span></span><a class="reference internal" href="../../../../_modules/samsara/stats/glcm.html#glcm_textures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#samsara.stats.glcm.glcm_textures" title="Link to this definition">#</a></dt>
+<dd><p>Calculate texture properties of an image.</p>
+<p>For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
+and the properties of that glcm. The properties are the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ASM</p></li>
+<li><p>Contrast</p></li>
+<li><p>Correlation</p></li>
+<li><p>Variance</p></li>
+<li><p>Inverse Difference Moment</p></li>
+<li><p>Sum Average</p></li>
+<li><p>Entropy</p></li>
+</ul>
+</div></blockquote>
+<section id="parameters">
+<h4>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>array<span class="classifier">xr.DataArray</span></dt><dd><p>2-dim DataArray image.</p>
+</dd>
+<dt>radius<span class="classifier">int</span></dt><dd><p>Radius of the moving window.</p>
+</dd>
+<dt>n_feats<span class="classifier">int, optional</span></dt><dd><p>Number of features or properties computed, by default 7.</p>
+</dd>
+<dt>kwargs :</dt><dd><p>Other keyword arguments to pass to function
+<a class="reference internal" href="#samsara.stats.glcm.block_glcm_textures" title="samsara.stats.glcm.block_glcm_textures"><code class="xref py py-func docutils literal notranslate"><span class="pre">block_glcm_textures</span></code></a>.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h4>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>xr.DataArray</dt><dd><p>3-dim array with the texture properties for each pixel. The new axis is located at the first
+dimension, and indexes the property.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h4>Raises<a class="headerlink" href="#raises" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>array</cite> is not 2-dimensional.</p>
+</dd>
+<dt>TypeError</dt><dd><p>If the data in <cite>array</cite> is neither da.Array or np.ndarray.</p>
+</dd>
+</dl>
+</section>
+<section id="see-also">
+<h4>See Also<a class="headerlink" href="#see-also" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#samsara.stats.glcm.block_glcm_textures" title="samsara.stats.glcm.block_glcm_textures"><code class="xref py py-func docutils literal notranslate"><span class="pre">block_glcm_textures</span></code></a>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">skimage.feature.graycomatrix</span></code></p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="samsara.stats.glcm.block_glcm_textures">
+<span class="sig-prename descclassname"><span class="pre">samsara.stats.glcm.</span></span><span class="sig-name descname"><span class="pre">block_glcm_textures</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_supression</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_nan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_normed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advanced_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/samsara/stats/glcm.html#block_glcm_textures"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#samsara.stats.glcm.block_glcm_textures" title="Link to this definition">#</a></dt>
+<dd><p>Calculate texture properties of an in-memory image.</p>
+<p>For each pixel in the image, it uses a window of values surrounding it and calculates the glcm
+and the properties of that glcm. The properties are the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ASM</p></li>
+<li><p>Contrast</p></li>
+<li><p>Correlation</p></li>
+<li><p>Variance</p></li>
+<li><p>Inverse Difference Moment</p></li>
+<li><p>Sum Average</p></li>
+<li><p>Entropy</p></li>
+</ul>
+</div></blockquote>
+<section id="id1">
+<h4>Parameters<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>array<span class="classifier">np.array</span></dt><dd><p>2-dim image.</p>
+</dd>
+<dt>radius<span class="classifier">int, optional</span></dt><dd><p>Radius of the moving window, by default 1.</p>
+</dd>
+<dt>n_feats<span class="classifier">int, optional</span></dt><dd><p>Number of features or properties computed, by default 7.</p>
+</dd>
+<dt>nan_supression<span class="classifier">int, optional</span></dt><dd><p>Method used to replace values in each glcm, by default 0.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>0</dt><dd><p>Do nothing to glcm.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>1</dt><dd><p>Position (0,0) in the glcm is replaced with 0s.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>2</dt><dd><p>Row and column 0 in the glcm are replaced with 0s.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>3</dt><dd><p>Row and column 0 are removed from the glcm. Only works for <cite>levels</cite> + 1.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>other</dt><dd><p>Do nothing to glcm.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>skip_nan<span class="classifier">bool, optional</span></dt><dd><p>Whether or not to replace fill NaN the texture of a pixel if its original value (in <cite>array</cite>)
+is 0, by default True.</p>
+</dd>
+<dt>rescale_normed<span class="classifier">bool, optional</span></dt><dd><p>Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
+even after <cite>nan_supression</cite>, by default False.</p>
+</dd>
+<dt>distances<span class="classifier">Union[list, None], optional</span></dt><dd><p>List of pixel pair distance offsets, by default [-1, 0, 1, 2].</p>
+</dd>
+<dt>angles<span class="classifier">Union[list, None], optional</span></dt><dd><p>List of pixel pair angles in radians, by default [0, <span class="math notranslate nohighlight">\(\pi/2\)</span>].</p>
+</dd>
+<dt>advanced_idx<span class="classifier">bool, optional</span></dt><dd><p>Use advanced indexing operations instead of loops when calculating properties that allow it,
+by default False.</p>
+</dd>
+<dt>kwargs :</dt><dd><p>Other keywords arguments to pass to function
+<code class="xref py py-func docutils literal notranslate"><span class="pre">skimage.feature.graycomatrix</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h4>Returns<a class="headerlink" href="#id2" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>np.ndarray</dt><dd><p>3-dim array with the texture properties for each pixel. The new axis is located at the first
+coordinate, and indexes the properties.</p>
+</dd>
+</dl>
+</section>
+<section id="id3">
+<h4>See Also<a class="headerlink" href="#id3" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#samsara.stats.glcm.matrix" title="samsara.stats.glcm.matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">matrix</span></code></a>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">skimage.feature.graycomatrix</span></code>
+<a class="reference internal" href="#samsara.stats.glcm.properties" title="samsara.stats.glcm.properties"><code class="xref py py-func docutils literal notranslate"><span class="pre">properties</span></code></a></p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="samsara.stats.glcm.matrix">
+<span class="sig-prename descclassname"><span class="pre">samsara.stats.glcm.</span></span><span class="sig-name descname"><span class="pre">matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">levels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nan_supression</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rescale_normed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/samsara/stats/glcm.html#matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#samsara.stats.glcm.matrix" title="Link to this definition">#</a></dt>
+<dd><p>Calculate the gray level co-occurrence matrix.</p>
+<section id="id4">
+<h4>Parameters<a class="headerlink" href="#id4" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>array<span class="classifier">np.ndarray</span></dt><dd><p>2-dimensional array. Input image.</p>
+</dd>
+<dt>distances<span class="classifier">np.ndarray</span></dt><dd><p>List of pixel pair distance offsets.</p>
+</dd>
+<dt>angles<span class="classifier">np.ndarray</span></dt><dd><p>List of pixel pair angles in radians.</p>
+</dd>
+<dt>levels<span class="classifier">Union[int, None], optional</span></dt><dd><p>Number of gray-levels counted, by default None. This argument is required for 16-bit images
+or higher and is typically the maximum of the image.</p>
+</dd>
+<dt>symmetric<span class="classifier">bool, optional</span></dt><dd><p>Whether or not the output is symmetric, by default False.</p>
+</dd>
+<dt>normed<span class="classifier">bool, optional</span></dt><dd><p>Whether or not to normalize each offset matrix, by default False.</p>
+</dd>
+<dt>nan_supression<span class="classifier">int, optional</span></dt><dd><p>Method used to replace values in each glcm, by default 0.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>0</dt><dd><p>Do nothing to glcm.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>1</dt><dd><p>Position (0,0) in the glcm is replaced with 0s.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>2</dt><dd><p>Row and column 0 in the glcm are replaced with 0s.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>3</dt><dd><p>Row and column 0 are removed from the glcm. Only works for <cite>levels</cite> + 1.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>other</dt><dd><p>Do nothing to glcm.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+<dt>rescale_normed<span class="classifier">bool, optional</span></dt><dd><p>Whether to rescale the resulting gray level co-occurrence matrix so the elements sum to 1,
+even after <cite>nan_supression</cite>, by default False.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h4>Returns<a class="headerlink" href="#id5" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>np.ndarray</dt><dd><p>4-dimensional array. The gray level co-occurrence matrix/histogram.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h4>See Also<a class="headerlink" href="#id6" title="Link to this heading">#</a></h4>
+<p><code class="xref py py-func docutils literal notranslate"><span class="pre">skimage.feature.graycomatrix</span></code></p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="samsara.stats.glcm.properties">
+<span class="sig-prename descclassname"><span class="pre">samsara.stats.glcm.</span></span><span class="sig-name descname"><span class="pre">properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">summarize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advanced_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_nan</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/samsara/stats/glcm.html#properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#samsara.stats.glcm.properties" title="Link to this definition">#</a></dt>
+<dd><p>Calculate texture features of a gray level co-occurrence matrix.</p>
+<p>From a gray level co-occurrence matrix compute the following properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ASM</p></li>
+<li><p>Contrast</p></li>
+<li><p>Correlation</p></li>
+<li><p>Variance</p></li>
+<li><p>Inverse Difference Moment</p></li>
+<li><p>Sum Average</p></li>
+<li><p>Entropy</p></li>
+</ul>
+</div></blockquote>
+<section id="id7">
+<h4>Parameters<a class="headerlink" href="#id7" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>array<span class="classifier">np.ndarray</span></dt><dd><p>4-dimensional array. Gray level co-occurrence histogram of an image. The number of times a
+level in the first coordinate occurs at a distance <cite>d</cite> at an angle <cite>t</cite> from another level in
+the second coordinate. The coordinates are (levels, levels, number of distances, number of
+angles).</p>
+</dd>
+<dt>n_feats<span class="classifier">int, optional</span></dt><dd><p>Number of features or properties computed with the glcm, by default 7.</p>
+</dd>
+<dt>summarize: str, optional</dt><dd><p>Method to summarize the values of each property, by default ‘mean’.</p>
+</dd>
+<dt>advanced_idx<span class="classifier">bool, optional</span></dt><dd><p>Use advanced indexing operations instead of loops when calculating properties that allow it,
+by default False.</p>
+</dd>
+<dt>skip_nan<span class="classifier">bool, optional</span></dt><dd><p>When computing the average of each texture for all directions and angles, nan will
+be ignored, by default True.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h4>Returns<a class="headerlink" href="#id8" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>np.ndarray</dt><dd><p>1-dim array of length <cite>n_feats</cite> with the features or properties computed from <cite>array</cite>.</p>
+</dd>
+</dl>
+</section>
+<section id="id9">
+<h4>Raises<a class="headerlink" href="#id9" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>array</cite> is not 4-dimensional.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h4>See Also<a class="headerlink" href="#id10" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#samsara.stats.glcm.matrix" title="samsara.stats.glcm.matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">matrix</span></code></a>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">skimage.feature.graycomatrix</span></code></p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="samsara.stats.glcm.level_properties">
+<span class="sig-prename descclassname"><span class="pre">samsara.stats.glcm.</span></span><span class="sig-name descname"><span class="pre">level_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_feats</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">advanced_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/samsara/stats/glcm.html#level_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#samsara.stats.glcm.level_properties" title="Link to this definition">#</a></dt>
+<dd><p>Calculate texture features of a pair of levels gray level co-occurrence matrix.</p>
+<p>From a slice (of a pair of levels) of the gray level co-occurrence matrix compute the following
+properties:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>ASM</p></li>
+<li><p>Contrast</p></li>
+<li><p>Correlation</p></li>
+<li><p>Variance</p></li>
+<li><p>Inverse Difference Moment</p></li>
+<li><p>Sum Average</p></li>
+<li><p>Entropy</p></li>
+</ul>
+</div></blockquote>
+<section id="id11">
+<h4>Parameters<a class="headerlink" href="#id11" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>array<span class="classifier">np.ndarray</span></dt><dd><p>2-dimensional array. Occurrence histogram of levels at every distance and angle for one pair
+of levels. The coordinates are (number of distances, number of angles).</p>
+</dd>
+<dt>n_feats<span class="classifier">int, optional</span></dt><dd><p>Number of features or properties computed, by default 7.</p>
+</dd>
+<dt>advanced_idx<span class="classifier">bool, optional</span></dt><dd><p>Use advanced indexing operations instead of loops when calculating properties that allow it,
+by default False.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h4>Returns<a class="headerlink" href="#id12" title="Link to this heading">#</a></h4>
+<dl class="simple">
+<dt>np.ndarray</dt><dd><p>1-dim array of length <cite>n_feats</cite> with the features or properties computed from <cite>array</cite>.</p>
+</dd>
+</dl>
+</section>
+<section id="id13">
+<h4>See Also<a class="headerlink" href="#id13" title="Link to this heading">#</a></h4>
+<p><a class="reference internal" href="#samsara.stats.glcm.properties" title="samsara.stats.glcm.properties"><code class="xref py py-func docutils literal notranslate"><span class="pre">properties</span></code></a>
+<a class="reference internal" href="#samsara.stats.glcm.matrix" title="samsara.stats.glcm.matrix"><code class="xref py py-func docutils literal notranslate"><span class="pre">matrix</span></code></a>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">skimage.feature.graycomatrix</span></code></p>
+</section>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">samsara.stats</span></code></p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../neighborhood/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">samsara.stats.neighborhood</span></code></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#samsara.stats.glcm.glcm_textures"><code class="docutils literal notranslate"><span class="pre">glcm_textures()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#samsara.stats.glcm.block_glcm_textures"><code class="docutils literal notranslate"><span class="pre">block_glcm_textures()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#samsara.stats.glcm.matrix"><code class="docutils literal notranslate"><span class="pre">matrix()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#samsara.stats.glcm.properties"><code class="docutils literal notranslate"><span class="pre">properties()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#samsara.stats.glcm.level_properties"><code class="docutils literal notranslate"><span class="pre">level_properties()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../../_sources/autoapi/samsara/stats/glcm/index.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2023-2024, Data Observatory.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

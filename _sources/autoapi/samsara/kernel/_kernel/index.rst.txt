@@ -1,0 +1,125 @@
+:orphan:
+
+:py:mod:`samsara.kernel._kernel`
+================================
+
+.. py:module:: samsara.kernel._kernel
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   samsara.kernel._kernel.Kernel
+
+
+
+
+.. py:class:: Kernel
+
+
+   Kernel for neighborhood based image computation.
+
+   A Kernel is an object to specify the neighborhood of a pixel. The kernel defines the size and
+   shape of the neighborhood, and also defines the weight of each element in the neighborhood.
+
+   Parameters
+   ----------
+   data: np.ndarray, optional
+       Kernel data array.
+   name: str, optional
+       Name of the type of kernel.
+   normalized: bool, optional
+       Flag to indicate if the euclidean norm of the data array is equal to 1, by default False.
+
+   .. py:property:: shape
+      :type: tuple
+
+      Shape of the kernel data array (tuple, read-only).
+
+
+   .. py:attribute:: data
+      :type: numpy.ndarray
+
+      Kernel data array (np.ndarray).
+          
+
+
+   .. py:attribute:: name
+      :type: str
+
+      Name of the type of kernel (str).
+          
+
+
+   .. py:attribute:: normalized
+      :type: bool
+
+      Flag to indicate if the euclidean norm of the data array is equal to 1 (bool).
+          
+
+
+   .. py:method:: add(kernel: Kernel, normalize: bool = False) -> Kernel
+
+      Add two kernels elementwise.
+
+      Elementwise sum of data from two kernels. The shape of the data of both kernels must be
+      broadcastable.
+      Currently the sum of kernels with different shapes is not supported.
+
+      Parameters
+      ----------
+      kernel : Kernel
+          The kernel to be added.
+      normalize : bool, optional
+          Normalize the sum of both kernels, by default False
+
+      Returns
+      -------
+      Kernel
+          The sum of both kernels elementwise.
+
+      Examples
+      --------
+      >>> from samsara.kernel import Kernel
+      >>> import numpy as np
+      >>> x = Kernel(np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]), "custom", False)
+      >>> y = Kernel(np.ones((3, 3)), "square", False)
+      >>> x.add(y).data
+      array([[1., 2., 3.],
+             [4., 5., 6.],
+             [7., 8., 9.]])
+
+
+   .. py:method:: rotate90(rotation: int) -> Kernel
+
+      Rotates the data array of a kernel.
+
+      Creates a new kernel with rotated data. The rotations are 90 degree rotations.
+
+      Parameters
+      ----------
+      rotation : int
+          Number of 90 degrees clockwise rotation to make.
+
+      Returns
+      -------
+      Kernel
+          A new kernel with rotated data.
+
+      Examples
+      --------
+      >>> from samsara.kernel import Kernel
+      >>> import numpy as np
+      >>> x = Kernel(np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]]), "custom", False)
+      >>> x.rotate90(1).data
+      array([[6, 3, 0],
+             [7, 4, 1],
+             [8, 5, 2]])
+
+
+
