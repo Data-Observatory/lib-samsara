@@ -232,9 +232,9 @@ def block_glcm_textures(
         sub_array = array[
             radius : (array.shape[0] - radius), radius : (array.shape[1] - radius)
         ]
-        response[
-            (np.repeat(sub_array[np.newaxis, :, :], n_feats, axis=0)) == 0
-        ] = np.nan
+        response[(np.repeat(sub_array[np.newaxis, :, :], n_feats, axis=0)) == 0] = (
+            np.nan
+        )
 
     return response
 
