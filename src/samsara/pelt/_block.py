@@ -1,6 +1,7 @@
 """
 Functions for Pelt applied over blocks/cubes of data.
 """
+
 from typing import Union
 
 import numpy as np

@@ -1,6 +1,7 @@
 """
 User functions to apply filters.
 """
+
 import numpy as np
 import xarray as xr
 
