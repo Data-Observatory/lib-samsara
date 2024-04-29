@@ -475,13 +475,13 @@ def level_properties(
     :func:`skimage.feature.graycomatrix <skimage.feature.graycomatrix>`
     """
 
-    def texture_asm(pravel):
+    def texture_asm(pravel, **kwargs):
         return np.dot(pravel, pravel)
 
-    def texture_contrast(k, px_minus_y):
+    def texture_contrast(k, px_minus_y, **kwargs):
         return np.dot(k**2, px_minus_y)
 
-    def texture_corr(p, pravel, i, j, vx, ux, k):
+    def texture_corr(p, pravel, i, j, vx, ux, k, **kwargs):
         ij = i * j
         sx = np.sqrt(vx)
         py = p.sum(1)
@@ -490,30 +490,32 @@ def level_properties(
         sy = np.sqrt(vy)
         return correlation(sx, sy, ux, uy, pravel, ij)
 
-    def texture_var(vx):
+    def texture_var(vx, **kwargs):
         return vx
 
-    def texture_idm(pravel, i, j):
+    def texture_idm(pravel, i, j, **kwargs):
         i_j2_p1 = (i - j) ** 2
         i_j2_p1 += 1
         i_j2_p1 = 1.0 / i_j2_p1
         i_j2_p1 = i_j2_p1.ravel()
         return np.dot(i_j2_p1, pravel)
 
-    def texture_savg(maxv, px_plus_y):
+    def texture_savg(maxv, px_plus_y, **kwargs):
         tk = np.arange(2 * maxv)
         return np.dot(tk, px_plus_y)
 
-    def texture_entropy(pravel):
+    def texture_entropy(pravel, **kwargs):
         return entropy(pravel)
 
-    def texture_diffvar(px_minus_y):
+    def texture_diffvar(px_minus_y, **kwargs):
         return px_minus_y.var()
 
-    def texture_diss(k, px_minus_y):
+    def texture_diss(k, px_minus_y, **kwargs):
         return np.dot(k, px_minus_y)
 
     # TODO Check if both n_feats and feats are provided
+
+    infeats = True
     if feats is None:
         feats = [
             "asm",
@@ -526,6 +528,7 @@ def level_properties(
             "diffvar",
             "diss",
         ][:n_feats]
+        infeats = False
     if n_feats < len(feats):
         feats = feats[:n_feats]
 
@@ -566,14 +569,9 @@ def level_properties(
         "diss": texture_diss,
     }
 
-    def filter_kwargs(func, dict):
-        args_ = list(func.__code__.co_varnames[: func.__code__.co_argcount])
-        kwargs_ = {k: dict[k] for k in args_}
-        return kwargs_
+    fts = [textures[feat](**kwargs) for feat in feats]
 
-    fts = [textures[feat](**filter_kwargs(textures[feat], kwargs)) for feat in feats]
-
-    if (len(fts) < n_feats) & (feats is None):
+    if (len(fts) < n_feats) and not infeats:
         return np.pad(
             np.array(fts, dtype=float), (0, n_feats - len(fts)), constant_values=np.nan
         )
