@@ -90,7 +90,10 @@ def glcm_textures(
     kwargs["feats"] = feats
 
     if isinstance(data, da.Array):
-        chunks_ = ((n_feats,), *list(data.chunks))
+        chunks_ = ((n_feats 
+                    if feats is None
+                    else len(feats),),
+                   *list(data.chunks))
         glcm_cube = da.map_overlap(
             block_glcm_textures,
             data,
