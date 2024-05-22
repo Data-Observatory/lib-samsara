@@ -18,13 +18,11 @@ forced_separate = ["conftest"]
 line-length = 88
 target-version = ["py39", "py310", "py311"]
 
-
 [tool.ruff]
 extend-exclude = ["static", "ci/templates"]
 line-length = 88
 src = ["src", "tests"]
 target-version = "py39"
-
 
 [tool.ruff.lint]
 ignore = [
@@ -56,10 +54,8 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401", "F403"]
-
-[tool.ruff.lint.extend-per-file-ignores]
 "ci/*" = ["S"]
+"__init__.py" = ["F401", "F403"]
 
 [tool.ruff.lint.flake8-pytest-style]
 fixture-parentheses = false

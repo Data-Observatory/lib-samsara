@@ -80,12 +80,12 @@ setup(
     ],
     extras_require={
         "dev": [
-            "black>=23.9.1",
+            "black>=24.4.1",
             "isort>=5.12.0",
             "pytest>=7.4",
             "pytest-cov>=4.1.0",
             "pre-commit>=3.4.0",
-            "ruff>=0.0.289",
+            "ruff>=0.4.2",
         ]
     },
     setup_requires=[
