@@ -1,6 +1,7 @@
 """
 User functions to apply Pelt.
 """
+
 from typing import Union
 
 import dask.array as da

@@ -336,6 +336,36 @@ class TestGLCM:
         assert set(res.dims) - {"prop", "y", "x"} == set()
         assert set(res.coords) - {"prop", "y", "x"} == set()
 
+    @pytest.mark.parametrize(
+        ("data", "okwarg", "n_feats"),
+        [
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), {}, 8),
+            (da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))), {}, 9),
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), {"advanced_idx": True}, 8),
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), {"nan_supression": 1}, 6),
+        ],
+    )
+    def test_glcm_textures_n_feats_run(self, data, okwarg, n_feats):
+        array = xr.DataArray(
+            data=data, dims=("x", "y"), coords={"x": np.arange(4), "y": np.arange(4)}
+        )
+        distances = [1, 2]
+        angles = [0, math.pi]
+        levels = 4
+        radius = 2
+        bgkwargs = {
+            "distances": distances,
+            "angles": angles,
+            "levels": levels,
+            **okwarg,
+        }
+        res = glcm.glcm_textures(
+            array=array, radius=radius, n_feats=n_feats, **bgkwargs
+        )
+        assert res.shape == (n_feats, 4, 4)
+        assert set(res.dims) - {"prop", "y", "x"} == set()
+        assert set(res.coords) - {"prop", "y", "x"} == set()
+
     @pytest.mark.parametrize(("data"), [np.zeros((2, 2, 2)), da.ones((3, 4, 5, 6))])
     def test_glcm_textures_error_ndim(self, data):
         array = xr.DataArray(data=data)
@@ -346,3 +376,49 @@ class TestGLCM:
     def test_glcm_textures_error_type(self, data):
         with pytest.raises(TypeError, match="Invalid type of data array in input."):
             glcm.glcm_textures(data, radius=2)
+
+    @pytest.mark.parametrize(
+        ("data", "n_feats"),
+        [
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), 10),
+            (np.arange(4).repeat(4, axis=0).reshape((4, 4)), 11),
+        ],
+    )
+    def test_glcm_textures_n_feats_fail(self, data, n_feats):
+        array = xr.DataArray(
+            data=data, dims=("x", "y"), coords={"x": np.arange(4), "y": np.arange(4)}
+        )
+        distances = [1, 2]
+        angles = [0, math.pi]
+        levels = 4
+        radius = 2
+        bgkwargs = {
+            "distances": distances,
+            "angles": angles,
+            "levels": levels,
+        }
+        with pytest.raises(RuntimeWarning, match="Mean of empty slice"):
+            glcm.glcm_textures(array, radius=radius, n_feats=n_feats, **bgkwargs)
+
+    @pytest.mark.parametrize(
+        ("data", "n_feats"),
+        [
+            (da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))), 10),
+            (da.from_array(np.arange(4).repeat(4, axis=0).reshape((4, 4))), 11),
+        ],
+    )
+    def test_glcm_textures_n_feats_dask_fail(self, data, n_feats):
+        array = xr.DataArray(
+            data=data, dims=("x", "y"), coords={"x": np.arange(4), "y": np.arange(4)}
+        )
+        distances = [1, 2]
+        angles = [0, math.pi]
+        levels = 4
+        radius = 2
+        bgkwargs = {
+            "distances": distances,
+            "angles": angles,
+            "levels": levels,
+        }
+        with pytest.raises(ValueError, match="conflicting sizes for dimension 'prop'"):
+            glcm.glcm_textures(array, radius=radius, n_feats=n_feats, **bgkwargs)

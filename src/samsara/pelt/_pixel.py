@@ -1,6 +1,7 @@
 """
 Functions for Pelt applied over a 1-dimensional array.
 """
+
 from typing import Union
 
 import numpy as np
